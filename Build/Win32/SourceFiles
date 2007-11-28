@@ -8,6 +8,8 @@
 ..\..\int_to_type.h
 ..\..\intrusive_list.cpp
 ..\..\intrusive_list.h
+..\..\intrusive_slist.cpp
+..\..\intrusive_slist.h
 ..\..\iterator.h
 ..\..\list.h
 ..\..\pair.h

@@ -5,7 +5,6 @@
 	Name="stltest"
 	ProjectGUID="{047B2954-859C-11DC-8314-0800200C9A66}"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -62,7 +61,7 @@
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="PreCompiled.h"
 				WarningLevel="4"
-				WarnAsError="true"
+				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 				CompileAs="0"
@@ -121,7 +120,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -218,7 +221,7 @@
 				TargetMachine="1"
 				AllowIsolation="true"
 				Profile="false"
-			/>
+			/>			
 			<Tool
 				Name="VCALinkTool"
 			/>
@@ -238,7 +241,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -336,7 +343,7 @@
 				TargetMachine="1"
 				AllowIsolation="true"
 				Profile="false"
-			/>
+			/>			
 			<Tool
 				Name="VCALinkTool"
 			/>
@@ -356,7 +363,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -454,7 +465,7 @@
 				TargetMachine="1"
 				AllowIsolation="true"
 				Profile="false"
-			/>
+			/>			
 			<Tool
 				Name="VCALinkTool"
 			/>
@@ -474,7 +485,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>

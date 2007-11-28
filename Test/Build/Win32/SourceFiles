@@ -2,6 +2,7 @@
 ..\..\FixedArrayTest.cpp
 ..\..\HashMapTest.cpp
 ..\..\IntrusiveListTest.cpp
+..\..\IntrusiveSListTest.cpp
 ..\..\ListTest.cpp
 ..\..\SortedVectorTest.cpp
 ..\..\SpeedTest.cpp
