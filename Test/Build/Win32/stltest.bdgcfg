@@ -1,0 +1,12 @@
+[General]
+Type = ConsoleApplication
+SourceFiles = SourceFiles
+
+[Project]
+Uuid=047b2954-859c-11dc-8314-0800200c9a66
+IncludePaths=../../../..;../../../../external
+ExceptionHandling=2
+
+[Solution]
+Dependencies=rdestl;UnitTest++.vsnet2003;core
+DependenciesPaths=../../../..;../../../../external

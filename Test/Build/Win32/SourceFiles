@@ -1,0 +1,9 @@
+..\..\AlgoTest.cpp
+..\..\FixedArrayTest.cpp
+..\..\HashMapTest.cpp
+..\..\IntrusiveListTest.cpp
+..\..\ListTest.cpp
+..\..\SortedVectorTest.cpp
+..\..\SpeedTest.cpp
+..\..\TestMain.cpp
+..\..\VectorTest.cpp

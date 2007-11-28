@@ -1,0 +1,7 @@
+[General]
+Type = StaticLibrary
+SourceFiles = SourceFiles
+
+[Project]
+Uuid=2e3c8bf2-8595-11dc-8314-0800200c9a66
+IncludePaths=../../..
