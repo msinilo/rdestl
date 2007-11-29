@@ -5,7 +5,7 @@
 namespace rdestl
 {
 //-----------------------------------------------------------------------------
-void* allocator::allocate(size_t bytes)
+void* allocator::allocate(size_t bytes, int /*flags*/)
 {
 	RDE_ASSERT(bytes != 0);
 	return malloc(bytes);

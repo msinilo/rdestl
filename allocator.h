@@ -11,7 +11,7 @@ public:
 	explicit allocator(const char* name = "DEFAULT"):	m_name(name) {}
 	~allocator() {}
 
-	void* allocate(size_t bytes);
+	void* allocate(size_t bytes, int flags = 0);
 	void deallocate(void* ptr, size_t bytes);
 
 	const char* get_name() const;
