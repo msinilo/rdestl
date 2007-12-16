@@ -2,6 +2,20 @@
 #include "rdestl/vector.h"
 #include <cstdio>
 
+	struct MyStruct
+	{
+		int i;
+		char c;
+		float f;
+	};
+namespace rdestl
+{
+	template<> struct is_pod<MyStruct>
+	{
+		enum { value = true };
+	};
+}
+
 namespace
 {
 	typedef rdestl::vector<int>			tTestVector;
@@ -125,6 +139,9 @@ namespace
 		tTestVector v(array, array + 6);
 		v.erase(v.begin(), v.end());
 		CHECK(v.empty());
+
+		rdestl::vector<MyStruct> v2;
+		v2.erase(v2.begin(), v2.end());
 	}
 
 	TEST(InsertString)
