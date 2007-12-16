@@ -376,4 +376,5 @@ private:
 
 } // namespace rdestl
 
+//-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_VECTOR_H

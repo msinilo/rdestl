@@ -5,6 +5,21 @@
 
 namespace rdestl
 {
+// @todo: test speed vs memcpy
+template<typename T> RDE_FORCEINLINE
+void mymemcpy(const T* dst, const T* src, size_t n)
+{
+	__asm mov	edi, [dst]
+	__asm mov	esi, [src]
+	__asm mov	ecx, [n]
+	__asm push  ecx
+	__asm shr	ecx, 2
+	__asm rep	movsd
+	__asm pop   ecx
+	__asm and   ecx, 0x3
+	__asm rep	movsb
+}
+
 namespace internal
 {
 	template<typename T>

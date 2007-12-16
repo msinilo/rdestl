@@ -13,19 +13,19 @@ struct string_rep
 	void add_ref() { ++refs; }
 	bool release() { --refs; return refs <= 0; }
 
-	void init(int new_capacity = 0)
+	void init(short new_capacity = 0)
 	{
 		refs = 1;
 		size = 0;
 		capacity = new_capacity;
 	}
 
-	long	refs;
-	int		size;
-	int		capacity;
+	short	refs;
+	short	size;
+	short	capacity;
 	// [data]
 };
-typedef char ERR_InvalidStringRepSize[sizeof(string_rep) == 12 ? 1 : -1];
+typedef char ERR_InvalidStringRepSize[sizeof(string_rep) == 6 ? 1 : -1];
 
 //-----------------------------------------------------------------------------
 template<typename T> int strlen(const T* str)
@@ -37,7 +37,7 @@ template<typename T> int strlen(const T* str)
 }
 
 //-----------------------------------------------------------------------------
-template<typename T> int strcompare(const T* s1, const T* s2, int len)
+template<typename T> int strcompare(const T* s1, const T* s2, size_t len)
 {
 	for (/**/; len != 0; --len)
 	{
@@ -77,7 +77,8 @@ public:
 		const int len = strlen(str);
 		init_string(len);
 		memcpy(m_data, str, len*sizeof(value_type));
-		get_rep()->size = len;
+		RDE_ASSERT(len < 32768);
+		get_rep()->size = static_cast<short>(len);
 		m_data[len] = 0;
 	}
 	string(const value_type* str, size_type len, 
@@ -86,7 +87,8 @@ public:
 	{
 		init_string(len);
 		memcpy(m_data, str, len*sizeof(value_type));
-		get_rep()->size = len;
+		RDE_ASSERT(len < 32768);
+		get_rep()->size = static_cast<short>(len);
 		m_data[len] = 0;
 	}
 	string(const string& str, const allocator_type& allocator = allocator_type())
@@ -203,18 +205,19 @@ private:
 	{
 		return reinterpret_cast<string_rep*>(m_data) - 1;
 	}
-	void init_string(int capacity)
+	void init_string(size_type capacity)
 	{
 		if (capacity != 0)
 		{
 			capacity = (capacity+kGranularity-1) & ~(kGranularity-1);
 			if (capacity < kGranularity)
 				capacity = kGranularity;
+			RDE_ASSERT(capacity < 32768);
 
-			const int toAlloc = sizeof(string_rep) + sizeof(value_type)*capacity;
+			const size_type toAlloc = sizeof(string_rep) + sizeof(value_type)*capacity;
 			void* mem = m_allocator.allocate(toAlloc);
 			string_rep* rep = reinterpret_cast<string_rep*>(mem);
-			rep->init(capacity);
+			rep->init(static_cast<short>(capacity));
 			m_data = reinterpret_cast<value_type*>(rep + 1);
 		}
 		else
@@ -233,9 +236,9 @@ private:
 	}
 
 	value_type*		m_data;
-	// @note: hack-ish. 12 bytes for string_rep, than place for terminating
+	// @note: hack-ish. sizeof(string_rep) bytes for string_rep, than place for terminating
 	// character (up to 2-bytes!)
-	char			m_buffer[12+2]; 
+	char			m_buffer[sizeof(string_rep)+2]; 
 	allocator_type	m_allocator;
 };
 
