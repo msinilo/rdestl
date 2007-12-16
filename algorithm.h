@@ -90,8 +90,25 @@ void destruct_n(T* first, size_t n)
 template<typename T> RDE_FORCEINLINE
 void fill_n(T* first, size_t n, const T& val)
 {
-	for (size_t i = 0; i < n; ++i)
-		first[i] = val;
+	//for (size_t i = 0; i < n; ++i)
+	//	first[i] = val;
+	// Loop unrolling with Duff's Device.
+	T* last = first + n;
+	switch (n & 0x7)
+	{
+	case 0:
+		while (first != last)
+		{
+			*first = val; ++first;
+	case 7:	*first = val; ++first;
+	case 6:	*first = val; ++first;
+	case 5:	*first = val; ++first;
+	case 4:	*first = val; ++first;
+	case 3:	*first = val; ++first;
+	case 2:	*first = val; ++first;
+	case 1:	*first = val; ++first;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

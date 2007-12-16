@@ -11,8 +11,19 @@ namespace internal
 	void copy_n(const T* first, size_t n, T* result, int_to_type<false>)
 	{
 		const T* last = first + n;
-		while (first != last)
-			*result++ = *first++;
+		//while (first != last)
+		//	*result++ = *first++;
+		switch (n & 0x3)
+		{
+		case 0:
+			while (first != last)
+			{
+				*result++ = *first++;
+		case 3:	*result++ = *first++;
+		case 2: *result++ = *first++;
+		case 1: *result++ = *first++;
+			}
+		}
 	}
 	template<typename T>
 	void copy_n(const T* first, size_t n, T* result, int_to_type<true>)
@@ -58,6 +69,7 @@ namespace internal
 		// Meh, MSVC does pretty stupid things here.
 		//memmove(result, first, (last - first) * sizeof(T));
 		const size_t n = reinterpret_cast<const char*>(last) - reinterpret_cast<const char*>(first);
+		//const size_t n = (last - first) * sizeof(T);
 		memmove(result, first, n);
 	}
 

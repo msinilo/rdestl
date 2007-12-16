@@ -487,6 +487,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\string.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\type_traits.h"
 			>
 		</File>
