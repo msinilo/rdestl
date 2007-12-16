@@ -10,8 +10,15 @@ namespace rdestl
 struct string_rep
 {
 	// @todo: thread-safe version.
-	void AddRef() { ++refs; }
-	bool Release() { --refs; return refs <= 0; }
+	void add_ref() { ++refs; }
+	bool release() { --refs; return refs <= 0; }
+
+	void init(int new_capacity = 0)
+	{
+		refs = 1;
+		size = 0;
+		capacity = new_capacity;
+	}
 
 	long	refs;
 	int		size;
@@ -51,6 +58,7 @@ template<typename T> int strcompare(const T* s1, const T* s2, int len)
 template<typename E, class TAllocator = rdestl::allocator>
 class string
 {
+	typedef char ERR_CharTypeTooBigSeeM_BufferComment[sizeof(E) <= 2 ? 1 : -1];
 public:
 	typedef E				value_type;
 	typedef size_t			size_type;
@@ -85,7 +93,7 @@ public:
 	:	m_data(str.m_data),
 		m_allocator(allocator)
 	{
-		get_rep()->AddRef();
+		get_rep()->add_ref();
 	}
 	~string()
 	{
@@ -102,12 +110,14 @@ public:
 
 	string& operator=(const string& rhs)
 	{
+		RDE_ASSERT(rhs.invariant());
 		if (m_data != rhs.m_data)
 		{
 			release_string();
 			m_data = rhs.m_data;
-			get_rep()->AddRef();
+			get_rep()->add_ref();
 		}
+		RDE_ASSERT(invariant());
 		return *this;
 	}
 	string& operator=(const value_type* str)
@@ -124,6 +134,7 @@ public:
 		memcpy(m_data, str, len*sizeof(value_type));
 		get_rep()->size = len;
 		m_data[len] = 0;
+		RDE_ASSERT(invariant());
 		return *this;
 	}
 	string& assign(const value_type* str)
@@ -163,11 +174,19 @@ public:
 		return strcompare(m_data, rhs.m_data, thisLen);
 	}
 
+	const value_type* c_str() const
+	{
+		RDE_ASSERT(invariant());
+		return m_data;
+	}
+
 	size_type length() const
 	{
 		return get_rep()->size;
 	}
 	bool empty() const	{ return length() == 0; }
+
+	const allocator_type& get_allocator() const	{ return m_allocator; }
 
 private:
 	bool invariant() const
@@ -195,17 +214,13 @@ private:
 			const int toAlloc = sizeof(string_rep) + sizeof(value_type)*capacity;
 			void* mem = m_allocator.allocate(toAlloc);
 			string_rep* rep = reinterpret_cast<string_rep*>(mem);
-			rep->refs = 1;
-			rep->size = 0;
-			rep->capacity = capacity;
+			rep->init(capacity);
 			m_data = reinterpret_cast<value_type*>(rep + 1);
 		}
 		else
 		{
 			string_rep* rep = reinterpret_cast<string_rep*>(m_buffer);
-			rep->refs = 1;
-			rep->size = 0;
-			rep->capacity = 0;
+			rep->init();
 			m_data = reinterpret_cast<value_type*>(rep + 1);
 		}
 		*m_data = 0;
@@ -213,12 +228,14 @@ private:
 	void release_string()
 	{
 		string_rep* rep = get_rep();
-		if (rep->Release() && rep->capacity != 0)
+		if (rep->release() && rep->capacity != 0)
 			m_allocator.deallocate(rep, rep->capacity);
 	}
 
 	value_type*		m_data;
-	char			m_buffer[12+1];
+	// @note: hack-ish. 12 bytes for string_rep, than place for terminating
+	// character (up to 2-bytes!)
+	char			m_buffer[12+2]; 
 	allocator_type	m_allocator;
 };
 
