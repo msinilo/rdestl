@@ -9,6 +9,7 @@ namespace rdestl
 //=============================================================================
 struct string_rep
 {
+	// @todo: thread-safe version.
 	void AddRef() { ++refs; }
 	bool Release() { --refs; return refs <= 0; }
 
