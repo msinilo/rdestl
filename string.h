@@ -46,6 +46,7 @@ template<typename T> int strcompare(const T* s1, const T* s2, int len)
 
 //=============================================================================
 // @note: this one is totally _not_ std::string compatible for the time being!
+// one way conversion should work, ie RDESTL --> STL.
 template<typename E, class TAllocator = rdestl::allocator>
 class string
 {
@@ -60,7 +61,8 @@ public:
 	{
 		init_string(0);
 	}
-	string(const value_type* str, const allocator_type& allocator = allocator_type())
+	// yeah, EXPLICIT.
+	explicit string(const value_type* str, const allocator_type& allocator = allocator_type())
 	:	m_allocator(allocator)
 	{
 		const int len = strlen(str);
