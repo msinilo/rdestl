@@ -1,5 +1,5 @@
-#ifndef RDE_ALLOCATOR_H
-#define RDE_ALLOCATOR_H
+#ifndef RDESTL_ALLOCATOR_H
+#define RDESTL_ALLOCATOR_H
 
 namespace rdestl
 {
@@ -22,4 +22,5 @@ private:
 
 } // namespace rdestl
 
-#endif // #ifndef RDE_ALLOCATOR_H
+//-----------------------------------------------------------------------------
+#endif // #ifndef RDESTL_ALLOCATOR_H

@@ -443,6 +443,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\buffer_allocator.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\fixed_array.h"
 			>
 		</File>

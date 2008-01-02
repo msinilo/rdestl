@@ -81,7 +81,6 @@ public:
 		}
 		rdestl::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
 		m_end = m_begin + rhs.size();
-		m_allocator = rhs.m_allocator;
 		RDE_ASSERT(invariant());
 		
 		return *this;

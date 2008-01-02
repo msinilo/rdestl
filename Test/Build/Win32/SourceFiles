@@ -6,5 +6,6 @@
 ..\..\ListTest.cpp
 ..\..\SortedVectorTest.cpp
 ..\..\SpeedTest.cpp
+..\..\StringTest.cpp
 ..\..\TestMain.cpp
 ..\..\VectorTest.cpp
