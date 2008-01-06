@@ -154,6 +154,15 @@ namespace
 		lst.erase(lst.begin(), lst.end());
 		CHECK(lst.empty());
 	}
+	TEST(AssignmentOp)
+	{
+		rdestl::list<int> lst(&array[0], &array[6]);
+		rdestl::list<int> lst2;
+		lst2 = lst;
+		CHECK_EQUAL(6ul, lst2.size());
+		CHECK_EQUAL(1, lst2.front());
+		CHECK_EQUAL(36, lst2.back());
+	}
 
 	TEST(IterArrowOp)
 	{

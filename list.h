@@ -141,9 +141,24 @@ public:
 		m_root.reset();
 		assign(first, last);
 	}
+	list(const list& rhs, const allocator_type& allocator = allocator_type())
+	:	m_allocator(allocator)
+	{
+		m_root.reset();
+		assign(rhs.begin(), rhs.end());
+	}
 	~list()
 	{
 		clear();
+	}
+
+	list& operator=(const list& rhs)
+	{
+		if (this != &rhs)
+		{
+			assign(rhs.begin(), rhs.end());
+		}
+		return *this;
 	}
 
 	iterator begin()				{ return iterator(m_root.next); }
