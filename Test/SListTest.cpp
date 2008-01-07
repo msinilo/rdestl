@@ -62,4 +62,32 @@ namespace
 		CHECK(lst.empty());
 		CHECK_EQUAL(0ul, lst.size());
 	}
+
+	TEST(AssignCtor)
+	{
+		rdestl::slist<int> lst(&array[0], &array[6]);
+		CHECK_EQUAL(6ul, lst.size());
+		CHECK_EQUAL(1, lst.front());
+		rdestl::slist<int>::iterator it = lst.begin();
+		int i(1);
+		for (/**/; it != lst.end(); ++it, ++i)
+		{
+			CHECK_EQUAL(i*i, *it);
+		}
+	}
+
+	TEST(AssignmentOp)
+	{
+		rdestl::slist<int> lst(&array[0], &array[6]);
+		rdestl::slist<int> lst2;
+		lst2 = lst;
+		CHECK_EQUAL(6ul, lst2.size());
+		CHECK_EQUAL(1, lst2.front());
+		rdestl::slist<int>::iterator it = lst.begin();
+		int i(1);
+		for (/**/; it != lst.end(); ++it, ++i)
+		{
+			CHECK_EQUAL(i*i, *it);
+		}
+	}
 }

@@ -122,6 +122,33 @@ public:
 	{
 		m_root.reset();
 	}
+	template<class InputIterator>
+	slist(InputIterator first, InputIterator last, 
+		const allocator_type& allocator = allocator_type())
+	:	m_allocator(allocator)
+	{
+		m_root.reset();
+		assign(first, last);
+	}
+	slist(const slist& rhs, const allocator_type& allocator = allocator_type())
+	:	m_allocator(allocator)
+	{
+		m_root.reset();
+		assign(rhs.begin(), rhs.end());
+	}
+	~slist()
+	{
+		clear();
+	}
+
+	slist& operator=(const slist& rhs)
+	{
+		if (this != &rhs)
+		{
+			assign(rhs.begin(), rhs.end());
+		}
+		return *this;
+	}
 
 	iterator begin()				{ return iterator(m_root.next); }
 	const_iterator begin() const	{ return const_iterator(m_root.next); }
@@ -145,6 +172,19 @@ public:
 	{
 		node* newNode = construct_node(value);
 		newNode->link_after(pos.node());
+	}
+
+	template<class InputIterator>
+	void assign(InputIterator first, InputIterator last) 
+	{
+		clear();
+		iterator it(&m_root);
+		while (first != last)
+		{
+			insert_after(it, *first);
+			++it;
+			++first;
+		}
 	}
 
 	void clear()
