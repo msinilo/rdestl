@@ -1,6 +1,6 @@
 #include "rdestl/intrusive_slist.h"
 
-namespace rdestl
+namespace rde
 {
 	intrusive_slist_base::intrusive_slist_base()
 	{

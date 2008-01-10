@@ -3,7 +3,7 @@
 
 namespace
 {
-	struct MyNode : public rdestl::intrusive_slist_node
+	struct MyNode : public rde::intrusive_slist_node
 	{
 		explicit MyNode(int i = 0): data(i) {}
 		int	data;
@@ -11,13 +11,13 @@ namespace
 
 	TEST(DefaultCtorConstructsEmptyList)
 	{
-		rdestl::intrusive_slist<MyNode> l;
+		rde::intrusive_slist<MyNode> l;
 		CHECK(l.empty());
 		CHECK_EQUAL(0ul, l.size());
 	}
 	TEST(PushFront)
 	{
-		rdestl::intrusive_slist<MyNode> l;
+		rde::intrusive_slist<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_front(&node);
@@ -30,7 +30,7 @@ namespace
 	}
 	TEST(PopFront)
 	{
-		rdestl::intrusive_slist<MyNode> l;
+		rde::intrusive_slist<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_front(&node);
@@ -53,21 +53,21 @@ namespace
 	}
 	TEST(Previous)
 	{
-		rdestl::intrusive_slist<MyNode> l;
+		rde::intrusive_slist<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_front(&node);
 		MyNode node2;
 		node2.data = 10;
 		l.push_front(&node2);
-		rdestl::intrusive_slist<MyNode>::iterator it = l.begin();
+		rde::intrusive_slist<MyNode>::iterator it = l.begin();
 		++it;
-		rdestl::intrusive_slist<MyNode>::iterator itPrev = l.previous(it);
+		rde::intrusive_slist<MyNode>::iterator itPrev = l.previous(it);
 		CHECK(itPrev == l.begin());
 	}
 	TEST(Clear)
 	{
-		rdestl::intrusive_slist<MyNode> l;
+		rde::intrusive_slist<MyNode> l;
 		l.push_front(new MyNode(5));
 		l.push_front(new MyNode(6));
 		l.push_front(new MyNode(7));
@@ -79,13 +79,13 @@ namespace
 	}
 	TEST(GetIterator)
 	{
-		rdestl::intrusive_slist<MyNode> l;
+		rde::intrusive_slist<MyNode> l;
 		l.push_front(new MyNode(5));
 		l.push_front(new MyNode(6));
 		MyNode* n(new MyNode(7));
 		l.push_front(n);
 		l.push_front(new MyNode(8));
-		rdestl::intrusive_slist<MyNode>::iterator it = l.get_iterator(n);
+		rde::intrusive_slist<MyNode>::iterator it = l.get_iterator(n);
 		CHECK_EQUAL(7, it->data);
 	}
 }

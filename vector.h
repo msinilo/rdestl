@@ -5,7 +5,7 @@
 #include "rdestl/allocator.h"
 #include "rdestl/rdestl.h"
 
-namespace rdestl
+namespace rde
 {
 //=============================================================================
 struct base_vector
@@ -17,7 +17,7 @@ struct base_vector
 //=============================================================================
 // Simplified vector class.
 // Mimics std::vector.
-template<typename T, class TAllocator = rdestl::allocator>
+template<typename T, class TAllocator = rde::allocator>
 class vector : public base_vector
 {
 public:
@@ -60,7 +60,7 @@ public:
 #endif
 	{
 		reallocate_discard_old(rhs.capacity());
-		rdestl::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
+		rde::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
 		m_end = m_begin + rhs.size();
 		RDE_ASSERT(invariant());
 	}
@@ -79,7 +79,7 @@ public:
 		{
 			reallocate_discard_old(rhs.capacity());
 		}
-		rdestl::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
+		rde::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
 		m_end = m_begin + rhs.size();
 		RDE_ASSERT(invariant());
 		
@@ -125,14 +125,22 @@ public:
 	{
 		if (size() == m_capacity)
 			grow();
-		rdestl::copy_construct(m_end, v);
+		rde::copy_construct(m_end, v);
+		++m_end;
+	}
+	// @note: extension. Use instead of push_back(T()) or resize(size() + 1).
+	void push_back()
+	{
+		if (size() == m_capacity)
+			grow();
+		rde::construct(m_end);
 		++m_end;
 	}
 	void pop_back()
 	{
 		RDE_ASSERT(!empty());
 		--m_end;
-		rdestl::destruct(m_end);
+		rde::destruct(m_end);
 	}
 
 	void assign(const T* first, const T* last)
@@ -143,9 +151,10 @@ public:
 
 		const size_type count = size_type(last - first);
 		RDE_ASSERT(count > 0);
+		clear();
 		if (count > m_capacity)
 			grow_discard_old(count);
-		rdestl::copy_n(first, count, m_begin);
+		rde::copy_n(first, count, m_begin);
 		m_end = m_begin + count;
 	}
 
@@ -165,16 +174,16 @@ public:
 			RDE_ASSERT(numAppend + numCopy == n);
 			iterator itOut = m_begin + prevSize;
 			for (size_type i = 0; i < numAppend; ++i, ++itOut)
-				rdestl::copy_construct(itOut, val);
-			rdestl::copy_construct_n(m_begin + index, numCopy, itOut);
+				rde::copy_construct(itOut, val);
+			rde::copy_construct_n(m_begin + index, numCopy, itOut);
 			for (size_type i = 0; i < numCopy; ++i)
 				m_begin[index + i] = val;
 		}
 		else
 		{
-			rdestl::copy_construct_n(m_end - n, n, m_end);
+			rde::copy_construct_n(m_end - n, n, m_end);
 			iterator insertPos = m_begin + index;
-			rdestl::move_n(insertPos, prevSize - indexEnd, insertPos + n);
+			rde::move_n(insertPos, prevSize - indexEnd, insertPos + n);
 			for (size_type i = 0; i < n; ++i)
 				insertPos[i] = val;
 		}
@@ -201,12 +210,12 @@ public:
 			it = m_begin + index;
 		}
 		else
-			rdestl::construct(m_begin + prevSize);
+			rde::construct(m_begin + prevSize);
 
 		// @note: conditional vs empty loop, what's better?
 		if (toMove > 0)
 		{
-			rdestl::internal::move_n(it, toMove, it + 1, int_to_type<has_trivial_copy<T>::value>());
+			rde::internal::move_n(it, toMove, it + 1, int_to_type<has_trivial_copy<T>::value>());
 		}
 		*it = val;
 		++m_end;
@@ -220,9 +229,9 @@ public:
 		RDE_ASSERT(validate_iterator(it));
 		RDE_ASSERT(it != end());  
 		// Move everything down, overwriting *it
-		rdestl::copy(it + 1, m_end, it);
+		rde::copy(it + 1, m_end, it);
 		--m_end;
-		rdestl::destruct(m_end);
+		rde::destruct(m_end);
 		return it;
 	}
 	iterator erase(iterator first, iterator last)
@@ -237,7 +246,7 @@ public:
 		if (toRemove > 0)
 		{
 			//const size_type toEnd = size_type(m_end - last);
-			rdestl::move(last, m_end, first);
+			rde::move(last, m_end, first);
 			shrink(size() - toRemove);
 		}
 		return m_begin + indexFirst;
@@ -312,7 +321,7 @@ private:
 			// Copy old data if needed.
 			if (m_begin)
 			{
-				rdestl::copy_construct_n(m_begin, newSize, newBegin);
+				rde::copy_construct_n(m_begin, newSize, newBegin);
 				destroy(m_begin, size());
 			}
 			m_begin = newBegin;
@@ -338,7 +347,7 @@ private:
 
 	RDE_FORCEINLINE void destroy(T* ptr, size_type n)
 	{
-		rdestl::destruct_n(ptr, n);
+		rde::destruct_n(ptr, n);
 		m_allocator.deallocate(ptr, n * sizeof(T));
 	}
 
@@ -358,7 +367,7 @@ private:
 	{
 		RDE_ASSERT(newSize <= size());
 		const size_type toShrink = size() - newSize;
-		rdestl::destruct_n(m_begin + newSize, toShrink);
+		rde::destruct_n(m_begin + newSize, toShrink);
 		m_end = m_begin + newSize;
 	}
 
@@ -373,7 +382,7 @@ private:
 	allocator_type	m_allocator;
 };
 
-} // namespace rdestl
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_VECTOR_H

@@ -1,7 +1,7 @@
 #ifndef RDESTL_INT_TO_TYPE_H
 #define RDESTL_INT_TO_TYPE_H
 
-namespace rdestl
+namespace rde
 {
 
 /**

@@ -4,7 +4,7 @@
 
 namespace
 {
-	typedef rdestl::sorted_vector<int, int> tVector;
+	typedef rde::sorted_vector<int, int> tVector;
 	TEST(Construct)
 	{
 		tVector v;
@@ -13,10 +13,10 @@ namespace
 	TEST(Insert)
 	{
 		tVector v;
-		CHECK_EQUAL(true, v.insert(rdestl::pair<int, int>(5, 5)).second);
+		CHECK_EQUAL(true, v.insert(rde::pair<int, int>(5, 5)).second);
 		CHECK_EQUAL(1ul, v.size());
 		// Try to insert again at the same key
-		CHECK_EQUAL(false, v.insert(rdestl::pair<int, int>(5, 10)).second);
+		CHECK_EQUAL(false, v.insert(rde::pair<int, int>(5, 10)).second);
 	}
 	TEST(InsertAndFind)
 	{

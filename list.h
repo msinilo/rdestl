@@ -4,10 +4,10 @@
 #include "rdestl/allocator.h"
 #include "rdestl/iterator.h"
 
-namespace rdestl
+namespace rde
 {
 //=============================================================================
-template<typename T, class TAllocator = rdestl::allocator>
+template<typename T, class TAllocator = rde::allocator>
 class list
 {
 private:
@@ -276,7 +276,7 @@ private:
 	node			m_root;
 };
 
-} // namespace rdestl
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // RDESTL_LIST_H

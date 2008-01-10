@@ -3,7 +3,7 @@
 
 namespace
 {
-	struct MyNode : public rdestl::intrusive_list_node
+	struct MyNode : public rde::intrusive_list_node
 	{
 		explicit MyNode(int i = 0): data(i) {}
 		int	data;
@@ -11,13 +11,13 @@ namespace
 
 	TEST(DefaultCtorConstructsEmptyList)
 	{
-		rdestl::intrusive_list<MyNode> l;
+		rde::intrusive_list<MyNode> l;
 		CHECK(l.empty());
 		CHECK_EQUAL(0ul, l.size());
 	}
 	TEST(PushBack)
 	{
-		rdestl::intrusive_list<MyNode> l;
+		rde::intrusive_list<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_back(&node);
@@ -30,7 +30,7 @@ namespace
 	}
 	TEST(PushBackPtr)
 	{
-		rdestl::intrusive_list<MyNode> l;
+		rde::intrusive_list<MyNode> l;
 		MyNode* n(new MyNode());
 		l.push_back(n);
 		CHECK_EQUAL(1ul, l.size());
@@ -39,7 +39,7 @@ namespace
 
 	TEST(PushFront)
 	{
-		rdestl::intrusive_list<MyNode> l;
+		rde::intrusive_list<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_front(&node);
@@ -54,7 +54,7 @@ namespace
 
 	TEST(PopBack)
 	{
-		rdestl::intrusive_list<MyNode> l;
+		rde::intrusive_list<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_back(&node);
@@ -70,16 +70,16 @@ namespace
 
 	TEST(IterEmpty)
 	{
-		rdestl::intrusive_list<MyNode> l;
+		rde::intrusive_list<MyNode> l;
 		CHECK(l.begin() == l.end());
 	}
 	TEST(IterTest)
 	{
-		rdestl::intrusive_list<MyNode> l;
+		rde::intrusive_list<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_back(&node);
-		rdestl::intrusive_list<MyNode>::iterator it(l.begin());
+		rde::intrusive_list<MyNode>::iterator it(l.begin());
 		CHECK(it != l.end());
 		++it;
 		CHECK(it == l.end());

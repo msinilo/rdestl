@@ -8,7 +8,7 @@
 		char c;
 		float f;
 	};
-namespace rdestl
+namespace rde
 {
 	template<> struct is_pod<MyStruct>
 	{
@@ -18,8 +18,8 @@ namespace rdestl
 
 namespace
 {
-	typedef rdestl::vector<int>			tTestVector;
-	typedef rdestl::vector<std::string>	tStringVector;
+	typedef rde::vector<int>			tTestVector;
+	typedef rde::vector<std::string>	tStringVector;
 
 	const int array [] = { 1, 4, 9, 16, 25, 36 }; 
 	void PrintVector(const tTestVector& v)
@@ -140,7 +140,7 @@ namespace
 		v.erase(v.begin(), v.end());
 		CHECK(v.empty());
 
-		rdestl::vector<MyStruct> v2;
+		rde::vector<MyStruct> v2;
 		v2.erase(v2.begin(), v2.end());
 	}
 

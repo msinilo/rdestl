@@ -6,7 +6,7 @@
 #include "rdestl/functional.h"
 #include "rdestl/pair.h"
 
-namespace rdestl
+namespace rde
 {
 
 //=============================================================================
@@ -21,13 +21,13 @@ protected:
 //=============================================================================
 // @todo: 2 allocators? one for buckets/one for single nodes?
 template<typename TKey, typename TValue, 
-	class THashFunc = rdestl::hash<TKey>, 
-	class TKeyEqualFunc = rdestl::equal_to<TKey>,
-	class TAllocator = rdestl::allocator>
+	class THashFunc = rde::hash<TKey>, 
+	class TKeyEqualFunc = rde::equal_to<TKey>,
+	class TAllocator = rde::allocator>
 class hash_map : public hash_map_base
 {
 public:
-	typedef rdestl::pair<TKey, TValue>						value_type;
+	typedef rde::pair<TKey, TValue>						value_type;
 
 private:
 	struct node
@@ -190,6 +190,7 @@ public:
 
 	pair<iterator, bool> insert(const value_type& value)
 	{
+		// Grow at fixed % of size/capacity ratio.
 		if (m_numEntries * 3 >= m_capacity * 4)
 			grow(m_capacity);
 		bool found;
@@ -380,7 +381,7 @@ private:
 	node* allocate_buckets(size_type n)
 	{
 		node* buckets = static_cast<node*>(m_allocator.allocate(n * sizeof(node)));
-		rdestl::construct_n(buckets, n);
+		rde::construct_n(buckets, n);
 		return buckets;
 	}
 	void delete_buckets()
@@ -394,7 +395,7 @@ private:
 				it = itNext;
 			}
 		}
-		rdestl::destruct_n(m_buckets, m_capacity);
+		rde::destruct_n(m_buckets, m_capacity);
 		m_allocator.deallocate(m_buckets, sizeof(node) * m_capacity);
 	}
 
@@ -407,7 +408,7 @@ private:
 	allocator_type	m_allocator;
 };
 
-} // namespace rdestl
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_HASH_MAP_H

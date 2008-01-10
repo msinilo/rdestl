@@ -1,6 +1,6 @@
 #include "rdestl/intrusive_list.h"
 
-namespace rdestl
+namespace rde
 {
 	intrusive_list_base::intrusive_list_base()
 	:	m_root()

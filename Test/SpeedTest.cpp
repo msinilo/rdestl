@@ -55,7 +55,7 @@ namespace
 	};
 }
 
-namespace rdestl
+namespace rde
 {
 	template<> struct is_pod<MyStruct>
 	{
@@ -168,17 +168,17 @@ namespace
 	SpeedTest s_tests[] = 
 	{
 		{ "STL vector: construction", Vector_Construct<std::vector<std::string> > },
-		{ "RDE vector: construction", Vector_Construct<rdestl::vector<std::string> > },
+		{ "RDE vector: construction", Vector_Construct<rde::vector<std::string> > },
 		{ "STL vector: push_back", Vector_PushBack<std::vector<std::string> > },
-		{ "RDE vector: push_back", Vector_PushBack<rdestl::vector<std::string> > },
+		{ "RDE vector: push_back", Vector_PushBack<rde::vector<std::string> > },
 		{ "STL vector: insert int", Vector_InsertInt<std::vector<int> > },
-		{ "RDE vector: insert int", Vector_InsertInt<rdestl::vector<int> > },
+		{ "RDE vector: insert int", Vector_InsertInt<rde::vector<int> > },
 		{ "STL vector: insert POD", Vector_InsertPOD<std::vector<MyStruct> > },
-		{ "RDE vector: insert POD", Vector_InsertPOD<rdestl::vector<MyStruct> > },
+		{ "RDE vector: insert POD", Vector_InsertPOD<rde::vector<MyStruct> > },
 		{ "STL vector: erase POD", Vector_ErasePOD<std::vector<MyStruct> > },
-		{ "RDE vector: erase POD", Vector_ErasePOD<rdestl::vector<MyStruct> > },
+		{ "RDE vector: erase POD", Vector_ErasePOD<rde::vector<MyStruct> > },
 		{ "STL vector: erase string", Vector_EraseString<std::vector<std::string> > },
-		{ "RDE vector: erase string", Vector_EraseString<rdestl::vector<std::string> > },
+		{ "RDE vector: erase string", Vector_EraseString<rde::vector<std::string> > },
 	};
 	const size_t kNumTests = sizeof(s_tests) / sizeof(s_tests[0]);
 

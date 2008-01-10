@@ -524,6 +524,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\StringTestInc.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\TestMain.cpp"
 			>
 		</File>

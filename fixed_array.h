@@ -3,7 +3,7 @@
 
 #include "rdestl/algorithm.h"
 
-namespace rdestl
+namespace rde
 {
 //=============================================================================
 // @todo: let it grow in special cases!
@@ -19,7 +19,7 @@ public:
 	fixed_array() {/**/}
 	fixed_array(const T array[N])
 	{
-		rdestl::copy_n(&array[0], N, m_data);
+		rde::copy_n(&array[0], N, m_data);
 	}
 	// copy ctor/dtor generated
 	// assignment op generated
@@ -52,7 +52,7 @@ private:
 	T	m_data[N];
 };
 
-}
+} // rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_FIXED_ARRAY_H

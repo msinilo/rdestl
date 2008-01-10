@@ -1,6 +1,6 @@
 #include "rdestl/hash_map.h"
 
-namespace rdestl
+namespace rde
 {
 //-----------------------------------------------------------------------------
 hash_map_base::size_type hash_map_base::get_next_capacity(size_type n)
@@ -24,4 +24,4 @@ hash_map_base::size_type hash_map_base::get_next_capacity(size_type n)
 	return n;
 }
 
-} // namespace rdestl
+} // namespace rde

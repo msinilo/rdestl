@@ -5,7 +5,7 @@
 #include "rdestl/pair.h"
 #include "rdestl/vector.h"
 
-namespace rdestl
+namespace rde
 {
 namespace internal
 {
@@ -29,8 +29,8 @@ namespace internal
 }
 
 //=============================================================================
-template<typename TKey, typename TValue, class TCompare = rdestl::less<TKey>,
-	class TAllocator = rdestl::allocator>
+template<typename TKey, typename TValue, class TCompare = rde::less<TKey>,
+	class TAllocator = rde::allocator>
 class sorted_vector : private vector<pair<TKey, TValue> >
 {
 	typedef vector<pair<TKey, TValue> >	Base;
@@ -127,19 +127,19 @@ public:
 
 	iterator lower_bound(const key_type& k)
 	{
-		return rdestl::lower_bound(begin(), end(), k, m_compare);
+		return rde::lower_bound(begin(), end(), k, m_compare);
 	}
 	const_iterator lower_bound(const key_type& k) const
 	{
-		return rdestl::lower_bound(begin(), end(), k, m_compare);
+		return rde::lower_bound(begin(), end(), k, m_compare);
 	}
 	iterator upper_bound(const key_type& k)
 	{
-		return rdestl::upper_bound(begin(), end(), k, m_compare);
+		return rde::upper_bound(begin(), end(), k, m_compare);
 	}
 	const_iterator upper_bound(const key_type& k) const
 	{
-		return rdestl::upper_bound(begin(), end(), k, m_compare);
+		return rde::upper_bound(begin(), end(), k, m_compare);
 	}
 private:
 	// @note: block copying for the time being.
@@ -167,7 +167,7 @@ private:
 	internal::compare_func<value_type, TCompare>	m_compare;
 };
 
-} // namespace rdestl
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_SORTED_VECTOR_H

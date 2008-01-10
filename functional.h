@@ -1,7 +1,7 @@
 #ifndef RDESTL_FUNCTIONAL_H
 #define RDESTL_FUNCTIONAL_H
 
-namespace rdestl
+namespace rde
 {
 //=============================================================================
 template<typename T>

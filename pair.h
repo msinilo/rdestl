@@ -3,7 +3,7 @@
 
 #include "rdestl/type_traits.h"
 
-namespace rdestl
+namespace rde
 {
 //=============================================================================
 template<typename T1, typename T2>
@@ -14,6 +14,7 @@ struct pair
 
 	pair() {/**/}
 	pair(const T1& a, const T2& b):	first(a), second(b) {/**/}
+	explicit pair(const T1& a):	first(a) {/**/}
 
 	T1	first;
 	T2	second;

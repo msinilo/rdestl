@@ -1,7 +1,7 @@
 #ifndef RDESTL_BUFFER_ALLOCATOR_H
 #define RDESTL_BUFFER_ALLOCATOR_H
 
-namespace rdestl
+namespace rde
 {
 
 // CONCEPT!
@@ -40,6 +40,6 @@ private:
 	size_t		m_bufferSize;
 };
 
-} // namespace rdestl
+} // namespace rde
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_BUFFER_ALLOCATOR_H

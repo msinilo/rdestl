@@ -6,13 +6,13 @@ namespace
 	const int array [] = { 1, 4, 9, 16, 25, 36 }; 
 	TEST(ConstructEmpty)
 	{
-		rdestl::slist<int> lst;
+		rde::slist<int> lst;
 		CHECK(lst.empty());
 		CHECK_EQUAL(0ul, lst.size());
 	}
 	TEST(PushFront)
 	{
-		rdestl::slist<int> lst;
+		rde::slist<int> lst;
 		lst.push_front(5);
 		CHECK(!lst.empty());
 		CHECK_EQUAL(1ul, lst.size());
@@ -23,7 +23,7 @@ namespace
 	}
 	TEST(PopFront)
 	{
-		rdestl::slist<int> lst;
+		rde::slist<int> lst;
 		lst.push_front(5);
 		lst.push_front(3);
 		CHECK(!lst.empty());
@@ -34,15 +34,15 @@ namespace
 	}
 	TEST(Previous)
 	{
-		rdestl::slist<int> lst;
+		rde::slist<int> lst;
 		lst.push_front(5);
 		lst.push_front(10);
 		lst.push_front(15);
-		rdestl::slist<int>::iterator it = lst.begin();
+		rde::slist<int>::iterator it = lst.begin();
 		++it; 
-		rdestl::slist<int>::iterator itAfterBegin = it;
+		rde::slist<int>::iterator itAfterBegin = it;
 		++it;
-		rdestl::slist<int>::iterator itPrev = lst.previous(it);
+		rde::slist<int>::iterator itPrev = lst.previous(it);
 		CHECK(itPrev == itAfterBegin);
 		itPrev = lst.previous(itPrev);
 		CHECK(itPrev == lst.begin());
@@ -50,7 +50,7 @@ namespace
 
 	TEST(Clear)
 	{
-		rdestl::slist<int> lst;
+		rde::slist<int> lst;
 		lst.push_front(5);
 		lst.push_front(4);
 		lst.push_front(3);
@@ -65,10 +65,10 @@ namespace
 
 	TEST(AssignCtor)
 	{
-		rdestl::slist<int> lst(&array[0], &array[6]);
+		rde::slist<int> lst(&array[0], &array[6]);
 		CHECK_EQUAL(6ul, lst.size());
 		CHECK_EQUAL(1, lst.front());
-		rdestl::slist<int>::iterator it = lst.begin();
+		rde::slist<int>::iterator it = lst.begin();
 		int i(1);
 		for (/**/; it != lst.end(); ++it, ++i)
 		{
@@ -78,12 +78,12 @@ namespace
 
 	TEST(AssignmentOp)
 	{
-		rdestl::slist<int> lst(&array[0], &array[6]);
-		rdestl::slist<int> lst2;
+		rde::slist<int> lst(&array[0], &array[6]);
+		rde::slist<int> lst2;
 		lst2 = lst;
 		CHECK_EQUAL(6ul, lst2.size());
 		CHECK_EQUAL(1, lst2.front());
-		rdestl::slist<int>::iterator it = lst.begin();
+		rde::slist<int>::iterator it = lst.begin();
 		int i(1);
 		for (/**/; it != lst.end(); ++it, ++i)
 		{

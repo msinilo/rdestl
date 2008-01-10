@@ -6,13 +6,13 @@ namespace
 	const int array [] = { 1, 4, 9, 16, 25, 36 }; 
 	TEST(ConstructEmpty)
 	{
-		rdestl::list<int> lst;
+		rde::list<int> lst;
 		CHECK(lst.empty());
 		CHECK_EQUAL(0ul, lst.size());
 	}
 	TEST(PushFront)
 	{
-		rdestl::list<int> lst;
+		rde::list<int> lst;
 		lst.push_front(5);
 		CHECK(!lst.empty());
 		CHECK_EQUAL(1ul, lst.size());
@@ -23,7 +23,7 @@ namespace
 	}
 	TEST(PopFront)
 	{
-		rdestl::list<int> lst;
+		rde::list<int> lst;
 		lst.push_front(5);
 		lst.push_front(3);
 		CHECK(!lst.empty());
@@ -35,7 +35,7 @@ namespace
 
 	TEST(PushBack)
 	{
-		rdestl::list<int> lst;
+		rde::list<int> lst;
 		lst.push_back(5);
 		CHECK(!lst.empty());
 		CHECK_EQUAL(1ul, lst.size());
@@ -48,7 +48,7 @@ namespace
 	}
 	TEST(PopBack)
 	{
-		rdestl::list<int> lst;
+		rde::list<int> lst;
 		lst.push_front(5);
 		lst.push_back(3);
 		CHECK(!lst.empty());
@@ -60,7 +60,7 @@ namespace
 
 	TEST(Clear)
 	{
-		rdestl::list<int> lst;
+		rde::list<int> lst;
 		lst.push_front(5);
 		CHECK(!lst.empty());
 		lst.clear();
@@ -69,29 +69,29 @@ namespace
 
 	TEST(IterEmpty)
 	{
-		rdestl::list<int> lst;
+		rde::list<int> lst;
 		CHECK(lst.begin() == lst.end());
-		const rdestl::list<int> lst2;
+		const rde::list<int> lst2;
 		CHECK(lst2.begin() == lst2.end());
 	}
 
 	TEST(IterOneElem)
 	{
-		rdestl::list<int> lst;
+		rde::list<int> lst;
 		lst.push_back(5);
-		rdestl::list<int>::iterator it = lst.begin();
+		rde::list<int>::iterator it = lst.begin();
 		CHECK(it != lst.end());
 		CHECK_EQUAL(5, *it);
 	}
 	TEST(IterTraverse)
 	{
-		rdestl::list<int> lst;
+		rde::list<int> lst;
 		lst.push_back(2);
 		lst.push_back(3);
 		lst.push_back(4);
 		lst.push_back(5);
 		lst.push_front(1);
-		rdestl::list<int>::const_iterator it = lst.end();
+		rde::list<int>::const_iterator it = lst.end();
 		--it;
 		CHECK_EQUAL(5, *it);
 		it--;
@@ -114,17 +114,17 @@ namespace
 	}
 	TEST(AssignCtor)
 	{
-		rdestl::list<int> lst(&array[0], &array[6]);
+		rde::list<int> lst(&array[0], &array[6]);
 		CHECK_EQUAL(6ul, lst.size());
 		CHECK_EQUAL(1, lst.front());
 		CHECK_EQUAL(36, lst.back());
 	}
 	TEST(Insert)
 	{
-		rdestl::list<int> lst(&array[0], &array[6]);
-		rdestl::list<int>::iterator it = lst.end();
+		rde::list<int> lst(&array[0], &array[6]);
+		rde::list<int>::iterator it = lst.end();
 		--it, --it;
-		rdestl::list<int>::iterator it2 = lst.insert(it, 20);
+		rde::list<int>::iterator it2 = lst.insert(it, 20);
 		CHECK_EQUAL(20, *it2);
 		CHECK_EQUAL(7ul, lst.size());
 		--it2;
@@ -137,8 +137,8 @@ namespace
 
 	TEST(Erase)
 	{
-		rdestl::list<int> lst(&array[0], &array[6]);
-		rdestl::list<int>::iterator it = lst.begin(); // 1
+		rde::list<int> lst(&array[0], &array[6]);
+		rde::list<int>::iterator it = lst.begin(); // 1
 		++it, ++it, ++it; // 16
 		it = lst.erase(it); 
 		CHECK_EQUAL(25, *it);
@@ -150,14 +150,14 @@ namespace
 	}
 	TEST(EraseAll)
 	{
-		rdestl::list<int> lst(&array[0], &array[6]);
+		rde::list<int> lst(&array[0], &array[6]);
 		lst.erase(lst.begin(), lst.end());
 		CHECK(lst.empty());
 	}
 	TEST(AssignmentOp)
 	{
-		rdestl::list<int> lst(&array[0], &array[6]);
-		rdestl::list<int> lst2;
+		rde::list<int> lst(&array[0], &array[6]);
+		rde::list<int> lst2;
 		lst2 = lst;
 		CHECK_EQUAL(6ul, lst2.size());
 		CHECK_EQUAL(1, lst2.front());
@@ -170,7 +170,7 @@ namespace
 		{
 			int k;
 		};
-		rdestl::list<Foo> lst;
+		rde::list<Foo> lst;
 		Foo f;
 		f.k = 11;
 		lst.push_front(f);

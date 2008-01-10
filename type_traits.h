@@ -1,7 +1,7 @@
 #ifndef RDESTL_TYPETRAITS_H
 #define RDESTL_TYPETRAITS_H
 
-namespace rdestl
+namespace rde
 {
 
 template<typename T> struct is_integral 
@@ -80,7 +80,7 @@ template<typename T> struct has_trivial_destructor
 	};
 };
 
-} // namespace rdestl
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_TYPETRAITS_H

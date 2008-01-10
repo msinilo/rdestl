@@ -17,13 +17,13 @@ public:
 	:	m_allocator(allocator),
 		m_length(0)
 	{
-		construct_string(0);
+		m_data = construct_string(0);
 	}
 	simple_string_storage(const value_type* str, const allocator_type& allocator)
 	:	m_allocator(allocator)
 	{
 		const int len = strlen(str);
-		construct_string(len);
+		m_data = construct_string(len);
 		memcpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
@@ -32,7 +32,7 @@ public:
 		const allocator_type& allocator)
 	:	m_allocator(allocator)
 	{
-		construct_string(len);
+		m_data = construct_string(len);
 		memcpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
@@ -65,7 +65,7 @@ public:
 		if (m_capacity <= len + 1)
 		{
 			release_string();
-			construct_string(len);
+			m_data = construct_string(len);
 		}
 		memcpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
@@ -78,11 +78,15 @@ public:
 		const size_type newLen = prevLen + len;
 		if (m_capacity <= newLen + 1)
 		{
-			// save + copy data here...
+			value_type* newData = construct_string(newLen);
+			memcpy(newData, m_data, prevLen * sizeof(value_type));
+			release_string();
+			m_data = newData;
 		}
-		memcpy(m_data + prevLen, str, len);
+		memcpy(m_data + prevLen, str, len * sizeof(value_type));
 		m_data[newLen] = 0;
-		rep->size = newLen;
+		m_length = newLen;
+		RDE_ASSERT(invariant());
 	}
 
 	inline const value_type* c_str() const
@@ -105,8 +109,9 @@ protected:
 		return true;
 	}
 private:
-	void construct_string(size_type capacity)
+	value_type* construct_string(size_type capacity)
 	{
+		value_type* data(0);
 		if (capacity != 0)
 		{
 			capacity = (capacity+kGranularity-1) & ~(kGranularity-1);
@@ -115,14 +120,15 @@ private:
 
 			const size_type toAlloc = sizeof(value_type)*(capacity + 1);
 			void* mem = m_allocator.allocate(toAlloc);
-			m_data = static_cast<value_type*>(mem);
+			data = static_cast<value_type*>(mem);
 		}
 		else	// empty string, no allocation needed. Use our internal buffer.
 		{
-			m_data = &m_end_of_data;
+			data = &m_end_of_data;
 		}
 		m_capacity = capacity;
-		*m_data = 0;
+		*data = 0;
+		return data;
 	}
 	void release_string()
 	{

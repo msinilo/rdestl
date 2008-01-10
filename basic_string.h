@@ -4,7 +4,7 @@
 #include "rdestl/allocator.h"
 #include "rdestl/rdestl.h"
 
-namespace rdestl
+namespace rde
 {
 // @todo: wrapper over memcpy
 
@@ -137,7 +137,7 @@ public:
 		RDE_ASSERT(rep->capacity >= short(newCapacity));
 		const size_type newLen = prevLen + len;
 		RDE_ASSERT(short(newLen) <= rep->capacity);
-		memcpy(m_data + prevLen, str, len);
+		memcpy(m_data + prevLen, str, len * sizeof(value_type));
 		m_data[newLen] = 0;
 		rep->size = newLen;
 	}
@@ -246,9 +246,9 @@ private:
 
 //=============================================================================
 // @note: this one is totally _not_ std::string compatible for the time being!
-// one way conversion should work, ie RDESTL --> STL.
+// one way conversion should work, ie rde --> STL.
 template<typename E, 
-	class TAllocator = rdestl::allocator,
+	class TAllocator = rde::allocator,
 	typename TStorage = cow_string_storage<E, TAllocator> >
 class basic_string : private TStorage
 {
@@ -429,7 +429,7 @@ bool operator>(const basic_string<E, TStorage, TAllocator>& lhs,
 	return lhs.compare(rhs) > 0;
 }
 
-}  // namespace rdestl
+}  // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_BASIC_STRING_H

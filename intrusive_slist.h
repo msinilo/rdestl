@@ -4,7 +4,7 @@
 #include "rdestl/iterator.h"
 #include "rdestl/type_traits.h"
 
-namespace rdestl
+namespace rde
 {
 
 //=============================================================================
@@ -14,7 +14,6 @@ struct intrusive_slist_node
 	{
 		next = this;
 	}
-
 	bool in_list() const	{ return this != next; }
 
 	intrusive_slist_node*	next;
@@ -86,16 +85,13 @@ public:
 	typedef size_t	size_type;
 
 	intrusive_slist_base();
-
 	void pop_front()
 	{
 		unlink_after(&m_root);
 	}
-
 	// @note: allow for constant complexity way of checking this
 	// (at a cost of additional variable)?
 	size_type size() const;
-
 	bool empty() const	{ return !m_root.in_list(); }
 
 protected:
@@ -218,7 +214,7 @@ private:
 	}
 };
 
-} // namespace rdestl
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_INTRUSIVE_SLIST_H

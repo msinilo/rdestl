@@ -3,7 +3,7 @@
 
 #include "rdestl/rdestl.h"
 
-namespace rdestl
+namespace rde
 {
 // @todo: test speed vs memcpy
 template<typename T> RDE_FORCEINLINE
@@ -190,7 +190,7 @@ namespace internal
 	}
 } // namespace internal
 
-} // namespace rdestl
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_UTILITY_H
