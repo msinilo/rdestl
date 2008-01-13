@@ -428,6 +428,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\cow_string_storage.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\fixed_array.h"
 			>
 		</File>
@@ -489,6 +493,10 @@
 		</File>
 		<File
 			RelativePath="..\..\sorted_vector.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\string_utils.h"
 			>
 		</File>
 		<File
