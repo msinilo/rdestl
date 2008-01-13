@@ -4,8 +4,10 @@
 ..\..\IntrusiveListTest.cpp
 ..\..\IntrusiveSListTest.cpp
 ..\..\ListTest.cpp
+..\..\SListTest.cpp
 ..\..\SortedVectorTest.cpp
 ..\..\SpeedTest.cpp
 ..\..\StringTest.cpp
+..\..\StringTestInc.h
 ..\..\TestMain.cpp
 ..\..\VectorTest.cpp

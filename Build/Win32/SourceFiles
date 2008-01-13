@@ -1,7 +1,11 @@
+..\..\win32\config.h
 ..\..\algorithm.h
 ..\..\allocator.cpp
 ..\..\allocator.h
+..\..\basic_string.h
 ..\..\buffer_allocator.h
+..\..\config.h
+..\..\cow_string_storage.h
 ..\..\fixed_array.h
 ..\..\functional.h
 ..\..\hash_map.cpp
@@ -15,8 +19,10 @@
 ..\..\list.h
 ..\..\pair.h
 ..\..\rdestl.h
+..\..\simple_string_storage.h
+..\..\slist.h
 ..\..\sorted_vector.h
-..\..\string.h
+..\..\string_utils.h
 ..\..\type_traits.h
 ..\..\utility.h
 ..\..\vector.h
