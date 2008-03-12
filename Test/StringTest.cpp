@@ -1,5 +1,5 @@
 #include <UnitTest++/src/UnitTest++.h>
-#include "rdestl/basic_string.h"
+#include "rdestl/string.h"
 #include "rdestl/simple_string_storage.h"
 #include <cstdio>
 

@@ -95,7 +95,7 @@ public:
 		release_string();
 		construct_string(len);
 		memcpy(m_data, str, len*sizeof(value_type));
-		get_rep()->size = len;
+		get_rep()->size = short(len);
 		m_data[len] = 0;
 	}
 
@@ -110,7 +110,7 @@ public:
 		RDE_ASSERT(short(newLen) <= rep->capacity);
 		memcpy(m_data + prevLen, str, len * sizeof(value_type));
 		m_data[newLen] = 0;
-		rep->size = newLen;
+		rep->size = short(newLen);
 	}
 
 	inline const value_type* c_str() const
@@ -122,6 +122,23 @@ public:
 		return get_rep()->size;
 	}
 	const allocator_type& get_allocator() const	{ return m_allocator; }
+
+	value_type* reserve(size_type capacity_hint)
+	{
+		make_unique(capacity_hint);
+		return m_data;
+	}
+	void clear()
+	{
+		resize(0);
+	}
+	void resize(size_type size)
+	{
+		string_rep* rep = get_rep();
+		make_unique(size);
+		rep->size = size;
+		m_data[size] = 0;
+	}
 
 protected:
 	bool invariant() const
@@ -177,9 +194,12 @@ private:
 		string_rep* rep = get_rep();
 		RDE_ASSERT(rep->refs >= 1);
 
-		capacity_hint = (capacity_hint+kGranularity-1) & ~(kGranularity-1);
-		if (capacity_hint < kGranularity)
-			capacity_hint = kGranularity;
+		if (capacity_hint != 0)
+		{
+			capacity_hint = (capacity_hint+kGranularity-1) & ~(kGranularity-1);
+			if (capacity_hint < kGranularity)
+				capacity_hint = kGranularity;
+		}
 		RDE_ASSERT(capacity_hint < string_rep::kMaxCapacity);
 		// Reallocate string only if we truly need to make it unique
 		// (it's shared) or if our current buffer is too small.
@@ -189,7 +209,7 @@ private:
 			{
 				void* newMem = m_allocator.allocate(capacity_hint);
 				string_rep* newRep = reinterpret_cast<string_rep*>(newMem);
-				newRep->init(capacity_hint);
+				newRep->init(short(capacity_hint));
 				value_type* newData = reinterpret_cast<value_type*>(newRep + 1);
 				memcpy(newData, m_data, rep->size*sizeof(value_type));
 				newRep->size = rep->size;

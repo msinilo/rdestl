@@ -64,8 +64,11 @@ public:
 	basic_string& operator=(const basic_string& rhs)
 	{
 		RDE_ASSERT(rhs.invariant());
-		TStorage& s = *this;
-		s = rhs;
+		if (this != &rhs)
+		{
+			TStorage& s = *this;
+			s = rhs;
+		}
 		RDE_ASSERT(invariant());
 		return *this;
 	}
@@ -154,14 +157,25 @@ public:
 
 	const allocator_type& get_allocator() const	{ return TStorage::get_allocator; }
 
+	value_type* reserve(size_type capacity_hint)
+	{
+		return TStorage::reserve(capacity_hint);
+	}
+	void clear()
+	{
+		TStorage::clear();
+	}
+	void resize(size_type size)
+	{
+		TStorage::resize(size);
+	}
+
 private:
 	bool invariant() const
 	{
 		return TStorage::invariant();
 	}
 };
-// @todo: move to string.h, move COW stuff to seperated file.
-typedef basic_string<char>	string;
 
 //-----------------------------------------------------------------------------
 template<typename E, class TStorage, class TAllocator>

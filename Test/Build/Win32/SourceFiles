@@ -1,3 +1,4 @@
+..\..\StringTestInc.h
 ..\..\AlgoTest.cpp
 ..\..\FixedArrayTest.cpp
 ..\..\HashMapTest.cpp
@@ -8,6 +9,5 @@
 ..\..\SortedVectorTest.cpp
 ..\..\SpeedTest.cpp
 ..\..\StringTest.cpp
-..\..\StringTestInc.h
 ..\..\TestMain.cpp
 ..\..\VectorTest.cpp

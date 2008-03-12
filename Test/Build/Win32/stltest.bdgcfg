@@ -8,5 +8,5 @@ IncludePaths=../../../..;../../../../external
 ExceptionHandling=2
 
 [Solution]
-Dependencies=rdestl;UnitTest++.vsnet2003;core
+Dependencies=rdestl;UnitTest++.vsnet2005;core
 DependenciesPaths=../../../..;../../../../external

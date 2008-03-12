@@ -434,14 +434,6 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="win32"
-			>
-			<File
-				RelativePath="..\..\win32\config.h"
-				>
-			</File>
-		</Filter>
 		<File
 			RelativePath="..\..\algorithm.h"
 			>
@@ -516,6 +508,10 @@
 		</File>
 		<File
 			RelativePath="..\..\sorted_vector.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\string.h"
 			>
 		</File>
 		<File

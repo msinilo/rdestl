@@ -2,7 +2,7 @@
 #define RDESTL_H
 
 #ifndef RDESTL_STANDALONE
-#	define RDESTL_STANDALONE	1
+#	define RDESTL_STANDALONE	0
 #endif
 
 #if RDESTL_STANDALONE

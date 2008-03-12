@@ -15,10 +15,151 @@ struct base_vector
 };
 
 //=============================================================================
+template<typename T, class TAllocator>
+struct standard_vector_storage 
+{
+	explicit standard_vector_storage(const TAllocator& allocator)
+	:	m_begin(0),
+		m_end(0),
+		m_capacity(0),
+		m_allocator(allocator)
+	{
+		/**/
+	}	
+
+	inline void reallocate(base_vector::size_type newCapacity, 
+		bool canShrink = false)
+	{
+		if (canShrink || newCapacity > m_capacity)
+		{
+			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
+			const base_vector::size_type currSize(m_end - m_begin);
+			const base_vector::size_type newSize = std::min(currSize, newCapacity);
+			// Copy old data if needed.
+			if (m_begin)
+			{
+				rde::copy_construct_n(m_begin, newSize, newBegin);
+				destroy(m_begin, currSize);
+			}
+			m_begin = newBegin;
+			m_end = m_begin + newSize;
+			m_capacity = newCapacity;
+			RDE_ASSERT(invariant());
+		}
+	}
+
+	// Reallocates memory, doesnt copy contents of old buffer.
+	RDE_FORCEINLINE void reallocate_discard_old(base_vector::size_type newCapacity)
+	{
+		RDE_ASSERT(newCapacity > m_capacity);
+		T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
+		const base_vector::size_type currSize(m_end - m_begin);
+		if (m_begin)
+			destroy(m_begin, currSize);
+		m_begin = newBegin;
+		m_end = m_begin + currSize;
+		m_capacity = newCapacity;
+		RDE_ASSERT(invariant());
+	}
+	RDE_FORCEINLINE void destroy(T* ptr, base_vector::size_type n)
+	{
+		rde::destruct_n(ptr, n);
+		m_allocator.deallocate(ptr, n * sizeof(T));
+	}
+	bool invariant() const
+	{
+		return m_end >= m_begin;
+	}
+
+	T*						m_begin;
+	T*						m_end;
+	base_vector::size_type	m_capacity;
+	TAllocator				m_allocator;
+};
+
+//=============================================================================
+template<typename T, class TAllocator, int TCapacity, bool TGrowOnOverflow>
+struct fixed_vector_storage 
+{
+	explicit fixed_vector_storage(const TAllocator& allocator)
+	:	m_begin(&m_data[0]),
+		m_end(m_begin),
+		m_capacity(TCapacity),
+		m_allocator(allocator)
+	{
+		/**/
+	}	
+
+	// @note	Cant shrink
+	inline void reallocate(base_vector::size_type newCapacity, 
+		bool /*canShrink*/ = false)
+	{
+		if (newCapacity > m_capacity)
+		{
+			if (!TGrowOnOverflow)
+			{
+				RDE_ASSERT(!"fixed_vector cannot grow");
+			}
+
+			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
+			const base_vector::size_type currSize(m_end - m_begin);
+			const base_vector::size_type newSize = std::min(currSize, newCapacity);
+			// Copy old data if needed.
+			if (m_begin)
+			{
+				rde::copy_construct_n(m_begin, newSize, newBegin);
+				destroy(m_begin, currSize);
+			}
+			m_begin = newBegin;
+			m_end = m_begin + newSize;
+			m_capacity = newCapacity;
+			RDE_ASSERT(invariant());
+		}
+	}
+
+	// Reallocates memory, doesnt copy contents of old buffer.
+	RDE_FORCEINLINE void reallocate_discard_old(base_vector::size_type newCapacity)
+	{
+		if (newCapacity > m_capacity)
+		{
+			if (!TGrowOnOverflow)
+			{
+				RDE_ASSERT(!"fixed_vector cannot grow");
+			}
+			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
+			const base_vector::size_type currSize(m_end - m_begin);
+			if (m_begin)
+				destroy(m_begin, currSize);
+			m_begin = newBegin;
+			m_end = m_begin + currSize;
+			m_capacity = newCapacity;
+		}
+		RDE_ASSERT(invariant());
+	}
+	RDE_FORCEINLINE void destroy(T* ptr, base_vector::size_type n)
+	{
+		rde::destruct_n(ptr, n);
+		if (ptr != &m_data[0])
+			m_allocator.deallocate(ptr, n * sizeof(T));
+	}
+	bool invariant() const
+	{
+		return m_end >= m_begin;
+	}
+	
+	T*						m_begin;
+	T*						m_end;
+	T						m_data[TCapacity];
+	base_vector::size_type	m_capacity;
+	TAllocator				m_allocator;
+};
+
+//=============================================================================
 // Simplified vector class.
 // Mimics std::vector.
-template<typename T, class TAllocator = rde::allocator>
-class vector : public base_vector
+template<typename T, class TAllocator = rde::allocator,
+	class TStorage = standard_vector_storage<T, TAllocator> >
+class vector : public base_vector, private TStorage
 {
 public:
 	typedef T			value_type;
@@ -27,37 +168,25 @@ public:
 	typedef TAllocator	allocator_type;
 
 	explicit vector(const allocator_type& allocator = allocator_type())
-	:	m_begin(0),
-		m_end(0),
-		m_capacity(0),
-		m_allocator(allocator)
+	:	TStorage(allocator)
 	{
 		/**/
 	}
+
 	explicit vector(size_t initialSize, const allocator_type& allocator = allocator_type())
-	:	m_begin(0),
-		m_end(0),
-		m_capacity(0),
-		m_allocator(allocator)
+	:	TStorage(allocator)
 	{
 		resize(initialSize);
 	}
 	vector(const T* first, const T* last, const allocator_type& allocator = allocator_type())
-	:	m_begin(0),
-		m_end(0),
-		m_capacity(0),
-		m_allocator(allocator)
+	:	TStorage(allocator)
 	{
 		assign(first, last);
 	}
 	// @note: allocator is not copied from rhs.
 	// @note: will not perform default constructor for newly created objects.
 	vector(const vector& rhs, const allocator_type& allocator = allocator_type())
-	:	m_begin(0),
-		m_allocator(allocator)
-#if RDE_DEBUG
-		, m_capacity(0)
-#endif
+	:	TStorage(allocator)
 	{
 		reallocate_discard_old(rhs.capacity());
 		rde::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
@@ -67,7 +196,7 @@ public:
 	~vector()
 	{
 		if (m_begin != 0)
-			destroy(m_begin, size());
+			TStorage::destroy(m_begin, size());
 	}
 
 	// @note: allocator is not copied!
@@ -312,44 +441,6 @@ public:
 	}
 
 private:
-	inline void reallocate(size_type newCapacity, bool canShrink = false)
-	{
-		if (canShrink || newCapacity > m_capacity)
-		{
-			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-			const size_type newSize = std::min(size(), newCapacity);
-			// Copy old data if needed.
-			if (m_begin)
-			{
-				rde::copy_construct_n(m_begin, newSize, newBegin);
-				destroy(m_begin, size());
-			}
-			m_begin = newBegin;
-			m_end = m_begin + newSize;
-			m_capacity = newCapacity;
-			RDE_ASSERT(invariant());
-		}
-	}
-
-	// Reallocates memory, doesnt copy contents of old buffer.
-	RDE_FORCEINLINE void reallocate_discard_old(size_type newCapacity)
-	{
-		RDE_ASSERT(newCapacity > m_capacity);
-		T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-		const size_type currSize = size();
-		if (m_begin)
-			destroy(m_begin, currSize);
-		m_begin = newBegin;
-		m_end = m_begin + currSize;
-		m_capacity = newCapacity;
-		RDE_ASSERT(invariant());
-	}
-
-	RDE_FORCEINLINE void destroy(T* ptr, size_type n)
-	{
-		rde::destruct_n(ptr, n);
-		m_allocator.deallocate(ptr, n * sizeof(T));
-	}
 
 	RDE_FORCEINLINE size_type compute_new_capacity(size_type newMinCapacity) const
 	{
@@ -370,16 +461,6 @@ private:
 		rde::destruct_n(m_begin + newSize, toShrink);
 		m_end = m_begin + newSize;
 	}
-
-	bool invariant() const
-	{
-		return m_end >= m_begin;
-	}
-
-	T*				m_begin;
-	T*				m_end;
-	size_type		m_capacity;
-	allocator_type	m_allocator;
 };
 
 } // namespace rde
