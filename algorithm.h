@@ -13,7 +13,8 @@ namespace rde
 template<typename T> RDE_FORCEINLINE
 void copy_construct(T* mem, const T& orig)
 {
-	new (mem) T(orig);
+	//new (mem) T(orig);
+	internal::copy_construct(mem, orig, int_to_type<has_trivial_copy<T>::value>());
 }
 
 //-----------------------------------------------------------------------------

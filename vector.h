@@ -27,8 +27,7 @@ struct standard_vector_storage
 		/**/
 	}	
 
-	inline void reallocate(base_vector::size_type newCapacity, 
-		bool canShrink = false)
+	void reallocate(base_vector::size_type newCapacity, bool canShrink = false)
 	{
 		if (canShrink || newCapacity > m_capacity)
 		{
@@ -49,7 +48,7 @@ struct standard_vector_storage
 	}
 
 	// Reallocates memory, doesnt copy contents of old buffer.
-	RDE_FORCEINLINE void reallocate_discard_old(base_vector::size_type newCapacity)
+	void reallocate_discard_old(base_vector::size_type newCapacity)
 	{
 		RDE_ASSERT(newCapacity > m_capacity);
 		T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
@@ -91,8 +90,7 @@ struct fixed_vector_storage
 	}	
 
 	// @note	Cant shrink
-	inline void reallocate(base_vector::size_type newCapacity, 
-		bool /*canShrink*/ = false)
+	void reallocate(base_vector::size_type newCapacity, bool /*canShrink*/ = false)
 	{
 		if (newCapacity > m_capacity)
 		{
@@ -118,7 +116,7 @@ struct fixed_vector_storage
 	}
 
 	// Reallocates memory, doesnt copy contents of old buffer.
-	RDE_FORCEINLINE void reallocate_discard_old(base_vector::size_type newCapacity)
+	void reallocate_discard_old(base_vector::size_type newCapacity)
 	{
 		if (newCapacity > m_capacity)
 		{

@@ -6,52 +6,42 @@
 
 namespace rde
 {
-//=============================================================================
-template<typename T, class TAllocator = rde::allocator>
-class slist
+namespace internal
 {
-	private:
-	// @todo: consider dividing into 2 classes.
-	// base_node with next + node with value.
-	// move some code to .cpp -> smaller coder -> win?
-	struct node
+	struct slist_base_node
 	{
-		node() 
+		slist_base_node()
 		{
-#if RDE_DEBUG
 			reset();
-#endif
 		}
-		explicit node(const T& v):	value(v) 
-		{
-#if RDE_DEBUG
-			reset();
-#endif
-		}
-
 		void reset()
 		{
 			next = this;
 		}
 		bool in_list() const { return this != next; }
 
-		void link_after(node* prevNode)
-		{
-			RDE_ASSERT(!in_list());
-			next = prevNode->next;
-			prevNode->next = this;
-		}
-		void unlink(node* prevNode)
-		{
-			RDE_ASSERT(in_list());
-			RDE_ASSERT(prevNode->next == this);
-			prevNode->next = next;
-			next = this;
-		}
+		void link_after(slist_base_node* prevNode);
+		void unlink(slist_base_node* prevNode);
 
-		node*	next;
+		slist_base_node*	next;
+	};
+}
+
+//=============================================================================
+template<typename T, class TAllocator = rde::allocator>
+class slist
+{
+	private:
+	struct node : public internal::slist_base_node
+	{
+		node():	internal::slist_base_node() {}
+		explicit node(const T& v): internal::slist_base_node(),	value(v) {}
 		T		value;
 	};
+	static RDE_FORCEINLINE node* upcast(internal::slist_base_node* n)
+	{
+		return (node*)n;
+	}
 	template<typename TNodePtr, typename TPtr, typename TRef>
 	class node_iterator
 	{
@@ -81,12 +71,12 @@ class slist
 		}
 		TNodePtr next() const
 		{
-			return m_node->next;
+			return upcast(m_node->next);
 		}
 		
 		node_iterator& operator++()
 		{
-			m_node = m_node->next;
+			m_node = upcast(m_node->next);
 			return *this;
 		}
 		node_iterator operator++(int)
@@ -150,13 +140,13 @@ public:
 		return *this;
 	}
 
-	iterator begin()				{ return iterator(m_root.next); }
-	const_iterator begin() const	{ return const_iterator(m_root.next); }
+	iterator begin()				{ return iterator(upcast(m_root.next)); }
+	const_iterator begin() const	{ return const_iterator(upcast(m_root.next)); }
 	iterator end()					{ return iterator(&m_root); }
 	const_iterator end() const		{ return const_iterator(&m_root); }
 
-	const T& front() const	{ RDE_ASSERT(!empty()); return m_root.next->value; }
-	T& front()				{ RDE_ASSERT(!empty()); return m_root.next->value; }
+	const T& front() const	{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
+	T& front()				{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
 
 	void push_front(const T& value)
 	{
@@ -190,10 +180,10 @@ public:
 	void clear()
 	{
 		// quicker then erase(begin(), end())
-		node* it = m_root.next;
+		node* it = upcast(m_root.next);
 		while (it != &m_root)
 		{
-			node* nextIt = it->next;
+			node* nextIt = upcast(it->next);
 			destruct_node(it);
 			it = nextIt;
 		}
@@ -204,12 +194,12 @@ public:
 	// as a policy? via preprocessor macro? TBD
 	size_type size() const
 	{
-		const node* it = m_root.next;
+		const node* it = upcast(m_root.next);
 		size_type size(0);
 		while (it != &m_root)
 		{
 			++size;
-			it = it->next;
+			it = upcast(it->next);
 		}
 		return size;
 	}

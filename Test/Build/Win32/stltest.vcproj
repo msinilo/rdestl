@@ -494,6 +494,14 @@
 		<File
 			RelativePath="..\..\FixedVectorTest.cpp"
 			>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AssemblerOutput="4"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath="..\..\HashMapTest.cpp"
@@ -538,6 +546,14 @@
 		<File
 			RelativePath="..\..\VectorTest.cpp"
 			>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AssemblerOutput="4"
+				/>
+			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

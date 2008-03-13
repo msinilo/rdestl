@@ -5,21 +5,6 @@
 
 namespace rde
 {
-// @todo: test speed vs memcpy
-template<typename T> RDE_FORCEINLINE
-void mymemcpy(const T* dst, const T* src, size_t n)
-{
-	__asm mov	edi, [dst]
-	__asm mov	esi, [src]
-	__asm mov	ecx, [n]
-	__asm push  ecx
-	__asm shr	ecx, 2
-	__asm rep	movsd
-	__asm pop   ecx
-	__asm and   ecx, 0x3
-	__asm rep	movsb
-}
-
 namespace internal
 {
 	template<typename T>
@@ -137,6 +122,17 @@ namespace internal
 	void construct(T*, int_to_type<true>)
 	{
 		// Nothing to do
+	}
+
+	template<typename T>
+	void copy_construct(T* mem, const T& orig, int_to_type<false>)
+	{
+		new (mem) T(orig);
+	}
+	template<typename T> RDE_FORCEINLINE
+	void copy_construct(T* mem, const T& orig, int_to_type<true>)
+	{
+		mem[0] = orig;
 	}
 
 	template<typename T>
