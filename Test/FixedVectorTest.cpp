@@ -1,11 +1,10 @@
 #include <UnitTest++/src/UnitTest++.h>
-#include "rdestl/vector.h"
+#include "rdestl/fixed_vector.h"
 
 namespace
 {
-	typedef rde::fixed_vector<int, 64, true>	tTestVector;
-	typedef rde::vector<std::string, rde::allocator, 
-		rde::fixed_vector_storage<std::string, rde::allocator, 64, true> > tStringVector;
+	typedef rde::fixed_vector<int, 64, true>			tTestVector;
+	typedef rde::fixed_vector<std::string, 64, true>	tStringVector;
 
 	const int array [] = { 1, 4, 9, 16, 25, 36 }; 
 
@@ -60,6 +59,9 @@ namespace
 	{
 		tTestVector v(array, array + 6);
 		CHECK_EQUAL(6ul, v.size());
+#if RDESTL_RECORD_WATERMARKS
+		CHECK_EQUAL(6ul, v.get_high_watermark());
+#endif
 		CHECK_EQUAL(0, memcmp(array, v.data(), sizeof(array)));
 	}
 
@@ -238,7 +240,21 @@ namespace
 		CHECK_EQUAL(2, v[1]);
 		CHECK_EQUAL(3, v[2]);
 	}
-
+#if RDESTL_RECORD_WATERMARKS
+	TEST(Watermarks)
+	{
+		tTestVector v;
+		CHECK_EQUAL(0ul, v.get_high_watermark());
+		v.push_back(1);
+		CHECK_EQUAL(1ul, v.get_high_watermark());
+		v.push_back(2); v.push_back(3); v.push_back(4);
+		CHECK_EQUAL(4ul, v.get_high_watermark());
+		v.pop_back();
+		CHECK_EQUAL(4ul, v.get_high_watermark());
+		v.clear();
+		CHECK_EQUAL(4ul, v.get_high_watermark());
+	}
+#endif
 #if !RDESTL_STANDALONE
 	int numFailedAssertions(0);
 	bool AssertionHandler(const char*, const char*, int)

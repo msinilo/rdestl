@@ -428,6 +428,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\fixed_sorted_vector.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\fixed_vector.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\functional.h"
 			>
 		</File>

@@ -50,6 +50,7 @@ public:
 	{
 		/**/
 	}
+#if 0
 	template <class InputIterator>
 	sorted_vector(InputIterator first, InputIterator last, 
 		const allocator_type& allocator = allocator_type())
@@ -57,6 +58,7 @@ public:
 	{
 		// @todo: sort!
 	}
+#endif
 
 	// @note: no non-const operator[], it may cause performance problems.
 	// use explicit ways: insert or find.
@@ -78,6 +80,7 @@ public:
 			it = Base::insert(it, val);
 			found = false;
 		}
+		RDE_ASSERT(invariant());
 		return pair<iterator, bool>(it, !found);
 	}
 	// @extension
@@ -119,6 +122,7 @@ public:
         if (i == end()) 
 			return 0;
         erase(i);
+		RDE_ASSERT(invariant());
         return 1;
 	}
 
@@ -166,22 +170,6 @@ private:
 	}
 
 	internal::compare_func<value_type, TCompare>	m_compare;
-};
-
-template<typename TKey, typename TValue, 
-	int TCapacity, bool TGrowOnOverflow, class TCompare = rde::less<TKey>,
-	class TAllocator = rde::allocator>
-class fixed_sorted_vector : public sorted_vector<TKey, TValue, TCompare,
-	TAllocator,
-	fixed_vector_storage<pair<TKey, TValue>, TAllocator, TCapacity, 
-		TGrowOnOverflow> >
-{
-public:
-	explicit fixed_sorted_vector(const allocator_type& allocator = allocator_type())
-	:	sorted_vector(allocator)
-	{
-		/**/
-	}
 };
 
 } // namespace rde
