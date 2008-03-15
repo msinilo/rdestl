@@ -94,10 +94,10 @@ struct fixed_vector_storage
 #if RDESTL_RECORD_WATERMARKS
 		return m_max_size;
 #else
-		return 0;	// ???
+		return m_capacity;	// ???
 #endif
 	}
-
+	
 	T*						m_begin;
 	T*						m_end;
 	T						m_data[TCapacity];
