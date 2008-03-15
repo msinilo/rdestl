@@ -30,19 +30,20 @@ namespace internal
 
 //=============================================================================
 template<typename TKey, typename TValue, class TCompare = rde::less<TKey>,
-	class TAllocator = rde::allocator>
-class sorted_vector : private vector<pair<TKey, TValue> >
+	class TAllocator = rde::allocator, 
+	class TStorage = rde::standard_vector_storage<pair<TKey, TValue>, TAllocator> >
+class sorted_vector : private vector<pair<TKey, TValue>, TAllocator, TStorage >
 {
-	typedef vector<pair<TKey, TValue> >	Base;
+	typedef vector<pair<TKey, TValue>, TAllocator, TStorage>	Base;
 
 public:
-	typedef TKey							key_type;
-	typedef TValue							mapped_type;
-	typedef typename Base::size_type		size_type;
-	typedef typename Base::value_type		value_type;
+	typedef TKey								key_type;
+	typedef TValue								mapped_type;
+	typedef typename Base::size_type			size_type;
+	typedef typename Base::value_type			value_type;
 	typedef typename Base::iterator			iterator;
-	typedef typename Base::const_iterator	const_iterator;
-	typedef typename Base::allocator_type	allocator_type;
+	typedef typename Base::const_iterator		const_iterator;
+	typedef typename Base::allocator_type		allocator_type;
 
 	explicit sorted_vector(const allocator_type& allocator = allocator_type())
 	:	vector(allocator)
@@ -165,6 +166,22 @@ private:
 	}
 
 	internal::compare_func<value_type, TCompare>	m_compare;
+};
+
+template<typename TKey, typename TValue, 
+	int TCapacity, bool TGrowOnOverflow, class TCompare = rde::less<TKey>,
+	class TAllocator = rde::allocator>
+class fixed_sorted_vector : public sorted_vector<TKey, TValue, TCompare,
+	TAllocator,
+	fixed_vector_storage<pair<TKey, TValue>, TAllocator, TCapacity, 
+		TGrowOnOverflow> >
+{
+public:
+	explicit fixed_sorted_vector(const allocator_type& allocator = allocator_type())
+	:	sorted_vector(allocator)
+	{
+		/**/
+	}
 };
 
 } // namespace rde

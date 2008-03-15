@@ -15,6 +15,8 @@ struct base_vector
 };
 
 //=============================================================================
+// Standard vector storage.
+// Dynamic allocation, can grow, can shrink.
 template<typename T, class TAllocator>
 struct standard_vector_storage 
 {
@@ -69,6 +71,10 @@ struct standard_vector_storage
 	{
 		return m_end >= m_begin;
 	}
+	RDE_FORCEINLINE void record_high_watermark()
+	{
+		// empty
+	}
 
 	T*						m_begin;
 	T*						m_end;
@@ -85,6 +91,9 @@ struct fixed_vector_storage
 		m_end(m_begin),
 		m_capacity(TCapacity),
 		m_allocator(allocator)
+#if RDESTL_RECORD_WATERMARKS
+		, m_max_size(0)
+#endif
 	{
 		/**/
 	}	
@@ -97,6 +106,7 @@ struct fixed_vector_storage
 			if (!TGrowOnOverflow)
 			{
 				RDE_ASSERT(!"fixed_vector cannot grow");
+				// @TODO: do something more spectacular here... do NOT throw exception, tho :)
 			}
 
 			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
@@ -111,6 +121,7 @@ struct fixed_vector_storage
 			m_begin = newBegin;
 			m_end = m_begin + newSize;
 			m_capacity = newCapacity;
+			record_high_watermark();
 			RDE_ASSERT(invariant());
 		}
 	}
@@ -130,6 +141,7 @@ struct fixed_vector_storage
 				destroy(m_begin, currSize);
 			m_begin = newBegin;
 			m_end = m_begin + currSize;
+			record_high_watermark();
 			m_capacity = newCapacity;
 		}
 		RDE_ASSERT(invariant());
@@ -144,12 +156,23 @@ struct fixed_vector_storage
 	{
 		return m_end >= m_begin;
 	}
+	RDE_FORCEINLINE void record_high_watermark()
+	{
+#if RDESTL_RECORD_WATERMARKS
+		const base_vector::size_type curr_size(m_end - m_begin);
+		if (curr_size > m_max_size)
+			m_max_size = curr_size;
+#endif
+	}
 	
 	T*						m_begin;
 	T*						m_end;
 	T						m_data[TCapacity];
 	base_vector::size_type	m_capacity;
 	TAllocator				m_allocator;
+#if RDESTL_RECORD_WATERMARKS
+	base_vector::size_type	m_max_size;
+#endif
 };
 
 //=============================================================================
@@ -170,7 +193,6 @@ public:
 	{
 		/**/
 	}
-
 	explicit vector(size_t initialSize, const allocator_type& allocator = allocator_type())
 	:	TStorage(allocator)
 	{
@@ -189,6 +211,7 @@ public:
 		reallocate_discard_old(rhs.capacity());
 		rde::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
 		m_end = m_begin + rhs.size();
+		TStorage::record_high_watermark();
 		RDE_ASSERT(invariant());
 	}
 	~vector()
@@ -206,8 +229,9 @@ public:
 		{
 			reallocate_discard_old(rhs.capacity());
 		}
-		rde::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
-		m_end = m_begin + rhs.size();
+		rde::copy_construct_n(rhs.m_begin, newSize, m_begin);
+		m_end = m_begin + newSize;
+		TStorage::record_high_watermark();
 		RDE_ASSERT(invariant());
 		
 		return *this;
@@ -220,7 +244,7 @@ public:
 	iterator end()					{ return m_end; }
 	const_iterator end() const		{ return m_end; }
 	size_type size() const			{ return size_type(m_end - m_begin); }
-	size_type empty() const			{ return size() == 0; }
+	size_type empty() const			{ return m_begin == m_end; }
 	size_type capacity() const		{ return m_capacity; }
 
 	T* data()				{ return empty() ? 0 : m_begin; }
@@ -254,6 +278,7 @@ public:
 			grow();
 		rde::copy_construct(m_end, v);
 		++m_end;
+		TStorage::record_high_watermark();
 	}
 	// @note: extension. Use instead of push_back(T()) or resize(size() + 1).
 	void push_back()
@@ -262,6 +287,7 @@ public:
 			grow();
 		rde::construct(m_end);
 		++m_end;
+		TStorage::record_high_watermark();
 	}
 	void pop_back()
 	{
@@ -283,10 +309,13 @@ public:
 			grow_discard_old(count);
 		rde::copy_n(first, count, m_begin);
 		m_end = m_begin + count;
+		TStorage::record_high_watermark();
+		RDE_ASSERT(invariant());
 	}
 
 	void insert(size_type index, size_type n, const T& val)
 	{
+		RDE_ASSERT(invariant());
 		const size_type indexEnd = index + n;
 		const size_type prevSize = size();
 		if (prevSize + n > m_capacity)
@@ -315,17 +344,20 @@ public:
 				insertPos[i] = val;
 		}
 		m_end += n; 
+		TStorage::record_high_watermark();
 	}
 	// @pre validate_iterator(it)
 	// @note use push_back for maximum efficiency if it == end()!
 	void insert(iterator it, size_type n, const T& val)
 	{
 		RDE_ASSERT(validate_iterator(it));
+		RDE_ASSERT(invariant());
 		insert(size_type(it - m_begin), n, val);
 	}
 	iterator insert(iterator it, const T& val)
 	{
 		RDE_ASSERT(validate_iterator(it));
+		RDE_ASSERT(invariant());
 		const size_type index = it - m_begin;
 		const size_type prevSize = size();
 		RDE_ASSERT(index <= prevSize);
@@ -346,6 +378,8 @@ public:
 		}
 		*it = val;
 		++m_end;
+		RDE_ASSERT(invariant());
+		TStorage::record_high_watermark();
 		return it;
 	}
 
@@ -354,7 +388,8 @@ public:
 	iterator erase(iterator it)
 	{
 		RDE_ASSERT(validate_iterator(it));
-		RDE_ASSERT(it != end());  
+		RDE_ASSERT(it != end());
+		RDE_ASSERT(invariant());
 		// Move everything down, overwriting *it
 		rde::copy(it + 1, m_end, it);
 		--m_end;
@@ -365,6 +400,7 @@ public:
 	{
 		RDE_ASSERT(validate_iterator(first));
 		RDE_ASSERT(validate_iterator(last));
+		RDE_ASSERT(invariant());
 		if (last <= first)
 			return end();
 		
@@ -384,6 +420,7 @@ public:
 	{
 		RDE_ASSERT(validate_iterator(it));
 		RDE_ASSERT(it != end());
+		RDE_ASSERT(invariant());
 		const iterator itNewEnd = end() - 1;
 		if (it != itNewEnd)
 			*it = *itNewEnd;
@@ -439,7 +476,6 @@ public:
 	}
 
 private:
-
 	RDE_FORCEINLINE size_type compute_new_capacity(size_type newMinCapacity) const
 	{
 		return (newMinCapacity > m_capacity * 2 ? newMinCapacity : (m_capacity == 0 ? 16 : m_capacity * 2));
@@ -458,6 +494,48 @@ private:
 		const size_type toShrink = size() - newSize;
 		rde::destruct_n(m_begin + newSize, toShrink);
 		m_end = m_begin + newSize;
+	}
+};
+
+template<typename T, int TCapacity, bool TGrowOnOverflow,
+	class TAllocator = rde::allocator>
+class fixed_vector : public vector<T, TAllocator, 
+	fixed_vector_storage<T, TAllocator, TCapacity, TGrowOnOverflow> >
+{
+	typedef vector<T, TAllocator, 
+		fixed_vector_storage<T, TAllocator, TCapacity, TGrowOnOverflow> > super;
+public:
+	explicit fixed_vector(const allocator_type& allocator = allocator_type())
+	:	super(allocator)
+	{
+		/**/
+	}
+	explicit fixed_vector(size_t initialSize, const allocator_type& allocator = allocator_type())
+	:	super(initialSize, allocator)
+	{
+		/**/
+	}
+	fixed_vector(const T* first, const T* last, const allocator_type& allocator = allocator_type())
+	:	super(first, last, allocator)
+	{
+		/**/
+	}
+	// @note: allocator is not copied from rhs.
+	// @note: will not perform default constructor for newly created objects.
+	fixed_vector(const fixed_vector& rhs, const allocator_type& allocator = allocator_type())
+	:	super(rhs, allocator)
+	{
+		/**/
+	}
+
+	fixed_vector& operator=(const fixed_vector& rhs)
+	{
+		if (&rhs != this)
+		{
+			super& superThis = *this;
+			superThis = rhs;
+		}
+		return *this;
 	}
 };
 

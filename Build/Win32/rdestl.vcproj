@@ -464,6 +464,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\list.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\list.h"
 			>
 		</File>

@@ -8,8 +8,6 @@
 
 namespace rde
 {
-// @todo: wrapper over memcpy
-
 //=============================================================================
 // @note: this one is totally _not_ std::string compatible for the time being!
 // one way conversion should work, ie rde --> STL.

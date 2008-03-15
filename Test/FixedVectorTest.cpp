@@ -3,8 +3,7 @@
 
 namespace
 {
-	typedef rde::vector<int, rde::allocator, 
-		rde::fixed_vector_storage<int, rde::allocator, 64, true> > tTestVector;
+	typedef rde::fixed_vector<int, 64, true>	tTestVector;
 	typedef rde::vector<std::string, rde::allocator, 
 		rde::fixed_vector_storage<std::string, rde::allocator, 64, true> > tStringVector;
 
@@ -230,6 +229,7 @@ namespace
 	TEST(Reserve)
 	{
 		tTestVector v;
+		CHECK_EQUAL(64ul, v.capacity());
 		v.push_back(1); v.push_back(2); v.push_back(3);
 		v.reserve(120);
 		CHECK(v.capacity() >= 120);
@@ -239,5 +239,22 @@ namespace
 		CHECK_EQUAL(3, v[2]);
 	}
 
+#if !RDESTL_STANDALONE
+	int numFailedAssertions(0);
+	bool AssertionHandler(const char*, const char*, int)
+	{
+		++numFailedAssertions;
+		return true;
+	}
+	TEST(AssertOnOverflow)
+	{
+		rde::fixed_vector<int, 10, false> v;
+		rde::assertion::Handler prevHandler = rde::assertion::SetHandler(AssertionHandler);
+		for (int i = 0; i < 11; ++i)
+			v.push_back(i);
+		CHECK_EQUAL(1, numFailedAssertions);
+		rde::assertion::SetHandler(prevHandler);
+	}
+#endif
 }
 

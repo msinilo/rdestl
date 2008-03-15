@@ -492,6 +492,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\FixedSortedVectorTest.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\FixedVectorTest.cpp"
 			>
 			<FileConfiguration

@@ -38,7 +38,7 @@ public:
 	typedef size_t				size_type;
 	typedef TAllocator			allocator_type;
 	typedef const value_type*	const_iterator;
-	static const size_type	kGranularity = 32;	
+	static const size_type		kGranularity = 32;	
 
 	explicit cow_string_storage(const allocator_type& allocator)
 	:	m_allocator(allocator)
@@ -50,7 +50,7 @@ public:
 	{
 		const int len = strlen(str);
 		construct_string(len);
-		memcpy(m_data, str, len*sizeof(value_type));
+		sys::MemCpy(m_data, str, len*sizeof(value_type));
 		RDE_ASSERT(len < string_rep::kMaxCapacity);
 		get_rep()->size = static_cast<short>(len);
 		m_data[len] = 0;
@@ -60,7 +60,7 @@ public:
 	:	m_allocator(allocator)
 	{
 		construct_string(len);
-		memcpy(m_data, str, len*sizeof(value_type));
+		sys::MemCpy(m_data, str, len*sizeof(value_type));
 		RDE_ASSERT(len < string_rep::kMaxCapacity);
 		get_rep()->size = static_cast<short>(len);
 		m_data[len] = 0;
@@ -94,7 +94,7 @@ public:
 		RDE_ASSERT(str != m_data);
 		release_string();
 		construct_string(len);
-		memcpy(m_data, str, len*sizeof(value_type));
+		sys::MemCpy(m_data, str, len*sizeof(value_type));
 		get_rep()->size = short(len);
 		m_data[len] = 0;
 	}
@@ -108,7 +108,7 @@ public:
 		RDE_ASSERT(rep->capacity >= short(newCapacity));
 		const size_type newLen = prevLen + len;
 		RDE_ASSERT(short(newLen) <= rep->capacity);
-		memcpy(m_data + prevLen, str, len * sizeof(value_type));
+		sys::MemCpy(m_data + prevLen, str, len * sizeof(value_type));
 		m_data[newLen] = 0;
 		rep->size = short(newLen);
 	}
@@ -211,7 +211,7 @@ private:
 				string_rep* newRep = reinterpret_cast<string_rep*>(newMem);
 				newRep->init(short(capacity_hint));
 				value_type* newData = reinterpret_cast<value_type*>(newRep + 1);
-				memcpy(newData, m_data, rep->size*sizeof(value_type));
+				sys::MemCpy(newData, m_data, rep->size*sizeof(value_type));
 				newRep->size = rep->size;
 				newData[rep->size] = 0;
 				release_string();

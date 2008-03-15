@@ -24,7 +24,7 @@ public:
 	{
 		const int len = strlen(str);
 		m_data = construct_string(len);
-		memcpy(m_data, str, len*sizeof(value_type));
+		sys::MemCpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
 	}
@@ -33,7 +33,7 @@ public:
 	:	m_allocator(allocator)
 	{
 		m_data = construct_string(len);
-		memcpy(m_data, str, len*sizeof(value_type));
+		sys::MemCpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
 	}
@@ -67,7 +67,7 @@ public:
 			release_string();
 			m_data = construct_string(len);
 		}
-		memcpy(m_data, str, len*sizeof(value_type));
+		sys::MemCpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
 	}
@@ -79,11 +79,11 @@ public:
 		if (m_capacity <= newLen + 1)
 		{
 			value_type* newData = construct_string(newLen);
-			memcpy(newData, m_data, prevLen * sizeof(value_type));
+			sys::MemCpy(newData, m_data, prevLen * sizeof(value_type));
 			release_string();
 			m_data = newData;
 		}
-		memcpy(m_data + prevLen, str, len * sizeof(value_type));
+		sys::MemCpy(m_data + prevLen, str, len * sizeof(value_type));
 		m_data[newLen] = 0;
 		m_length = newLen;
 		RDE_ASSERT(invariant());
