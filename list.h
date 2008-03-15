@@ -6,55 +6,46 @@
 
 namespace rde
 {
-//=============================================================================
-template<typename T, class TAllocator = rde::allocator>
-class list
+namespace internal
 {
-private:
-	// @todo: consider dividing into 2 classes.
-	// base_node with next/prev + node with value.
-	// move some code to .cpp -> smaller coder -> win?
-	struct node
+	struct list_base_node
 	{
-		node() 
+		list_base_node()
 		{
 #if RDE_DEBUG
 			reset();
 #endif
 		}
-		explicit node(const T& v):	value(v) 
-		{
-#if RDE_DEBUG
-			reset();
-#endif
-		}
-
 		void reset()
 		{
 			next = prev = this;
 		}
 		bool in_list() const { return this != next; }
 
-		void link_before(node* nextNode)
-		{
-			RDE_ASSERT(!in_list());
-			prev = nextNode->prev;
-			prev->next = this;
-			nextNode->prev = this;
-			next = nextNode;
-		}
-		void unlink()
-		{
-			RDE_ASSERT(in_list());
-			prev->next = next;
-			next->prev = prev;
-			next = prev = this;
-		}
+		void link_before(list_base_node* nextNode);
+		void unlink();
 
-		node*	next;
-		node*	prev;
+		list_base_node* prev;
+		list_base_node*	next;
+	};
+}
+
+//=============================================================================
+template<typename T, class TAllocator = rde::allocator>
+class list
+{
+private:
+	struct node : public internal::list_base_node
+	{
+		node():	list_base_node() {}
+		explicit node(const T& v): list_base_node(), value(v) {}
+
 		T		value;
 	};
+	static RDE_FORCEINLINE node* upcast(internal::list_base_node* n)
+	{
+		return (node*)n;
+	}
 
 	template<typename TNodePtr, typename TPtr, typename TRef>
 	class node_iterator
@@ -86,12 +77,12 @@ private:
 
 		node_iterator& operator++()
 		{
-			m_node = m_node->next;
+			m_node = upcast(m_node->next);
 			return *this;
 		}
 		node_iterator& operator--()
 		{
-			m_node = m_node->prev;
+			m_node = upcast(m_node->prev);
 			return *this;
 		}
 		node_iterator operator++(int)
@@ -121,10 +112,10 @@ private:
 	};
 
 public:
-	typedef T												value_type;
-	typedef TAllocator										allocator_type;
-	typedef size_t											size_type;
-	typedef node_iterator<node*, T*, T&>					iterator;
+	typedef T													value_type;
+	typedef TAllocator											allocator_type;
+	typedef size_t												size_type;
+	typedef node_iterator<node*, T*, T&>						iterator;
 	typedef node_iterator<const node*, const T*, const T&>	const_iterator;
 	static const size_t										kNodeSize = sizeof(node);
 
@@ -161,15 +152,15 @@ public:
 		return *this;
 	}
 
-	iterator begin()				{ return iterator(m_root.next); }
-	const_iterator begin() const	{ return const_iterator(m_root.next); }
+	iterator begin()				{ return iterator(upcast(m_root.next)); }
+	const_iterator begin() const	{ return const_iterator(upcast(m_root.next)); }
 	iterator end()					{ return iterator(&m_root); }
 	const_iterator end() const		{ return const_iterator(&m_root); }
 
-	const T& front() const	{ RDE_ASSERT(!empty()); return m_root.next->value; }
-	T& front()				{ RDE_ASSERT(!empty()); return m_root.next->value; }
-	const T& back() const	{ RDE_ASSERT(!empty()); return m_root.prev->value; }
-	T& back()				{ RDE_ASSERT(!empty()); return m_root.prev->value; }
+	const T& front() const	{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
+	T& front()				{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
+	const T& back() const	{ RDE_ASSERT(!empty()); return upcast(m_root.prev)->value; }
+	T& back()				{ RDE_ASSERT(!empty()); return upcast(m_root.prev)->value; }
 
 	void push_front(const T& value)
 	{
@@ -180,7 +171,7 @@ public:
 	void pop_front()
 	{
 		RDE_ASSERT(!empty());
-		node* frontNode = m_root.next;
+		node* frontNode = upcast(m_root.next);
 		frontNode->unlink();
 		destruct_node(frontNode);
 	}
@@ -194,7 +185,7 @@ public:
 	void pop_back()
 	{
 		RDE_ASSERT(!empty());
-		node* backNode = m_root.prev;
+		node* backNode = upcast(m_root.prev);
 		backNode->unlink();
 		destruct_node(backNode);
 	}
@@ -237,10 +228,10 @@ public:
 	void clear()
 	{
 		// quicker then erase(begin(), end())
-		node* it = m_root.next;
+		node* it = upcast(m_root.next);
 		while (it != &m_root)
 		{
-			node* nextIt = it->next;
+			node* nextIt = upcast(it->next);
 			destruct_node(it);
 			it = nextIt;
 		}
@@ -250,12 +241,12 @@ public:
 	// as a policy? via preprocessor macro? TBD
 	size_type size() const
 	{
-		const node* it = m_root.next;
+		const node* it = upcast(m_root.next);
 		size_type size(0);
 		while (it != &m_root)
 		{
 			++size;
-			it = it->next;
+			it = upcast(it->next);
 		}
 		return size;
 	}
