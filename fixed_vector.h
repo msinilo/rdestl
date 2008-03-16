@@ -12,7 +12,7 @@ template<typename T, class TAllocator, int TCapacity, bool TGrowOnOverflow>
 struct fixed_vector_storage 
 {
 	explicit fixed_vector_storage(const TAllocator& allocator)
-	:	m_begin(&m_data[0]),
+	:	m_begin((T*)&m_data[0]),
 		m_end(m_begin),
 		m_capacity(TCapacity),
 		m_allocator(allocator)
@@ -74,7 +74,7 @@ struct fixed_vector_storage
 	RDE_FORCEINLINE void destroy(T* ptr, base_vector::size_type n)
 	{
 		rde::destruct_n(ptr, n);
-		if (ptr != &m_data[0])
+		if ((unsigned char*)ptr != &m_data[0])
 			m_allocator.deallocate(ptr, n * sizeof(T));
 	}
 	bool invariant() const
@@ -100,7 +100,9 @@ struct fixed_vector_storage
 	
 	T*						m_begin;
 	T*						m_end;
-	T						m_data[TCapacity];
+	typedef char ERR_InvalidUCharSize[sizeof(unsigned char) == 1 ? 1 : -1];
+	// Not T[], because we need uninitialized memory.
+	unsigned char			m_data[TCapacity * sizeof(T)];
 	// @todo: m_capacity is not really needed for containers that
 	// cant overflow.
 	base_vector::size_type	m_capacity;
