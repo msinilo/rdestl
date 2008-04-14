@@ -4,6 +4,7 @@
 namespace
 {
 	const int array [] = { 1, 4, 9, 16, 25, 36 }; 
+
 	TEST(ConstructEmpty)
 	{
 		rde::list<int> lst;
