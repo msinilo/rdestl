@@ -9,7 +9,7 @@ namespace rde
 template<typename T1, typename T2>
 struct pair
 {
-	typedef	T1	first_type;
+	typedef T1	first_type;
 	typedef T2	second_type;
 
 	pair() {/**/}
