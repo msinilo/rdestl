@@ -202,6 +202,18 @@ TIter find_if(TIter first, TIter last, const T& val, const TPred& pred)
 	return last;
 }
 
+//-----------------------------------------------------------------------------
+template<class TIter, typename T>
+void accumulate(TIter first, TIter last, T& result)
+{
+	while (first != last)
+	{
+		result += *first;
+		++first;
+	}
+}
+
+
 } // namespace rde
 
 //-----------------------------------------------------------------------------
