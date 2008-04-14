@@ -255,7 +255,7 @@ namespace
 		CHECK_EQUAL(4ul, v.get_high_watermark());
 	}
 #endif
-#if !RDESTL_STANDALONE
+#if !RDESTL_STANDALONE && RDE_DEBUG
 	int numFailedAssertions(0);
 	bool AssertionHandler(const char*, const char*, int)
 	{
