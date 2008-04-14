@@ -168,7 +168,7 @@ public:
 		newNode->link_before(m_root.next);
 	}
 	// @pre: !empty()
-	void pop_front()
+	inline void pop_front()
 	{
 		RDE_ASSERT(!empty());
 		node* frontNode = upcast(m_root.next);
@@ -182,7 +182,7 @@ public:
 		newNode->link_before(&m_root);
 	}
 	// @pre: !empty()
-	void pop_back()
+	inline void pop_back()
 	{
 		RDE_ASSERT(!empty());
 		node* backNode = upcast(m_root.prev);

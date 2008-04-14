@@ -82,7 +82,6 @@ struct standard_vector_storage
 	TAllocator				m_allocator;
 };
 
-
 //=============================================================================
 // Simplified vector class.
 // Mimics std::vector.
