@@ -36,6 +36,7 @@ private:
 
 		value_type	data;
 		node*		next;
+		// @todo: store bucket/hash here? typical memory/CPU time trade-off.
 		bool		used;
 	};
 
@@ -115,12 +116,12 @@ private:
 	};
 
 public:
-	typedef TKey														key_type;
-	typedef TValue														mapped_type;
-	typedef node_iterator<node*, value_type*, value_type&>				iterator;
+	typedef TKey															key_type;
+	typedef TValue															mapped_type;
+	typedef node_iterator<node*, value_type*, value_type&>					iterator;
 	typedef node_iterator<node*, const value_type*, const value_type&>	const_iterator;
-	typedef TAllocator													allocator_type;
-	static const size_type												kNodeSize = sizeof(node);
+	typedef TAllocator														allocator_type;
+	static const size_type													kNodeSize = sizeof(node);
 
 	friend class iterator;
 
@@ -191,7 +192,7 @@ public:
 	pair<iterator, bool> insert(const value_type& value)
 	{
 		// Grow at fixed % of size/capacity ratio.
-		if (m_numEntries * 3 >= m_capacity * 4)
+		if (m_numEntries * 4 >= m_capacity * 3)
 			grow(m_capacity);
 		bool found;
 		node* inserted = insert_noresize(value, found);
@@ -359,11 +360,11 @@ private:
 		return first;
 	}
 
-	size_type get_bucket(const key_type& key) const
+	RDE_FORCEINLINE size_type get_bucket(const key_type& key) const
 	{
 		return (m_hashFunc(key) & 0x7FFFFFFF) % m_capacity;
 	}
-	size_type get_bucket(const key_type& key, size_type n) const
+	RDE_FORCEINLINE size_type get_bucket(const key_type& key, size_type n) const
 	{
 		return (m_hashFunc(key) & 0x7FFFFFFF) % n;
 	}
