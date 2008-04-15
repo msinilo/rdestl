@@ -5,16 +5,12 @@
 #include "rdestl/functional.h"
 #include "rdestl/pair.h"
 
-#define RDE_HASHMAP_CACHE_HASH	1
-
 namespace rde
 {
 class hash_map_base2
 {
 public:
 	typedef size_t	size_type;
-protected:
-	static size_type get_next_capacity(size_type);
 };
 
 template<typename TKey, typename TValue, 
@@ -186,8 +182,8 @@ public:
 	pair<iterator, bool> insert(const value_type& value)
 	{
 		RDE_ASSERT(invariant());
-		// Try to keep ~75% load/reasonable # of collisions
-		if (m_numEntries * 4 >= m_capacity * 3 || m_capacity >> 2 < m_numCollisions)
+		//if (m_numEntries * 4 >= m_capacity * 3)
+		if (m_numEntries >= m_capacity / 2)
 			grow(m_capacity);
 
 		const size_type hash = m_hashFunc(value.first);
@@ -196,7 +192,7 @@ public:
 		size_type hadCollisions(0);
 		while (true)
 		{
-			i &= m_capacity - 1;
+			i = get_bucket(i);
 
 			currentNode = &m_buckets[i];
 			// Empty node with proper hashing?
@@ -233,14 +229,14 @@ public:
 
 	iterator find(const key_type& key)
 	{
-		size_type index;
-		node* keyNode = find_node(key, index);
+		const size_type index = find_bucket(key);
+		node* keyNode = m_buckets[index].used ? &m_buckets[index] : 0;
 		return iterator(keyNode, index, this);
 	}
 	const_iterator find(const key_type& key) const
 	{
-		size_type index;
-		node* keyNode = find_node(key, index);
+		const size_type index = find_bucket(key);
+		node* keyNode = m_buckets[index].used ? &m_buckets[index] : 0;
 		return const_iterator(keyNode, index, this);
 	}
 
@@ -259,23 +255,23 @@ public:
 			// same bucket.
 			while (true)
 			{
-				j = (j + 1) & (m_capacity - 1);
+				j = get_bucket(j + 1);
 				if (!m_buckets[j].used)
 					break;
 #if RDE_HASHMAP_CACHE_HASH
-				const size_type k = m_buckets[j].hash & (m_capacity - 1);
+				const size_type k = get_bucket(m_buckets[j].hash);
 #else
-				const size_type k = m_hashFunc(m_buckets[j].data.first) & (m_capacity - 1);
+				const size_type k = get_bucket(m_hashFunc(m_buckets[j].data.first));
 #endif
-				if ((j > i && (k <= i || k > j)) || 
+				if ((j > i && (k <= i || k > j)) ||
 					(j < i && (k <= i && k > j)))
 				{
 					m_buckets[i] = m_buckets[j];
 					i = j;
-					currentNode = &m_buckets[i];
 				}
 			}
-			currentNode->used = false;
+			RDE_ASSERT(m_buckets[i].used);
+			m_buckets[i].used = false;
 			--m_numEntries;
 		}
 		RDE_ASSERT(invariant());
@@ -290,11 +286,11 @@ public:
 	}
 
 	// @todo: doesnt make much sense here...
-	/*void resize(size_type new_bucket_count_hint)
+	void resize(size_type new_bucket_count_hint)
 	{
 		grow(new_bucket_count_hint);
-	}*/
-
+	}
+	
 	size_type size() const				{ return m_numEntries; }
 	bool empty() const					{ return m_numEntries == 0; }
 	size_type bucket_count() const		{ return m_capacity; }
@@ -317,7 +313,8 @@ private:
 	void grow(size_type new_capacity_hint)
 	{
 		RDE_ASSERT(invariant());
-		new_capacity_hint = (new_capacity_hint < 64 ? 64 : new_capacity_hint * 2);
+		new_capacity_hint = 
+			(new_capacity_hint < 64 ? 64 : new_capacity_hint * 2);
 		if (new_capacity_hint > m_capacity)
 		{
 			node* newBuckets = allocate_buckets(new_capacity_hint);
@@ -342,12 +339,11 @@ private:
 #else
 				const size_type hash = m_hashFunc(currentNode->data.first);
 #endif
-				size_type j = hash & (new_capacity - 1);
+				size_type j = get_bucket(hash, new_capacity);
 				size_type hadCollisions(0);
 				while (new_buckets[j].used)
 				{
-					++j;
-					j &= (new_capacity - 1);
+					j = get_bucket(j + 1, new_capacity);
 					hadCollisions = 1;
 				}
 				node* newNode = &new_buckets[j];
@@ -358,20 +354,12 @@ private:
 		}
 	}
 
-	node* find_node(const key_type& key, size_type& out_index) const
+	size_type find_bucket(const key_type& key) const
 	{
-		const size_type hash = m_hashFunc(key);
-		size_type i(hash & (m_capacity - 1));
-
+		size_type i = get_bucket(m_hashFunc(key));
 		while (m_buckets[i].used && !m_keyEqualFunc(key, m_buckets[i].data.first))
-			i = (i + 1) & (m_capacity - 1);
-
-		if (m_buckets[i].used)
-		{
-			out_index = i;
-			return &m_buckets[i];
-		}
-		return 0;
+			i = get_bucket(i + 1);
+		return i;
 	}
 
 	node* allocate_buckets(size_type n)
@@ -385,6 +373,17 @@ private:
 		rde::destruct_n(m_buckets, m_capacity);
 		m_allocator.deallocate(m_buckets, sizeof(node) * m_capacity);
 	}
+	RDE_FORCEINLINE size_type get_bucket(size_type hash) const
+	{
+		RDE_ASSERT(invariant());
+		return hash & (m_capacity - 1);
+	}
+	RDE_FORCEINLINE size_type get_bucket(size_type hash, size_type capacity) const
+	{
+		RDE_ASSERT(invariant());
+		return hash & (capacity - 1);
+	}
+
 	bool invariant() const
 	{
 		return (m_capacity & (m_capacity - 1)) == 0;
