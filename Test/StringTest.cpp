@@ -20,4 +20,9 @@ namespace
 #define POSTFIX			Simple
 #define STRING_CLASS	simple_string
 #include "StringTestInc.h"
+
+#undef POSTFIX
+#undef CONCAT_
+#undef CONCAT2_
+#undef TESTC
 }

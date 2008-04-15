@@ -34,7 +34,7 @@ namespace
 		MyNode* n(new MyNode());
 		l.push_back(n);
 		CHECK_EQUAL(1ul, l.size());
-		n = new MyNode();
+		delete n;
 	}
 
 	TEST(PushFront)
@@ -97,12 +97,14 @@ namespace
 		CHECK_EQUAL(5, it->data);
 		CHECK_EQUAL(10, (++it)->data);
 
-		l.insert(it, new MyNode(15));
+		MyNode* n = new MyNode(15);
+		l.insert(it, n);
 		CHECK_EQUAL(3ul, l.size());
 		it = l.begin();
 		++it;
 		CHECK_EQUAL(15, it->data);
 		CHECK_EQUAL(10, (++it)->data);
+		delete n;
 	}
 }
 
