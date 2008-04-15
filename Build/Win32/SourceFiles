@@ -5,6 +5,8 @@
 ..\..\config.h
 ..\..\cow_string_storage.h
 ..\..\fixed_array.h
+..\..\fixed_sorted_vector.h
+..\..\fixed_vector.h
 ..\..\functional.h
 ..\..\hash_map.h
 ..\..\int_to_type.h
@@ -13,6 +15,7 @@
 ..\..\iterator.h
 ..\..\list.h
 ..\..\pair.h
+..\..\rb_tree.h
 ..\..\rdestl.h
 ..\..\simple_string_storage.h
 ..\..\slist.h
@@ -26,3 +29,5 @@
 ..\..\hash_map.cpp
 ..\..\intrusive_list.cpp
 ..\..\intrusive_slist.cpp
+..\..\list.cpp
+..\..\slist.cpp

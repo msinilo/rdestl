@@ -448,6 +448,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\hash_map2.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\int_to_type.h"
 			>
 		</File>
@@ -481,6 +485,10 @@
 		</File>
 		<File
 			RelativePath="..\..\pair.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\rb_tree.h"
 			>
 		</File>
 		<File
