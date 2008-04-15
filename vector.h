@@ -370,6 +370,14 @@ public:
 				return index;
 		return npos;
 	}
+	iterator find(const T& item)
+	{
+		iterator itEnd = end();
+		for (iterator it = begin(); it != itEnd; ++it)
+			if (*it == item)
+				return it;
+		return itEnd;
+	}
 
 	const allocator_type& get_allocator() const	{ return m_allocator; }
 	void set_allocator(const allocator_type& allocator)
