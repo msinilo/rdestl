@@ -38,4 +38,9 @@
 #	include "core/System.h"
 #endif
 
+// Cache hash value in the node structure.
+// Costs 4 bytes per node, but hash doesnt have to be calculated during
+// rehashing and removing nodes in clusters.
+#define RDE_HASHMAP_CACHE_HASH	1
+
 #endif // #ifndef RDESTL_H
