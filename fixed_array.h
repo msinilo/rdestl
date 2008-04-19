@@ -6,7 +6,6 @@
 namespace rde
 {
 //=============================================================================
-// @todo: let it grow in special cases!
 template<typename T, size_t N>
 class fixed_array
 {
