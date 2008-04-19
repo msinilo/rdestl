@@ -5,6 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stltest", "stltest.vcproj",
 		{2E3C8BF2-8595-11DC-8314-0800200C9A66} = {2E3C8BF2-8595-11DC-8314-0800200C9A66}
 		{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6} = {64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}
 		{3396FFC4-8254-11DC-8314-0800200C9A66} = {3396FFC4-8254-11DC-8314-0800200C9A66}
+		{AB654BA1-5A10-BB73-F758-F428A8044118} = {AB654BA1-5A10-BB73-F758-F428A8044118}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rdestl", "..\..\..\Build\Win32\rdestl.vcproj", "{2E3C8BF2-8595-11DC-8314-0800200C9A66}"
@@ -12,6 +13,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest++.vsnet2005", "..\..\..\..\external\UnitTest++\UnitTest++.vsnet2005.vcproj", "{64A4FEFE-0461-4E95-8CC1-91EF5F57DBC6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\..\core\Build\Win32\core.vcproj", "{3396FFC4-8254-11DC-8314-0800200C9A66}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "profile", "..\..\..\..\profile\Build\Win32\profile.vcproj", "{AB654BA1-5A10-BB73-F758-F428A8044118}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +56,14 @@ Global
 		{3396FFC4-8254-11DC-8314-0800200C9A66}.Profile|Win32.ActiveCfg = Profile|Win32
 		{3396FFC4-8254-11DC-8314-0800200C9A66}.Final|Win32.Build.0 = Final|Win32
 		{3396FFC4-8254-11DC-8314-0800200C9A66}.Final|Win32.ActiveCfg = Final|Win32
+		{AB654BA1-5A10-BB73-F758-F428A8044118}.Debug|Win32.Build.0 = Debug|Win32
+		{AB654BA1-5A10-BB73-F758-F428A8044118}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AB654BA1-5A10-BB73-F758-F428A8044118}.Release|Win32.Build.0 = Release|Win32
+		{AB654BA1-5A10-BB73-F758-F428A8044118}.Release|Win32.ActiveCfg = Release|Win32
+		{AB654BA1-5A10-BB73-F758-F428A8044118}.Profile|Win32.Build.0 = Profile|Win32
+		{AB654BA1-5A10-BB73-F758-F428A8044118}.Profile|Win32.ActiveCfg = Profile|Win32
+		{AB654BA1-5A10-BB73-F758-F428A8044118}.Final|Win32.Build.0 = Final|Win32
+		{AB654BA1-5A10-BB73-F758-F428A8044118}.Final|Win32.ActiveCfg = Final|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

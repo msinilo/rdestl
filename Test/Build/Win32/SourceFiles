@@ -1,7 +1,10 @@
-..\..\StringTestInc.h
 ..\..\AlgoTest.cpp
 ..\..\FixedArrayTest.cpp
+..\..\FixedSortedVectorTest.cpp
+..\..\FixedSubstring.cpp
+..\..\FixedVectorTest.cpp
 ..\..\HashMapTest.cpp
+..\..\HashMapTestInc.h
 ..\..\IntrusiveListTest.cpp
 ..\..\IntrusiveSListTest.cpp
 ..\..\ListTest.cpp
@@ -9,5 +12,6 @@
 ..\..\SortedVectorTest.cpp
 ..\..\SpeedTest.cpp
 ..\..\StringTest.cpp
+..\..\StringTestInc.h
 ..\..\TestMain.cpp
 ..\..\VectorTest.cpp

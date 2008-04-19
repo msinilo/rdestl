@@ -6,7 +6,8 @@ SourceFiles = SourceFiles
 Uuid=047b2954-859c-11dc-8314-0800200c9a66
 IncludePaths=../../../..;../../../../external
 ExceptionHandling=2
+Defines=RDE_DONT_CHECK_COMPILER_OPTIONS=1
 
 [Solution]
-Dependencies=rdestl;UnitTest++.vsnet2005;core
+Dependencies=rdestl;UnitTest++.vsnet2005;core;profile
 DependenciesPaths=../../../..;../../../../external
