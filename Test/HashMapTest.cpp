@@ -1,6 +1,15 @@
 #include <UnitTest++/src/UnitTest++.h>
 #include "rdestl/hash_map.h"
+#include "rdestl/hash_map2.h"
 #include <cstdio>
+
+#if !RDESTL_STANDALONE
+#	include "rdestl/vector.h"
+#	include "core/Timer.h"
+#	include "profile/Profile.h"
+#	define WIN32_LEAN_AND_MEAN
+#	include <windows.h>
+#endif
 
 namespace
 {
@@ -20,147 +29,126 @@ namespace
 	};
 	struct poor_hasher
 	{
-		size_t operator()(const std::string&) const
+		size_t operator()(const std::string& s) const
 		{
-			return 1;
+			return s == "crashtest" ? 4 : 1;
 		}
 	};
-	typedef rde::hash_map<std::string, int, hasher> tMap;
 
-	TEST(DefaultConstructor)
-	{
-		tMap h;
-		CHECK(h.empty());
-		CHECK_EQUAL(0ul, h.size());
-		CHECK_EQUAL(0ul, h.bucket_count());
-		CHECK_EQUAL(0ul, h.used_memory());
-	}
-	TEST(ConstructorInitialCapacity)
-	{
-		tMap h(100);
-		CHECK(h.empty());
-		CHECK_EQUAL(0ul, h.size());
-		CHECK(h.bucket_count() >= 100);
-		CHECK_EQUAL(h.bucket_count() * h.kNodeSize, h.used_memory());
-	}
-	TEST(Insert)
-	{
-		tMap h(100);
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("world"), 10));
-		CHECK_EQUAL(2ul, h.size());
-		CHECK(!h.empty());
-		CHECK(h.bucket_count() > 0);
-	}
-	TEST(Clear)
-	{
-		tMap h(100);
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("world"), 10));
-		CHECK(!h.empty());
-		h.clear();
-		CHECK(h.empty());
-	}
-	TEST(IterEmpty)
-	{
-		tMap h(100);
-		CHECK(h.begin() == h.end());
-	}
-	TEST(IterTraverse)
-	{
-		tMap h(100);
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("world"), 10));
-		tMap::iterator it = h.begin();
-		CHECK(it != h.end());
-		++it;
-		CHECK(it != h.end());
-		CHECK(it->second == 5 || it->second == 10);
-		++it;
-		CHECK(it == h.end());
-	}
-	TEST(EraseSimple)
-	{
-		tMap h(100);
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("world"), 10));
-		tMap::iterator it = h.begin();
-		h.erase(it);
-		CHECK_EQUAL(1ul, h.size());
-	}
-	TEST(Find)
-	{
-		tMap h(100);
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("brave"), 7));
-		h.insert(rde::make_pair(std::string("world"), 10));
-		tMap::iterator it = h.find("brave");
-		CHECK(it != h.end());
-		CHECK_EQUAL(7, it->second);
-	}
-	TEST(EraseFind)
-	{
-		tMap h(100);
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("brave"), 7));
-		h.insert(rde::make_pair(std::string("world"), 10));
-		tMap::iterator it = h.find("brave");
-		h.erase(it);
-		CHECK_EQUAL(2ul, h.size());
-		it = h.find("hello");
-		h.erase(it);
-		CHECK_EQUAL(1ul, h.size());
-		it = h.begin();
-		CHECK_EQUAL(10, it->second);
-		CHECK(it->first == "world");
-	}
-	TEST(EraseFindKey)
-	{
-		tMap h(100);
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("brave"), 7));
-		CHECK_EQUAL(1ul, h.erase("hello"));
-		CHECK_EQUAL(0ul, h.erase("hello"));
-		CHECK_EQUAL(1ul, h.size());
-	}
-	TEST(StatsPoorHash)
-	{
-		rde::hash_map<std::string, int, poor_hasher> h;
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("brave"), 7));
-		h.insert(rde::make_pair(std::string("world"), 10));
-		CHECK_EQUAL(h.bucket_count() * h.kNodeSize + h.kNodeSize*2, h.used_memory());
-		CHECK_EQUAL(2ul, h.collisions());
-	}
-	TEST(IterPoorHash)
-	{
-		rde::hash_map<std::string, int, poor_hasher> h;
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("world"), 10));
-		rde::hash_map<std::string, int, poor_hasher>::iterator it = h.begin();
-		CHECK(it != h.end());
-		++it;
-		CHECK(it != h.end());
-		CHECK(it->second == 5 || it->second == 10);
-		++it;
-		CHECK(it == h.end());
-	}
-	TEST(ErasePoorHash)
-	{
-		rde::hash_map<std::string, int, poor_hasher> h;
-		h.insert(rde::make_pair(std::string("hello"), 5));
-		h.insert(rde::make_pair(std::string("brave"), 7));
-		h.insert(rde::make_pair(std::string("world"), 10));
-		rde::hash_map<std::string, int, poor_hasher>::iterator it = h.find("brave");
-		h.erase(it);
-		CHECK_EQUAL(2ul, h.size());
+#define CONCAT_(x, y)	x ## y
+#define CONCAT2_(x, y)	CONCAT_(x, y)
+#define TESTC(x)		TEST(CONCAT2_(x, POSTFIX))
 
-		it = h.find("hello");
-		h.erase(it);
-		CHECK_EQUAL(1ul, h.size());
-		it = h.begin();
-		CHECK(it != h.end());
-		CHECK_EQUAL(10, it->second);
-		CHECK(it->first == "world");
+#define POSTFIX				Linked
+#define tMap				rde::hash_map<std::string, int, hasher>
+#define tPoorlyHashedMap	rde::hash_map<std::string, int, poor_hasher>
+#include "HashMapTestInc.h"
+	
+#undef tMap
+#undef tPoorlyHashedMap
+#undef POSTFIX
+#define POSTFIX				Closed
+#define tMap				rde::hash_map2<std::string, int, hasher>
+#define tPoorlyHashedMap	rde::hash_map2<std::string, int, poor_hasher>
+#include "HashMapTestInc.h"
+
+
+#if !RDESTL_STANDALONE
+	#undef tMap
+#	define tMap				rde::hash_map<std::string, int, hasher>
+	typedef rde::hash_map2<std::string, int, hasher>		tMap2;
+	template<typename TMAP>
+	void HashMapSpeedTest(profile::BlockInfo& blockEnumerate, profile::BlockInfo& blockIter,
+		profile::BlockInfo& blockRemove)
+	{
+		TMAP fileMap;
+		rde::vector<std::string> allFiles;
+
+		WIN32_FIND_DATA ffd;
+		HANDLE hFind = FindFirstFile("c:\\Windows\\System32\\*.*", &ffd);
+		if (hFind)
+		{
+			int i(0);
+			//double deltaTicks[3];
+			{
+				profile::ScopedProfile prof(blockEnumerate);
+				do
+				{
+					if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+					{
+						fileMap.insert(rde::make_pair(std::string(ffd.cFileName), i));
+						allFiles.push_back(std::string(ffd.cFileName));
+						++i;
+					}
+				} while (FindNextFile(hFind, &ffd) != 0);
+				FindClose(hFind);
+			}
+			//printf("Enumerating took %.3f ticks\n", deltaTicks[0]);
+			printf("%d node(s) found, hash map uses %d buckets and ~%d bytes [%d collision(s)]\n", fileMap.size(), 
+				fileMap.bucket_count(), fileMap.used_memory(), fileMap.collisions());
+
+			// Iteration
+			{
+				profile::ScopedProfile prof(blockIter);
+				for (TMAP::iterator it = fileMap.begin(); it != fileMap.end(); ++it)
+				{
+					tolower(it->first.c_str()[0]);
+				}
+			}
+			//printf("Iteration took %.3f ticks\n", deltaTicks[1]);
+
+			{
+				profile::ScopedProfile prof(blockRemove);
+				// Now try to remove some % of randomly selected items.
+				const int numToRemove = int(0.45f * float(allFiles.size()));
+				//printf("Removing %d randomly selected item(s)\n", numToRemove);
+				int notFound(0);
+				for (int i = 0; i < numToRemove; ++i)
+				{
+					const int j = rand() % allFiles.size();
+					const std::string& str = allFiles[j];
+					if (!fileMap.erase(str))
+						++notFound;
+				}
+			}
+			//printf("Removal took %.3f ticks [%d node(s) not removed]\n", deltaTicks[2], notFound);
+		}
 	}
+
+	void ReportProfileBlock(const profile::BlockInfo& info)
+	{
+		char buf[256];
+		info.Report(buf, RDE_ARRAY_COUNT(buf));
+		printf("%s", buf);
+	}
+
+	TEST(HashMapSpeedTest)
+	{
+		profile::BlockInfo enumLinked("LL hashmap - enumeration");
+		profile::BlockInfo enumClosed("Closed hashmap - enumeration");
+		profile::BlockInfo iterLinked("LL hashmap - iteration");
+		profile::BlockInfo iterClosed("Closed hashmap - iteration");
+		profile::BlockInfo removeLinked("LL hashmap - removal");
+		profile::BlockInfo removeClosed("Closed hashmap - removal");
+		profile::BlockInfo blockLinked("Linked-list hashmap - TOTAL");
+		profile::BlockInfo blockClosed("Closed hashmap - TOTAL");
+		
+		const int kNumTests = 10;
+		for (int i = 0; i < kNumTests; ++i)
+		{
+			{
+				profile::ScopedProfile prof(blockLinked);
+				HashMapSpeedTest<tMap>(enumLinked, iterLinked, removeLinked);
+			}
+			{
+				profile::ScopedProfile prof(blockClosed);
+				HashMapSpeedTest<tMap2>(enumClosed, iterClosed, removeClosed);
+			}
+		}
+
+		profile::BlockInfo::EnumerateAll(ReportProfileBlock);
+
+		CHECK(1);
+	} 
+#endif
 }
