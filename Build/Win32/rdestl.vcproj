@@ -5,7 +5,6 @@
 	Name="rdestl"
 	ProjectGUID="{2E3C8BF2-8595-11DC-8314-0800200C9A66}"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -62,7 +61,7 @@
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="PreCompiled.h"
 				WarningLevel="4"
-				WarnAsError="true"
+				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 				CompileAs="0"
@@ -81,13 +80,16 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="false"
-				AdditionalOptions="/IGNORE:4221 /IGNORE:4006"
 				AdditionalDependencies=" "
 				AdditionalLibraryDirectories=" "
 				SuppressStartupBanner="true"
+				AdditionalOptions="/IGNORE:4221 /IGNORE:4006"
 			/>
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -99,7 +101,14 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -176,13 +185,16 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="false"
-				AdditionalOptions="/IGNORE:4221  /IGNORE:4006"
 				AdditionalDependencies=" "
 				AdditionalLibraryDirectories=" "
 				SuppressStartupBanner="true"
-			/>
+				AdditionalOptions="/IGNORE:4221  /IGNORE:4006"
+			/>			
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -194,7 +206,14 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -272,13 +291,16 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="false"
-				AdditionalOptions="/IGNORE:4221  /IGNORE:4006"
 				AdditionalDependencies=" "
 				AdditionalLibraryDirectories=" "
 				SuppressStartupBanner="true"
-			/>
+				AdditionalOptions="/IGNORE:4221  /IGNORE:4006"
+			/>			
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -290,7 +312,14 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -368,13 +397,16 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="false"
-				AdditionalOptions="/IGNORE:4221  /IGNORE:4006"
 				AdditionalDependencies=" "
 				AdditionalLibraryDirectories=" "
 				SuppressStartupBanner="true"
-			/>
+				AdditionalOptions="/IGNORE:4221  /IGNORE:4006"
+			/>			
 			<Tool
 				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -386,7 +418,14 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -397,10 +436,6 @@
 	<Files>
 		<File
 			RelativePath="..\..\algorithm.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\allocator.cpp"
 			>
 		</File>
 		<File
@@ -432,15 +467,15 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\fixed_substring.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\fixed_vector.h"
 			>
 		</File>
 		<File
 			RelativePath="..\..\functional.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\hash_map.cpp"
 			>
 		</File>
 		<File
@@ -456,15 +491,7 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\intrusive_list.cpp"
-			>
-		</File>
-		<File
 			RelativePath="..\..\intrusive_list.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\intrusive_slist.cpp"
 			>
 		</File>
 		<File
@@ -473,10 +500,6 @@
 		</File>
 		<File
 			RelativePath="..\..\iterator.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\list.cpp"
 			>
 		</File>
 		<File
@@ -497,10 +520,6 @@
 		</File>
 		<File
 			RelativePath="..\..\simple_string_storage.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\slist.cpp"
 			>
 		</File>
 		<File
@@ -529,6 +548,30 @@
 		</File>
 		<File
 			RelativePath="..\..\vector.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\allocator.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\hash_map.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\intrusive_list.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\intrusive_slist.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\list.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\slist.cpp"
 			>
 		</File>
 	</Files>
