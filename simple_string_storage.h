@@ -11,7 +11,7 @@ public:
 	typedef size_t				size_type;
 	typedef TAllocator			allocator_type;
 	typedef const value_type*	const_iterator;
-	static const size_type	kGranularity = 32;	
+	static const size_type		kGranularity = 32;	
 
 	explicit simple_string_storage(const allocator_type& allocator)
 	:	m_allocator(allocator),
@@ -60,7 +60,7 @@ public:
 
 	void assign(const value_type* str, size_type len)
 	{
-		// Do not use with str = str2.c_str()!
+		// Do not use with str = str.c_str()!
 		RDE_ASSERT(str != m_data);
 		if (m_capacity <= len + 1)
 		{
