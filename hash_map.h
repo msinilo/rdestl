@@ -34,10 +34,12 @@ private:
 	{
 		node():	next(0), used(false) {/**/}
 
-		value_type	data;
-		node*		next;
-		// @todo: store bucket/hash here? typical memory/CPU time trade-off.
-		bool		used;
+		value_type		data;
+		node*			next;
+#if RDE_HASHMAP_CACHE_HASH
+		unsigned int	hash;
+#endif
+		bool			used;
 	};
 
 	template<typename TNodePtr, typename TPtr, typename TRef>
@@ -101,7 +103,7 @@ private:
 	private:
 		TNodePtr find_next_node(TNodePtr node) const
 		{
-			const size_type nodeBucket = m_map->get_bucket(node->data.first);
+			const size_type nodeBucket = m_map->get_bucket(node);
 			const size_type numBuckets = m_map->bucket_count();
 			for (size_type i = nodeBucket + 1; i < numBuckets; ++i)
 			{
@@ -214,23 +216,12 @@ public:
 	{
 		return const_iterator(find_node(key), this);
 	}
-	size_type count(const key_type& key) const
-	{
-		const size_type bucket = get_bucket(key);
-		size_type n(0);
-		for (node* it = &m_buckets[bucket]; it != 0; it = it->next)
-		{
-			if (it->used && m_keyEqualFunc(it->data.first, key))
-				++n;
-		}
-		return n;
-	}
 
 	void erase(iterator it)
 	{
 		RDE_ASSERT(!empty());
 		node* itNode = it.node();
-		const size_type bucket = get_bucket(itNode->data.first);
+		const size_type bucket = get_bucket(itNode);
 		node* prevNode(0);
 		node* nextNode(0);
 		for (node* first = &m_buckets[bucket]; first != 0; first = nextNode)
@@ -313,11 +304,15 @@ private:
 		if (freeNode == 0)
 		{
 			++m_numCollisions;
+
 			freeNode = construct_node();
 			freeNode->next = first->next;
 			first->next = freeNode;
 		}
 		freeNode->data = data;
+#if RDE_HASHMAP_CACHE_HASH
+		freeNode->hash = (unsigned int)m_hashFunc(data.first);
+#endif
 		freeNode->used = true;
 		return freeNode;
 	}
@@ -363,6 +358,14 @@ private:
 	RDE_FORCEINLINE size_type get_bucket(const key_type& key) const
 	{
 		return (m_hashFunc(key) & 0x7FFFFFFF) % m_capacity;
+	}
+	RDE_FORCEINLINE size_type get_bucket(const node* n) const
+	{
+#if RDE_HASHMAP_CACHE_HASH
+		return (n->hash & 0x7FFFFFFF) % m_capacity;
+#else
+		return (m_hashFunc(n->data.first) & 0x7FFFFFFF) % m_capacity;
+#endif
 	}
 	RDE_FORCEINLINE size_type get_bucket(const key_type& key, size_type n) const
 	{

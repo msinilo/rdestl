@@ -27,11 +27,11 @@ private:
 	{
 		node():	used(false) {}
 
-		value_type	data;
+		value_type		data;
 #if RDE_HASHMAP_CACHE_HASH
-		size_type	hash;
+		unsigned int	hash;
 #endif
-		bool		used;
+		bool			used;
 	};
 	template<typename TNodePtr, typename TPtr, typename TRef>
 	class node_iterator
@@ -187,7 +187,7 @@ public:
 			grow(m_capacity);
 
 		const size_type hash = m_hashFunc(value.first);
-		size_type i(hash);
+		size_t i(hash);
 		node* currentNode(0);
 		size_type hadCollisions(0);
 		while (true)
@@ -214,7 +214,7 @@ public:
 		currentNode->data = value;
 		currentNode->used = true;
 #if RDE_HASHMAP_CACHE_HASH
-		currentNode->hash = hash;
+		currentNode->hash = (unsigned int)hash;
 #endif
 		++m_numEntries;
 		RDE_ASSERT(currentNode == &m_buckets[i]);
@@ -247,8 +247,7 @@ public:
 		if (it != end())
 		{
 			size_type i = it.get_index();
-			node* currentNode = &m_buckets[i];
-			RDE_ASSERT(currentNode->used);
+			RDE_ASSERT(m_buckets[i].used);
 			size_type j(i);
 			// Remove "holes" in case of collisions.
 			// We cannot have unused nodes in our chains of items resolving to
@@ -313,8 +312,7 @@ private:
 	void grow(size_type new_capacity_hint)
 	{
 		RDE_ASSERT(invariant());
-		new_capacity_hint = 
-			(new_capacity_hint < 64 ? 64 : new_capacity_hint * 2);
+		new_capacity_hint = (new_capacity_hint < 64 ? 64 : new_capacity_hint * 2);
 		if (new_capacity_hint > m_capacity)
 		{
 			node* newBuckets = allocate_buckets(new_capacity_hint);
