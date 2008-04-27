@@ -7,20 +7,54 @@
 
 namespace rde
 {
-class hash_map_base2
+class hash_map_base2_power2
 {
 public:
 	typedef size_t	size_type;
+
+protected:
+	RDE_FORCEINLINE static size_type get_next_capacity(size_type current_capacity)
+	{
+		return current_capacity < 64 ? 64 : current_capacity * 2;
+	}
+	inline static bool invariant(size_type capacity)
+	{
+		return (capacity & (capacity - 1)) == 0;
+	}
+	RDE_FORCEINLINE static size_type get_bucket(size_type hash, size_type capacity)
+	{
+		return hash & (capacity - 1);
+	}
 };
+
+class hash_map_base2_prime
+{
+public:
+	typedef size_t	size_type;
+
+protected:
+	static size_type get_next_capacity(size_type current_capacity);
+	inline static bool invariant(size_type)
+	{
+		return true;
+	}
+	RDE_FORCEINLINE static size_type get_bucket(size_type hash, size_type capacity)
+	{
+		return hash % capacity;
+	}
+};
+
 
 template<typename TKey, typename TValue, 
 	class THashFunc = rde::hash<TKey>, 
 	class TKeyEqualFunc = rde::equal_to<TKey>,
-	class TAllocator = rde::allocator>
-class hash_map2 : public hash_map_base2
+	class TAllocator = rde::allocator, class TBase = hash_map_base2_power2>
+class hash_map2 : public TBase
 {
+	typedef TBase	Base;
 public:
-	typedef rde::pair<TKey, TValue>						value_type;
+	typedef typename TBase::size_type		size_type;
+	typedef rde::pair<TKey, TValue>		value_type;
 
 private:
 	struct node
@@ -190,6 +224,9 @@ public:
 		size_t i(hash);
 		node* currentNode(0);
 		size_type hadCollisions(0);
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+		size_type longestCluster(0);
+#endif
 		while (true)
 		{
 			i = get_bucket(i);
@@ -206,6 +243,11 @@ public:
 			hadCollisions = 1;
 
 			++i;
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+			++longestCluster;
+			if (longestCluster > m_longestCluster)
+				m_longestCluster = longestCluster;
+#endif
 		}
 		const bool found = currentNode->used;
 		if (found)
@@ -307,12 +349,23 @@ public:
 	{
 		return kNodeSize * m_capacity;
 	}
+	size_type longest_cluster() const
+	{
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+		return m_longestCluster;
+#else
+		return 0xFFFFFFFF;
+#endif
+	}
 
 private:
 	void grow(size_type new_capacity_hint)
 	{
 		RDE_ASSERT(invariant());
-		new_capacity_hint = (new_capacity_hint < 64 ? 64 : new_capacity_hint * 2);
+		new_capacity_hint = Base::get_next_capacity(new_capacity_hint);
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+		m_longestCluster = 0;
+#endif
 		if (new_capacity_hint > m_capacity)
 		{
 			node* newBuckets = allocate_buckets(new_capacity_hint);
@@ -339,10 +392,18 @@ private:
 #endif
 				size_type j = get_bucket(hash, new_capacity);
 				size_type hadCollisions(0);
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+				size_type longestCluster(0);
+#endif
 				while (new_buckets[j].used)
 				{
 					j = get_bucket(j + 1, new_capacity);
 					hadCollisions = 1;
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+					++longestCluster;
+					if (longestCluster > m_longestCluster)
+						m_longestCluster = longestCluster;
+#endif
 				}
 				node* newNode = &new_buckets[j];
 				RDE_ASSERT(!newNode->used);
@@ -374,17 +435,16 @@ private:
 	RDE_FORCEINLINE size_type get_bucket(size_type hash) const
 	{
 		RDE_ASSERT(invariant());
-		return hash & (m_capacity - 1);
+		return Base::get_bucket(hash, m_capacity);
 	}
 	RDE_FORCEINLINE size_type get_bucket(size_type hash, size_type capacity) const
 	{
 		RDE_ASSERT(invariant());
-		return hash & (capacity - 1);
+		return Base::get_bucket(hash, capacity);
 	}
-
 	bool invariant() const
 	{
-		return (m_capacity & (m_capacity - 1)) == 0;
+		return Base::invariant(m_capacity);
 	}
 
 	node*			m_buckets;
@@ -394,6 +454,9 @@ private:
 	THashFunc		m_hashFunc;
 	TKeyEqualFunc	m_keyEqualFunc;
 	allocator_type	m_allocator;
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+	size_type		m_longestCluster;
+#endif
 };
 
 } // namespace rde
