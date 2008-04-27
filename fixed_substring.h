@@ -27,8 +27,8 @@ public:
 	{
 		assign(str);
 	}
-	// @todo: substrings of different sizes.
 
+	using Base::operator[];
 	using Base::data;
 
 	void assign(const value_type* str)
