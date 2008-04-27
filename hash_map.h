@@ -281,6 +281,14 @@ public:
 		}
 		return bytes;
 	}
+	size_type longest_cluster() const
+	{
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+		return m_longestCluster;
+#else
+		return 0xFFFFFFFF;
+#endif
+	}
 
 private:
 	node* insert_noresize(const value_type& data, bool& found)
@@ -308,6 +316,13 @@ private:
 			freeNode = construct_node();
 			freeNode->next = first->next;
 			first->next = freeNode;
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+			size_type longestCluster(0);
+			for (node* cur = first; cur != 0; cur = cur->next)
+				++longestCluster;
+			if (longestCluster > m_longestCluster)
+				m_longestCluster = longestCluster;
+#endif
 		}
 		freeNode->data = data;
 #if RDE_HASHMAP_CACHE_HASH
@@ -320,6 +335,9 @@ private:
 	void grow(size_type new_capacity_hint)
 	{
 		new_capacity_hint = get_next_capacity(new_capacity_hint);
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+		m_longestCluster = 0;
+#endif
 		if (new_capacity_hint > m_capacity)
 		{
 			node* newBuckets = allocate_buckets(new_capacity_hint);
@@ -410,6 +428,9 @@ private:
 	THashFunc		m_hashFunc;
 	TKeyEqualFunc	m_keyEqualFunc;
 	allocator_type	m_allocator;
+#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
+	size_type		m_longestCluster;
+#endif
 };
 
 } // namespace rde
