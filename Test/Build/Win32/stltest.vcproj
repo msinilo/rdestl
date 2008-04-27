@@ -5,6 +5,7 @@
 	Name="stltest"
 	ProjectGUID="{047B2954-859C-11DC-8314-0800200C9A66}"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -61,7 +62,7 @@
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="PreCompiled.h"
 				WarningLevel="4"
-				WarnAsError="TRUE"
+				WarnAsError="true"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 				CompileAs="0"
@@ -120,11 +121,7 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -177,7 +174,7 @@
 				DefaultCharIsUnsigned="true"
 				TreatWChar_tAsBuiltInType="true"
 				ForceConformanceInForLoopScope="true"
-				RuntimeTypeInfo="true"
+				RuntimeTypeInfo="false"
 				OpenMP="false"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="PreCompiled.h"
@@ -221,7 +218,7 @@
 				TargetMachine="1"
 				AllowIsolation="true"
 				Profile="false"
-			/>			
+			/>
 			<Tool
 				Name="VCALinkTool"
 			/>
@@ -241,11 +238,7 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -298,7 +291,7 @@
 				DefaultCharIsUnsigned="true"
 				TreatWChar_tAsBuiltInType="true"
 				ForceConformanceInForLoopScope="true"
-				RuntimeTypeInfo="true"
+				RuntimeTypeInfo="false"
 				OpenMP="false"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="PreCompiled.h"
@@ -343,7 +336,7 @@
 				TargetMachine="1"
 				AllowIsolation="true"
 				Profile="false"
-			/>			
+			/>
 			<Tool
 				Name="VCALinkTool"
 			/>
@@ -363,11 +356,7 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -420,7 +409,7 @@
 				DefaultCharIsUnsigned="true"
 				TreatWChar_tAsBuiltInType="true"
 				ForceConformanceInForLoopScope="true"
-				RuntimeTypeInfo="true"
+				RuntimeTypeInfo="false"
 				OpenMP="false"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="PreCompiled.h"
@@ -465,7 +454,7 @@
 				TargetMachine="1"
 				AllowIsolation="true"
 				Profile="false"
-			/>			
+			/>
 			<Tool
 				Name="VCALinkTool"
 			/>
@@ -485,11 +474,7 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
-				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -498,14 +483,6 @@
 	<References>
 	</References>
 	<Files>
-		<File
-			RelativePath="..\..\HashMapTestInc.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\StringTestInc.h"
-			>
-		</File>
 		<File
 			RelativePath="..\..\AlgoTest.cpp"
 			>
@@ -519,7 +496,7 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\FixedSubstring.cpp"
+			RelativePath="..\..\FixedSubstringTest.cpp"
 			>
 		</File>
 		<File
@@ -528,6 +505,18 @@
 		</File>
 		<File
 			RelativePath="..\..\HashMapTest.cpp"
+			>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					AssemblerOutput="4"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\HashMapTestInc.h"
 			>
 		</File>
 		<File
@@ -556,6 +545,10 @@
 		</File>
 		<File
 			RelativePath="..\..\StringTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\StringTestInc.h"
 			>
 		</File>
 		<File
