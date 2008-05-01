@@ -25,6 +25,7 @@ protected:
 	{
 		return hash & (capacity - 1);
 	}
+	void set_capacity(size_type) {}
 };
 
 class hash_map_base2_prime
@@ -38,17 +39,26 @@ protected:
 	{
 		return true;
 	}
-	RDE_FORCEINLINE static size_type get_bucket(size_type hash, size_type capacity)
+	RDE_FORCEINLINE size_type get_bucket(size_type hash, size_type capacity) const
 	{
 		return hash % capacity;
 	}
 };
 
 
+// TLoadFactor4 determines the max load factor of the hash table.
+// Basically, it's used like: 
+//	if (numEntries * 4 >= capacity * loadFactor4)
+//		grow&rehash.
+// So, LoadFactor4 == 1 gives 25% load
+// LoadFactor4 == 2 - 50% load
+// LoadFactor4 == 3 - 75% load and so on.
 template<typename TKey, typename TValue, 
 	class THashFunc = rde::hash<TKey>, 
 	class TKeyEqualFunc = rde::equal_to<TKey>,
-	class TAllocator = rde::allocator, class TBase = hash_map_base2_power2>
+	class TBase = hash_map_base2_power2,
+	int TLoadFactor4 = 2,
+	class TAllocator = rde::allocator>
 class hash_map2 : public TBase
 {
 	typedef TBase	Base;
@@ -59,13 +69,17 @@ public:
 private:
 	struct node
 	{
-		node():	used(false) {}
+		static const unsigned int kTombstoneHash = 0xFFFFFFFF;
+
+		node(): hash(kTombstoneHash) {}
+
+		RDE_FORCEINLINE bool is_used() const	{ return hash != kTombstoneHash; }
+		RDE_FORCEINLINE void set_unused()		{ hash = kTombstoneHash; }
 
 		value_type		data;
 #if RDE_HASHMAP_CACHE_HASH
 		unsigned int	hash;
 #endif
-		bool			used;
 	};
 	template<typename TNodePtr, typename TPtr, typename TRef>
 	class node_iterator
@@ -132,7 +146,7 @@ private:
 			const size_type numBuckets = m_map->bucket_count();
 			for (size_type i = nodeBucket + 1; i < numBuckets; ++i)
 			{
-				if (m_map->m_buckets[i].used)
+				if (m_map->m_buckets[i].is_used())
 				{
 					m_index = i;
 					return &m_map->m_buckets[i];
@@ -196,7 +210,7 @@ public:
 	{
 		for (size_type i = 0; i < m_capacity; ++i)
 		{
-			if (m_buckets[i].used)
+			if (m_buckets[i].is_used())
 				return iterator(&m_buckets[i], i, this);
 		}
 		return end();
@@ -217,10 +231,11 @@ public:
 	{
 		RDE_ASSERT(invariant());
 		//if (m_numEntries * 4 >= m_capacity * 3)
-		if (m_numEntries >= m_capacity / 2)
+		//if (m_numEntries * 4 >= m_capacity * 2)
+		if (m_numEntries * 4 >= m_capacity * (size_type)TLoadFactor4)
 			grow(m_capacity);
 
-		const size_type hash = m_hashFunc(value.first);
+		const size_type hash = hash_func(value.first);
 		size_t i(hash);
 		node* currentNode(0);
 		size_type hadCollisions(0);
@@ -233,13 +248,14 @@ public:
 
 			currentNode = &m_buckets[i];
 			// Empty node with proper hashing?
-			if (!currentNode->used)
+			if (!currentNode->is_used())
 				break;
 
 			// Entry with this key already exists?
 			if (m_keyEqualFunc(value.first, currentNode->data.first))
-				break;
-
+			{
+				return pair<iterator, bool>(iterator(currentNode, i, this), false);
+			}
 			hadCollisions = 1;
 
 			++i;
@@ -249,18 +265,14 @@ public:
 				m_longestCluster = longestCluster;
 #endif
 		}
-		const bool found = currentNode->used;
-		if (found)
-			RDE_ASSERT(m_keyEqualFunc(value.first, currentNode->data.first));
 		m_numCollisions += hadCollisions;
-		currentNode->data = value;
-		currentNode->used = true;
+		rde::copy_construct(&currentNode->data, value);
 #if RDE_HASHMAP_CACHE_HASH
 		currentNode->hash = (unsigned int)hash;
 #endif
 		++m_numEntries;
 		RDE_ASSERT(currentNode == &m_buckets[i]);
-		return pair<iterator, bool>(iterator(currentNode, i, this), !found);
+		return pair<iterator, bool>(iterator(currentNode, i, this), true);
 	}
 	template<class InputIterator>
 	void insert(InputIterator first, InputIterator last)
@@ -272,7 +284,7 @@ public:
 	iterator find(const key_type& key)
 	{
 		const size_type index = find_bucket(key);
-		node* keyNode = m_buckets[index].used ? &m_buckets[index] : 0;
+		node* keyNode = m_buckets[index].is_used() ? &m_buckets[index] : 0;
 		return iterator(keyNode, index, this);
 	}
 	const_iterator find(const key_type& key) const
@@ -289,7 +301,7 @@ public:
 		if (it != end())
 		{
 			size_type i = it.get_index();
-			RDE_ASSERT(m_buckets[i].used);
+			RDE_ASSERT(m_buckets[i].is_used());
 			size_type j(i);
 			// Remove "holes" in case of collisions.
 			// We cannot have unused nodes in our chains of items resolving to
@@ -297,12 +309,12 @@ public:
 			while (true)
 			{
 				j = get_bucket(j + 1);
-				if (!m_buckets[j].used)
+				if (!m_buckets[j].is_used())
 					break;
 #if RDE_HASHMAP_CACHE_HASH
 				const size_type k = get_bucket(m_buckets[j].hash);
 #else
-				const size_type k = get_bucket(m_hashFunc(m_buckets[j].data.first));
+				const size_type k = get_bucket(hash_func(m_buckets[j].data.first));
 #endif
 				if ((j > i && (k <= i || k > j)) ||
 					(j < i && (k <= i && k > j)))
@@ -311,8 +323,9 @@ public:
 					i = j;
 				}
 			}
-			RDE_ASSERT(m_buckets[i].used);
-			m_buckets[i].used = false;
+			RDE_ASSERT(m_buckets[i].is_used());
+			m_buckets[i].set_unused();
+			rde::destruct(&m_buckets[i].data);
 			--m_numEntries;
 		}
 		RDE_ASSERT(invariant());
@@ -340,7 +353,9 @@ public:
 	void clear()
 	{
 		for (size_type i = 0; i < m_capacity; ++i)
-			m_buckets[i].used = false;
+			m_buckets[i].set_unused();
+
+			//m_buckets[i].used = false;
 		m_numEntries = 0;
 		m_numCollisions = 0;
 	}
@@ -370,7 +385,8 @@ private:
 		{
 			node* newBuckets = allocate_buckets(new_capacity_hint);
 			rehash(newBuckets, new_capacity_hint);
-			delete_buckets();
+			//delete_buckets();
+			m_allocator.deallocate(m_buckets, sizeof(node) * m_capacity);
 			m_buckets = newBuckets;
 			m_capacity = new_capacity_hint;
 		}
@@ -380,22 +396,24 @@ private:
 	void rehash(node* new_buckets, size_type new_capacity)
 	{
 		m_numCollisions = 0;
-		for (size_type i = 0; i < m_capacity; ++i)
+		node* bucket = &m_buckets[0];
+		node* bucketEnd = bucket + m_capacity;
+		for (/**/; bucket != bucketEnd; ++bucket)
 		{
-			node* currentNode = &m_buckets[i];
-			if (currentNode->used)
+			node* currentNode = bucket;
+			if (currentNode->is_used())
 			{
 #if RDE_HASHMAP_CACHE_HASH
 				const size_type hash(currentNode->hash);
 #else
-				const size_type hash = m_hashFunc(currentNode->data.first);
+				const size_type hash = hash_func(currentNode->data.first);
 #endif
 				size_type j = get_bucket(hash, new_capacity);
 				size_type hadCollisions(0);
 #if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
 				size_type longestCluster(0);
 #endif
-				while (new_buckets[j].used)
+				while (new_buckets[j].is_used())
 				{
 					j = get_bucket(j + 1, new_capacity);
 					hadCollisions = 1;
@@ -406,8 +424,14 @@ private:
 #endif
 				}
 				node* newNode = &new_buckets[j];
-				RDE_ASSERT(!newNode->used);
-				*newNode = *currentNode;
+				RDE_ASSERT(!newNode->is_used());
+				rde::copy_construct(&newNode->data, currentNode->data);
+				//newNode->data = currentNode->data;
+				//newNode->used = true;
+#if RDE_HASHMAP_CACHE_HASH
+				newNode->hash = (unsigned long)hash;
+#endif
+				rde::destruct(&currentNode->data);
 				m_numCollisions += hadCollisions;
 			}
 		}
@@ -415,8 +439,8 @@ private:
 
 	size_type find_bucket(const key_type& key) const
 	{
-		size_type i = get_bucket(m_hashFunc(key));
-		while (m_buckets[i].used && !m_keyEqualFunc(key, m_buckets[i].data.first))
+		size_type i = get_bucket(hash_func(key));
+		while (m_buckets[i].is_used() && !m_keyEqualFunc(key, m_buckets[i].data.first))
 			i = get_bucket(i + 1);
 		return i;
 	}
@@ -424,12 +448,20 @@ private:
 	node* allocate_buckets(size_type n)
 	{
 		node* buckets = static_cast<node*>(m_allocator.allocate(n * sizeof(node)));
-		rde::construct_n(buckets, n);
+		node* iterBuckets(buckets);
+		for (size_type i = 0; i < n; ++i, ++iterBuckets)
+			iterBuckets->set_unused();
+			
 		return buckets;
 	}
 	void delete_buckets()
 	{
-		rde::destruct_n(m_buckets, m_capacity);
+		//rde::destruct_n(m_buckets, m_capacity);
+		for (size_t i = 0; i < m_capacity; ++i)
+		{
+			if (m_buckets[i].is_used())
+				rde::destruct(&m_buckets[i].data);
+		}
 		m_allocator.deallocate(m_buckets, sizeof(node) * m_capacity);
 	}
 	RDE_FORCEINLINE size_type get_bucket(size_type hash) const
@@ -441,6 +473,12 @@ private:
 	{
 		RDE_ASSERT(invariant());
 		return Base::get_bucket(hash, capacity);
+	}
+	RDE_FORCEINLINE size_type hash_func(const key_type& key) const
+	{
+		const size_type h = m_hashFunc(key);
+		RDE_ASSERT(h != node::kTombstoneHash);
+		return h;
 	}
 	bool invariant() const
 	{
