@@ -194,7 +194,7 @@ public:
 	pair<iterator, bool> insert(const value_type& value)
 	{
 		// Grow at fixed % of size/capacity ratio.
-		if (m_numEntries * 4 >= m_capacity * 3)
+		if (m_numEntries * 4 >= m_capacity * 2)
 			grow(m_capacity);
 		bool found;
 		node* inserted = insert_noresize(value, found);
@@ -235,6 +235,10 @@ public:
 				{
 					prevNode->next = first->next;
 					destruct_node(first);
+				}
+				else
+				{
+					rde::destruct(&first->data);
 				}
 				break; // ??
 			}
@@ -324,7 +328,8 @@ private:
 				m_longestCluster = longestCluster;
 #endif
 		}
-		freeNode->data = data;
+		//freeNode->data = data;
+		rde::copy_construct(&freeNode->data, data);
 #if RDE_HASHMAP_CACHE_HASH
 		freeNode->hash = (unsigned int)m_hashFunc(data.first);
 #endif
@@ -366,7 +371,7 @@ private:
 		const size_type bucket = get_bucket(key);
 		node* first;
 		for (first = &m_buckets[bucket]; 
-			first && (!m_keyEqualFunc(key, first->data.first) || !first->used); first = first->next)
+			first && (!first->used || !m_keyEqualFunc(key, first->data.first)); first = first->next)
 		{
 			// empty
 		}
@@ -393,7 +398,9 @@ private:
 	node* construct_node()
 	{
 		void* mem = m_allocator.allocate(sizeof(node));
-		return new (mem) node();
+		//return new (mem) node();
+		node* n = (node*)mem;
+		return n;
 	}
 	void destruct_node(node* n)
 	{
@@ -403,7 +410,12 @@ private:
 	node* allocate_buckets(size_type n)
 	{
 		node* buckets = static_cast<node*>(m_allocator.allocate(n * sizeof(node)));
-		rde::construct_n(buckets, n);
+		//rde::construct_n(buckets, n);
+		for (size_type i = 0; i < n; ++i)
+		{
+			buckets[i].used = false;
+			buckets[i].next = 0;
+		}
 		return buckets;
 	}
 	void delete_buckets()
@@ -417,7 +429,12 @@ private:
 				it = itNext;
 			}
 		}
-		rde::destruct_n(m_buckets, m_capacity);
+		//rde::destruct_n(m_buckets, m_capacity);
+		for (size_type i = 0; i < m_capacity; ++i)
+		{
+			if (m_buckets[i].used)
+				rde::destruct(&m_buckets[i].data);
+		}
 		m_allocator.deallocate(m_buckets, sizeof(node) * m_capacity);
 	}
 
