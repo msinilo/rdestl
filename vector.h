@@ -35,7 +35,7 @@ struct standard_vector_storage
 		{
 			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
 			const base_vector::size_type currSize(m_end - m_begin);
-			const base_vector::size_type newSize = std::min(currSize, newCapacity);
+			const base_vector::size_type newSize = currSize < newCapacity ? currSize : newCapacity;
 			// Copy old data if needed.
 			if (m_begin)
 			{
@@ -323,7 +323,7 @@ public:
 	}
 
 	// *Much* quicker version of erase, doesnt preserve collection order.
-	void erase_unordered(iterator it)
+	RDE_FORCEINLINE void erase_unordered(iterator it)
 	{
 		RDE_ASSERT(validate_iterator(it));
 		RDE_ASSERT(it != end());
