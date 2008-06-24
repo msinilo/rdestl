@@ -63,4 +63,16 @@ namespace
 		CHECK_EQUAL(it, &array[3]);
 		CHECK_EQUAL(16, *it);
 	}
+	TEST(AbsGeneric)
+	{
+		CHECK_EQUAL(5.f, rde::abs(5.f));
+		CHECK_EQUAL(5.f, rde::abs(-5.f));
+		CHECK_EQUAL(0.f, rde::abs(0.f));
+	}
+	TEST(AbsInt)
+	{
+		CHECK_EQUAL(5, rde::abs(5));
+		CHECK_EQUAL(5, rde::abs(-5));
+		CHECK_EQUAL(0, rde::abs(0));
+	}
 }
