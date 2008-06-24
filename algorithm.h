@@ -213,6 +213,26 @@ void accumulate(TIter first, TIter last, T& result)
 	}
 }
 
+//-----------------------------------------------------------------------------
+template<typename T>
+T abs(const T& t)
+{
+	return t >= T(0) ? t : -t;
+}
+// No branches, Hacker's Delight way.
+RDE_FORCEINLINE int abs(int x)
+{
+	const int y = x >> 31;
+	return (x ^ y) - y;
+}
+
+
+//-----------------------------------------------------------------------------
+template<typename T> inline
+T min(const T& x, const T& y)
+{
+	return x < y ? x : y;
+}
 
 } // namespace rde
 
