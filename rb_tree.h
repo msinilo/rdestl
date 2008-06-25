@@ -34,6 +34,7 @@ public:
 	};
 
 	rb_tree()
+	:	m_size(0)
 	{
 		m_sentinel.color	= black;
 		m_sentinel.left		= &m_sentinel;
@@ -49,7 +50,7 @@ public:
 		while (iter != &m_sentinel)
 		{
 			parent = iter;
-			if (key > iter->key)
+			if (iter->key < key)
 				iter = iter->right;
 			else if (key < iter->key)
 				iter = iter->left;
@@ -75,12 +76,96 @@ public:
 
 		rebalance(new_node);
 		validate();
+		++m_size;
 	}
 
-	bool empty() const	{ return m_root == &m_sentinel; }
+	node* find_node(const key_type& key) 
+	{
+		node* iter(m_root);
+		while (iter != &m_sentinel)
+		{
+			if (iter->key < key)
+				iter = iter->right;
+			else if (key < iter->key)
+				iter = iter->left;
+			else // key == iter->key
+				return iter;
+		}
+		return 0;	// not found
+	}
+
+	void erase(const key_type& key)
+	{
+		node* toErase = find_node(key);
+		if (toErase != 0)
+			erase(toErase);
+	}
+	void erase(node* n)
+	{
+		RDE_ASSERT(m_size > 0);
+		node* toErase;
+		if (n->left == &m_sentinel || n->right == &m_sentinel)
+			toErase = n;
+		else
+		{
+			toErase = n->right;
+			while (toErase->left != &m_sentinel)
+				toErase = toErase->left;
+		}
+
+		node* x = toErase->left;
+		if (x == &m_sentinel)
+			x = toErase->right;
+		x->parent = toErase->parent;
+		if (toErase->parent != &m_sentinel)
+		{
+			if (toErase == toErase->parent->left)
+				toErase->parent->left = x;
+			else
+				toErase->parent->right = x;
+		}
+		else
+		{
+			m_root = x;
+		}
+
+		// Branching is probably worse than key copy anyway.
+		// $$$ unless key is very expensive?
+		//if (toErase != n)
+		n->key = toErase->key;
+
+		if (toErase->color == black)
+			rebalance_after_erase(x);
+		validate();
+		--m_size;
+	}
+
+	bool empty() const	{ return m_size == 0; }
 	size_type size() const
 	{
-		return num_nodes(m_root);
+		return m_size;
+	}
+
+	typedef void (*TravFunc)(node* n, int left, int depth);
+
+	void traverse_node(node* n, TravFunc func, int depth)
+	{
+		int left(-1);
+		if (n->parent != &m_sentinel)
+		{
+			left = n->parent->left == n;
+		}
+		func(n, left, depth);
+		if (n->left != &m_sentinel)
+			traverse_node(n->left, func, depth + 1);
+		if (n->right != &m_sentinel)
+			traverse_node(n->right, func, depth + 1);
+	}
+
+	void traverse(TravFunc func)
+	{
+		int depth(0);
+		traverse_node(m_root, func, depth);
 	}
 
 private:
@@ -98,6 +183,8 @@ private:
 			if (iter->parent == grandparent->left)
 			{
 				node* uncle = grandparent->right;
+				// Both parent and uncle are red.
+				// Repaint both, make grandparent red.
 				if (uncle->color == red)
 				{
 					iter->parent->color = black;
@@ -139,6 +226,79 @@ private:
 					iter->parent->color = black;
 					grandparent->color = red;
 					rotate_left(grandparent);
+				}
+			}
+		}
+		m_root->color = black;
+	}
+
+	void rebalance_after_erase(node* n)
+	{
+		node* iter(n);
+		while (iter != m_root && iter->color == black)
+		{
+			if (iter == iter->parent->left)
+			{
+				node* sibling = iter->parent->right;
+				if (sibling->color == red)
+				{
+					sibling->color = black;
+					iter->parent->color = red;
+					rotate_left(iter->parent);
+					sibling = iter->parent->right;
+				}
+				if (sibling->left->color == black &&
+					sibling->right->color == black)
+				{
+					sibling->color = red;
+					iter = iter->parent;
+				}
+				else
+				{
+					if (sibling->right->color == black)
+					{
+						sibling->left->color = black;
+						sibling->color = red;
+						rotate_right(sibling);
+						sibling = iter->parent->right;
+					}
+					sibling->color = iter->parent->color;
+					iter->parent->color = black;
+					sibling->right->color = black;
+					rotate_left(iter->parent);
+					iter = m_root;
+				}
+			}
+			else	// iter == right child
+			{
+				node* sibling = iter->parent->left;
+				if (sibling->color == red)
+				{
+					sibling->color = black;
+					iter->parent->color = red;
+					rotate_right(iter->parent);
+					sibling = iter->parent->left;
+				}
+				if (sibling->left->color == black &&
+					sibling->right->color == black)
+				{
+					sibling->color = red;
+					iter = iter->parent;
+				}
+				else
+				{
+					if (sibling->left->color == black)
+					{
+						sibling->right->color = black;
+						sibling->color = red;
+						rotate_left(sibling);
+						sibling = iter->parent->left;
+					}
+					sibling->color = iter->parent->color;
+					iter->parent->color = black;
+					sibling->left->color = black;
+					rotate_right(iter->parent);
+					iter = m_root;
 				}
 			}
 		}
@@ -222,8 +382,9 @@ private:
 		return new node();
 	}
 
-	node	m_sentinel;
-	node*	m_root;
+	node		m_sentinel;
+	node*		m_root;
+	size_type	m_size;
 };
 
 } // rde
