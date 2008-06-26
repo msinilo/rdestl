@@ -2,6 +2,7 @@
 #define RDESTL_RB_TREE_H
 
 #include "rdestl/rdestl.h"
+#include "rdestl/allocator.h"
 
 namespace rde
 {
@@ -18,11 +19,12 @@ namespace internal
 	};
 } // internal
 
-template<typename T>
+template<typename T, class TAllocator = rde::allocator>
 class rb_tree : private internal::rb_tree_base
 {
 public:
-	typedef T	key_type;
+	typedef T				key_type;
+	typedef TAllocator		allocator_type;
 
 	struct node
 	{
@@ -33,14 +35,19 @@ public:
 		node*	parent;
 	};
 
-	rb_tree()
-	:	m_size(0)
+	explicit rb_tree(const allocator_type& allocator = allocator_type())
+	:	m_size(0),
+		m_allocator(allocator)
 	{
 		m_sentinel.color	= black;
 		m_sentinel.left		= &m_sentinel;
 		m_sentinel.right	= &m_sentinel;
 		m_sentinel.parent	= &m_sentinel;
 		m_root				= &m_sentinel;
+	}
+	~rb_tree()
+	{
+		clear();
 	}
 
 	void insert(const key_type& key)
@@ -138,6 +145,16 @@ public:
 			rebalance_after_erase(x);
 		validate();
 		--m_size;
+	}
+
+	void clear()
+	{
+		if (!empty())
+		{
+			free_node(m_root);
+			m_root = &m_sentinel;
+			m_size = 0;
+		}
 	}
 
 	bool empty() const	{ return m_size == 0; }
@@ -379,12 +396,22 @@ private:
 	}
 	node* alloc_node()
 	{
-		return new node();
+		return (node*)m_allocator.allocate(sizeof(node));
+	}
+	void free_node(node* n)
+	{
+		if (n->left != &m_sentinel)
+			free_node(n->left);
+		if (n->right != &m_sentinel)
+			free_node(n->right);
+		if (n != &m_sentinel)
+			m_allocator.deallocate(n, sizeof(node));
 	}
 
-	node		m_sentinel;
-	node*		m_root;
-	size_type	m_size;
+	node			m_sentinel;
+	node*			m_root;
+	size_type		m_size;
+	allocator_type	m_allocator;
 };
 
 } // rde
