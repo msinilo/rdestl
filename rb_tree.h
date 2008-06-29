@@ -185,7 +185,56 @@ public:
 		traverse_node(m_root, func, depth);
 	}
 
-private:
+protected:
+	node* get_begin_node() const
+	{
+		node* iter(0);
+		if (m_root != &m_sentinel)
+		{
+			iter = m_root;
+			while (iter->left != &m_sentinel)
+				iter = iter->left;
+		}
+		return iter;
+	}
+	node* find_next_node(node* n) const
+	{
+		node* next(0);
+		if (n != 0)
+		{
+			if (n->right != &m_sentinel)
+			{
+				next = n->right;
+				while (next->left != &m_sentinel)
+					next = next->left;
+			}
+			else if (n->parent != &m_sentinel)
+			{
+				if (n == n->parent->left)
+					return n->parent;
+				else
+				{
+					next = n;
+					while (next->parent != &m_sentinel)
+					{
+						if (next == next->parent->right)
+							next = next->parent;
+						else
+						{
+							return next->parent;
+						}
+					}
+					return 0;
+				}
+			}
+			else	// 'n' is root.
+			{
+				RDE_ASSERT(n == m_root);
+			}
+		}
+		return next;
+	}
+
 	size_type num_nodes(const node* n) const
 	{
 		return n == &m_sentinel ? 0 : 1 + num_nodes(n->left) + num_nodes(n->right);
