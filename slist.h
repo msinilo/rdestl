@@ -156,7 +156,9 @@ public:
 	void pop_front()
 	{
 		RDE_ASSERT(!empty());
-		m_root.next->unlink(&m_root);
+		node* n = upcast(m_root.next);
+		n->unlink(&m_root);
+		destruct_node(n);
 	}
 	void insert_after(iterator pos, const T& value)
 	{
