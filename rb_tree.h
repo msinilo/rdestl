@@ -143,6 +143,9 @@ public:
 
 		if (toErase->color == black)
 			rebalance_after_erase(x);
+
+		free_node(toErase, false);
+
 		validate();
 		--m_size;
 	}
@@ -151,7 +154,7 @@ public:
 	{
 		if (!empty())
 		{
-			free_node(m_root);
+			free_node(m_root, true);
 			m_root = &m_sentinel;
 			m_size = 0;
 		}
@@ -224,7 +227,7 @@ protected:
 							return next->parent;
 						}
 					}
-					return 0;
+					next = 0;
 				}
 			}
 			else	// 'n' is root.
@@ -447,12 +450,15 @@ protected:
 	{
 		return (node*)m_allocator.allocate(sizeof(node));
 	}
-	void free_node(node* n)
+	void free_node(node* n, bool recursive)
 	{
-		if (n->left != &m_sentinel)
-			free_node(n->left);
-		if (n->right != &m_sentinel)
-			free_node(n->right);
+		if (recursive)
+		{
+			if (n->left != &m_sentinel)
+				free_node(n->left, true);
+			if (n->right != &m_sentinel)
+				free_node(n->right, true);
+		}
 		if (n != &m_sentinel)
 			m_allocator.deallocate(n, sizeof(node));
 	}

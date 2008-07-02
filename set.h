@@ -106,6 +106,24 @@ public:
 		return iterator(0, this);
 	}
 
+	iterator find(const value_type& v)	
+	{ 
+		return iterator(Base::find_node(v), this); 
+	}
+	const_iterator find(const value_type& v) const
+	{
+		return const_iterator(Base::find_node(v), this);
+	}
+	void erase(const value_type& v)
+	{
+		erase(find(v));
+	}
+	void erase(iterator it)
+	{
+		RDE_ASSERT(it != end());
+		Base::erase(it.node());
+	}
+
 	using Base::insert;
 	using Base::empty;
 	using Base::size;
