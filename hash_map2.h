@@ -77,9 +77,7 @@ private:
 		RDE_FORCEINLINE void set_unused()		{ hash = kTombstoneHash; }
 
 		value_type		data;
-#if RDE_HASHMAP_CACHE_HASH
 		unsigned int	hash;
-#endif
 	};
 	template<typename TNodePtr, typename TPtr, typename TRef>
 	class node_iterator
@@ -130,7 +128,7 @@ private:
 
 		bool operator==(const node_iterator& rhs) const
 		{
-			return rhs.m_node == m_node;
+			return rhs.m_node == m_node && m_map == rhs.get_map();
 		}
 		bool operator!=(const node_iterator& rhs) const
 		{
@@ -267,9 +265,7 @@ public:
 		}
 		m_numCollisions += hadCollisions;
 		rde::copy_construct(&currentNode->data, value);
-#if RDE_HASHMAP_CACHE_HASH
 		currentNode->hash = (unsigned int)hash;
-#endif
 		++m_numEntries;
 		RDE_ASSERT(currentNode == &m_buckets[i]);
 		return pair<iterator, bool>(iterator(currentNode, i, this), true);
@@ -283,12 +279,16 @@ public:
 
 	iterator find(const key_type& key)
 	{
+		if (empty())
+			return end();
 		const size_type index = find_bucket(key);
 		node* keyNode = m_buckets[index].is_used() ? &m_buckets[index] : 0;
 		return iterator(keyNode, index, this);
 	}
 	const_iterator find(const key_type& key) const
 	{
+		if (empty())
+			return end();
 		const size_type index = find_bucket(key);
 		node* keyNode = m_buckets[index].used ? &m_buckets[index] : 0;
 		return const_iterator(keyNode, index, this);
@@ -311,11 +311,7 @@ public:
 				j = get_bucket(j + 1);
 				if (!m_buckets[j].is_used())
 					break;
-#if RDE_HASHMAP_CACHE_HASH
 				const size_type k = get_bucket(m_buckets[j].hash);
-#else
-				const size_type k = get_bucket(hash_func(m_buckets[j].data.first));
-#endif
 				if ((j > i && (k <= i || k > j)) ||
 					(j < i && (k <= i && k > j)))
 				{
@@ -403,11 +399,7 @@ private:
 			node* currentNode = bucket;
 			if (currentNode->is_used())
 			{
-#if RDE_HASHMAP_CACHE_HASH
 				const size_type hash(currentNode->hash);
-#else
-				const size_type hash = hash_func(currentNode->data.first);
-#endif
 				size_type j = get_bucket(hash, new_capacity);
 				size_type hadCollisions(0);
 #if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
@@ -428,9 +420,7 @@ private:
 				rde::copy_construct(&newNode->data, currentNode->data);
 				//newNode->data = currentNode->data;
 				//newNode->used = true;
-#if RDE_HASHMAP_CACHE_HASH
 				newNode->hash = (unsigned long)hash;
-#endif
 				rde::destruct(&currentNode->data);
 				m_numCollisions += hadCollisions;
 			}
