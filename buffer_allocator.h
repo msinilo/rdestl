@@ -1,6 +1,8 @@
 #ifndef RDESTL_BUFFER_ALLOCATOR_H
 #define RDESTL_BUFFER_ALLOCATOR_H
 
+#include "rdestl/rdestl.h"
+
 namespace rde
 {
 
@@ -8,7 +10,7 @@ namespace rde
 class buffer_allocator
 {
 public:
-	explicit buffer_allocator(const char* name = "DEFAULT", const char* mem,
+	explicit buffer_allocator(const char* name, char* mem,
 		size_t bufferSize)
 	:	m_name(name), 
 		m_buffer(mem),
@@ -18,7 +20,7 @@ public:
 		/**/
 	}
 
-	void* allocate(size_t bytes, int /*flags = 0*/)
+	void* allocate(size_t bytes, int /*flags*/ = 0)
 	{
 		RDE_ASSERT(m_bufferTop + bytes <= m_bufferSize);
 		char* ret = m_buffer + m_bufferTop;
@@ -27,7 +29,7 @@ public:
 	}
 	void deallocate(void* ptr, size_t /*bytes*/)
 	{
-		RDE_ASSERT(ptr >= m_buffer && ptr < m_buffer + m_bufferSize);
+		RDE_ASSERT(ptr == 0 || (ptr >= m_buffer && ptr < m_buffer + m_bufferSize));
 		sizeof(ptr);
 	}
 
