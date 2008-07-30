@@ -36,7 +36,8 @@ struct fixed_vector_storage
 
 			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
 			const base_vector::size_type currSize(m_end - m_begin);
-			const base_vector::size_type newSize = std::min(currSize, newCapacity);
+			const base_vector::size_type newSize = currSize < newCapacity ? 
+				currSize : newCapacity;
 			// Copy old data if needed.
 			if (m_begin)
 			{
