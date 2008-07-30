@@ -92,7 +92,7 @@ private:
 
 		bool operator==(const node_iterator& rhs) const
 		{
-			return rhs.m_node == m_node;
+			return rhs.m_node == m_node && m_map == rhs.get_map();
 		}
 		bool operator!=(const node_iterator& rhs) const
 		{
@@ -368,6 +368,8 @@ private:
 
 	node* find_node(const key_type& key) const
 	{
+		if (empty())
+			return 0;
 		const size_type bucket = get_bucket(key);
 		node* first;
 		for (first = &m_buckets[bucket]; 
