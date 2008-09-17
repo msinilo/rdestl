@@ -9,6 +9,7 @@ namespace rde
 template<typename T, size_t N>
 class fixed_array
 {
+	typedef char ERR_N_MustBeBiggerThanZero[N > 0 ? 1 : -1];
 public:
 	typedef T			value_type;
 	typedef T*			iterator;
