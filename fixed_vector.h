@@ -103,6 +103,7 @@ struct fixed_vector_storage
 	T*						m_end;
 	typedef char ERR_InvalidUCharSize[sizeof(unsigned char) == 1 ? 1 : -1];
 	// Not T[], because we need uninitialized memory.
+	// @todo: solve potential alignment problems.
 	unsigned char			m_data[TCapacity * sizeof(T)];
 	// @todo: m_capacity is not really needed for containers that
 	// cant overflow.
