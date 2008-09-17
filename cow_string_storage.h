@@ -35,10 +35,10 @@ class cow_string_storage
 	typedef char ERR_CharTypeTooBigSeeM_BufferComment[sizeof(E) <= 2 ? 1 : -1];
 public:
 	typedef E					value_type;
-	typedef size_t				size_type;
+	typedef int					size_type;
 	typedef TAllocator			allocator_type;
 	typedef const value_type*	const_iterator;
-	static const size_type		kGranularity = 32;	
+	static const unsigned long	kGranularity = 32;	
 
 	explicit cow_string_storage(const allocator_type& allocator)
 	:	m_allocator(allocator)
@@ -50,7 +50,7 @@ public:
 	{
 		const int len = strlen(str);
 		construct_string(len);
-		sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len*sizeof(value_type));
 		RDE_ASSERT(len < string_rep::kMaxCapacity);
 		get_rep()->size = static_cast<short>(len);
 		m_data[len] = 0;
@@ -60,7 +60,7 @@ public:
 	:	m_allocator(allocator)
 	{
 		construct_string(len);
-		sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len*sizeof(value_type));
 		RDE_ASSERT(len < string_rep::kMaxCapacity);
 		get_rep()->size = static_cast<short>(len);
 		m_data[len] = 0;
@@ -69,10 +69,24 @@ public:
 	:	m_data(rhs.m_data),
 		m_allocator(allocator)
 	{
-		get_rep()->add_ref();
+		if (rhs.is_dynamic())
+		{
+			get_rep()->add_ref();
+		}
+		else
+		{
+			const int len = rhs.length();
+			construct_string(len);
+			Sys::MemCpy(m_data, rhs.c_str(), len*sizeof(value_type));
+			RDE_ASSERT(len < string_rep::kMaxCapacity);
+			get_rep()->size = static_cast<short>(len);
+			m_data[len] = 0;
+		}
 	}
 	~cow_string_storage()
 	{
+		if (!is_dynamic())
+			RDE_ASSERT(get_rep()->refs == 1);
 		release_string();
 	}
 
@@ -94,7 +108,7 @@ public:
 		RDE_ASSERT(str != m_data);
 		release_string();
 		construct_string(len);
-		sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len*sizeof(value_type));
 		get_rep()->size = short(len);
 		m_data[len] = 0;
 	}
@@ -108,7 +122,7 @@ public:
 		RDE_ASSERT(rep->capacity >= short(newCapacity));
 		const size_type newLen = prevLen + len;
 		RDE_ASSERT(short(newLen) <= rep->capacity);
-		sys::MemCpy(m_data + prevLen, str, len * sizeof(value_type));
+		Sys::MemCpy(m_data + prevLen, str, len * sizeof(value_type));
 		m_data[newLen] = 0;
 		rep->size = short(newLen);
 	}
@@ -151,6 +165,47 @@ protected:
 			RDE_ASSERT(m_data[length()] == 0);
 		return true;
 	}
+	void make_unique(size_type capacity_hint)
+	{
+		string_rep* rep = get_rep();
+		RDE_ASSERT(rep->refs >= 1);
+
+		if (capacity_hint != 0)
+		{
+			++capacity_hint;
+			capacity_hint = (capacity_hint+kGranularity-1) & ~(kGranularity-1);
+			if (capacity_hint < kGranularity)
+				capacity_hint = kGranularity;
+		}
+		RDE_ASSERT(capacity_hint < string_rep::kMaxCapacity);
+		// Reallocate string only if we truly need to make it unique
+		// (it's shared) or if our current buffer is too small.
+		if (rep->refs > 1 || short(capacity_hint) > rep->capacity)
+		{
+			if (capacity_hint > 0)
+			{
+				void* newMem = m_allocator.allocate(capacity_hint);
+				string_rep* newRep = reinterpret_cast<string_rep*>(newMem);
+				newRep->init(short(capacity_hint));
+				value_type* newData = reinterpret_cast<value_type*>(newRep + 1);
+				Sys::MemCpy(newData, m_data, rep->size*sizeof(value_type));
+				newRep->size = rep->size;
+				newData[rep->size] = 0;
+				release_string();
+				m_data = newData;
+			}
+			else
+			{
+				release_string();
+				string_rep* rep = reinterpret_cast<string_rep*>(m_buffer);
+				rep->init();
+				m_data = reinterpret_cast<value_type*>(rep + 1);
+				*m_data = 0;
+			}
+		}
+	}
+	RDE_FORCEINLINE E* get_data()	{ return m_data; }
+
 private:
 	RDE_FORCEINLINE string_rep* get_rep() const
 	{
@@ -160,6 +215,7 @@ private:
 	{
 		if (capacity != 0)
 		{
+			++capacity;
 			capacity = (capacity+kGranularity-1) & ~(kGranularity-1);
 			if (capacity < kGranularity)
 				capacity = kGranularity;
@@ -185,47 +241,13 @@ private:
 		if (rep->release() && rep->capacity != 0)
 		{
 			// Make sure it was a dynamically allocated data.
-			RDE_ASSERT(rep != reinterpret_cast<string_rep*>(&m_buffer[0]));
+			RDE_ASSERT(is_dynamic());
 			m_allocator.deallocate(rep, rep->capacity);
 		}
 	}
-	void make_unique(size_type capacity_hint)
+	bool is_dynamic() const
 	{
-		string_rep* rep = get_rep();
-		RDE_ASSERT(rep->refs >= 1);
-
-		if (capacity_hint != 0)
-		{
-			capacity_hint = (capacity_hint+kGranularity-1) & ~(kGranularity-1);
-			if (capacity_hint < kGranularity)
-				capacity_hint = kGranularity;
-		}
-		RDE_ASSERT(capacity_hint < string_rep::kMaxCapacity);
-		// Reallocate string only if we truly need to make it unique
-		// (it's shared) or if our current buffer is too small.
-		if (rep->refs > 1 || short(capacity_hint) > rep->capacity)
-		{
-			if (capacity_hint > 0)
-			{
-				void* newMem = m_allocator.allocate(capacity_hint);
-				string_rep* newRep = reinterpret_cast<string_rep*>(newMem);
-				newRep->init(short(capacity_hint));
-				value_type* newData = reinterpret_cast<value_type*>(newRep + 1);
-				sys::MemCpy(newData, m_data, rep->size*sizeof(value_type));
-				newRep->size = rep->size;
-				newData[rep->size] = 0;
-				release_string();
-				m_data = newData;
-			}
-			else
-			{
-				release_string();
-				string_rep* rep = reinterpret_cast<string_rep*>(m_buffer);
-				rep->init();
-				m_data = reinterpret_cast<value_type*>(rep + 1);
-				*m_data = 0;
-			}
-		}
+		return get_rep() != reinterpret_cast<const string_rep*>(&m_buffer[0]);
 	}
 
 	E*			m_data;
