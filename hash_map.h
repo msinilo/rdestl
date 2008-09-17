@@ -48,7 +48,7 @@ private:
 	public:
 		typedef forward_iterator_tag	iterator_category;
 
-		explicit node_iterator(TNodePtr node, hash_map* map)
+		explicit node_iterator(TNodePtr node, const hash_map* map)
 		:	m_node(node),
 			m_map(map)
 		{/**/}
@@ -99,7 +99,7 @@ private:
 			return !(rhs == *this);
 		}
 
-		hash_map* get_map() const { return m_map; }
+		const hash_map* get_map() const { return m_map; }
 	private:
 		TNodePtr find_next_node(TNodePtr node) const
 		{
@@ -114,14 +114,14 @@ private:
 		}
 
 		TNodePtr	m_node;
-		hash_map*	m_map;
+		const hash_map*	m_map;
 	};
 
 public:
 	typedef TKey															key_type;
 	typedef TValue															mapped_type;
 	typedef node_iterator<node*, value_type*, value_type&>					iterator;
-	typedef node_iterator<node*, const value_type*, const value_type&>	const_iterator;
+	typedef node_iterator<node*, const value_type*, const value_type&>		const_iterator;
 	typedef TAllocator														allocator_type;
 	static const size_type													kNodeSize = sizeof(node);
 
