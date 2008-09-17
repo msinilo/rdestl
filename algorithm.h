@@ -225,7 +225,11 @@ RDE_FORCEINLINE int abs(int x)
 	const int y = x >> 31;
 	return (x ^ y) - y;
 }
-
+RDE_FORCEINLINE short abs(short x)
+{
+	const short y = x >> 15;
+	return (x ^ y) - y;
+}
 
 //-----------------------------------------------------------------------------
 template<typename T> inline
@@ -233,6 +237,21 @@ T min(const T& x, const T& y)
 {
 	return x < y ? x : y;
 }
+// @TODO: determine if it REALLY is quicker than version with branches.
+/*RDE_FORCEINLINE float min(float x, float y)
+{
+	float result;
+	__asm
+	{
+		fld		[x]
+		fld		[y]
+		fcomi	st(0), st(1)
+		fcmovnb	st(0), st(1)
+		fstp	[result]
+		fcomp
+	}
+	return result;
+}*/
 
 } // namespace rde
 
