@@ -2,6 +2,7 @@
 #define RDESTL_UTILITY_H
 
 #include "rdestl/rdestl.h"
+#include <new.h>
 
 namespace rde
 {
@@ -29,7 +30,7 @@ namespace internal
 	void copy_n(const T* first, size_t n, T* result, int_to_type<true>)
 	{
 		RDE_ASSERT(result >= first + n || result < first);
-		sys::MemCpy(result, first, n * sizeof(T));
+		Sys::MemCpy(result, first, n * sizeof(T));
 	}
 
 	template<typename T>
@@ -42,7 +43,7 @@ namespace internal
 	void copy(const T* first, const T* last, T* result, int_to_type<true>)
 	{
 		const size_t n = reinterpret_cast<const char*>(last) - reinterpret_cast<const char*>(first);
-		sys::MemCpy(result, first, n);
+		Sys::MemCpy(result, first, n);
 	}
 
 	template<typename T> RDE_FORCEINLINE
@@ -54,7 +55,7 @@ namespace internal
 	template<typename T> RDE_FORCEINLINE
 	void move_n(const T* first, size_t n, T* result, int_to_type<true>)
 	{
-		sys::MemMove(result, first, n * sizeof(T));
+		Sys::MemMove(result, first, n * sizeof(T));
 	}
 
 	template<typename T> RDE_FORCEINLINE
@@ -70,7 +71,7 @@ namespace internal
 		//memmove(result, first, (last - first) * sizeof(T));
 		const size_t n = reinterpret_cast<const char*>(last) - reinterpret_cast<const char*>(first);
 		//const size_t n = (last - first) * sizeof(T);
-		sys::MemMove(result, first, n);
+		Sys::MemMove(result, first, n);
 	}
 
 
@@ -84,7 +85,7 @@ namespace internal
 	void copy_construct_n(const T* first, size_t n, T* result, int_to_type<true>)
 	{
 		RDE_ASSERT(result >= first + n || result < first);
-		sys::MemCpy(result, first, n * sizeof(T));
+		Sys::MemCpy(result, first, n * sizeof(T));
 	}
 
 	template<typename T>
