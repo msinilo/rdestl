@@ -8,10 +8,10 @@ class simple_string_storage
 {
 public:
 	typedef E					value_type;
-	typedef size_t				size_type;
+	typedef int					size_type;
 	typedef TAllocator			allocator_type;
 	typedef const value_type*	const_iterator;
-	static const size_type		kGranularity = 32;	
+	static const unsigned long	kGranularity = 32;	
 
 	explicit simple_string_storage(const allocator_type& allocator)
 	:	m_allocator(allocator),
@@ -24,7 +24,7 @@ public:
 	{
 		const int len = strlen(str);
 		m_data = construct_string(len);
-		sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
 	}
@@ -33,7 +33,7 @@ public:
 	:	m_allocator(allocator)
 	{
 		m_data = construct_string(len);
-		sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
 	}
@@ -67,7 +67,7 @@ public:
 			release_string();
 			m_data = construct_string(len);
 		}
-		sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
 	}
@@ -79,11 +79,11 @@ public:
 		if (m_capacity <= newLen + 1)
 		{
 			value_type* newData = construct_string(newLen);
-			sys::MemCpy(newData, m_data, prevLen * sizeof(value_type));
+			Sys::MemCpy(newData, m_data, prevLen * sizeof(value_type));
 			release_string();
 			m_data = newData;
 		}
-		sys::MemCpy(m_data + prevLen, str, len * sizeof(value_type));
+		Sys::MemCpy(m_data + prevLen, str, len * sizeof(value_type));
 		m_data[newLen] = 0;
 		m_length = newLen;
 		RDE_ASSERT(invariant());
@@ -98,6 +98,9 @@ public:
 		return m_length;
 	}
 	const allocator_type& get_allocator() const	{ return m_allocator; }
+
+	void make_unique(size_type) {}
+	value_type* get_data() { return m_data; }
 
 protected:
 	bool invariant() const
