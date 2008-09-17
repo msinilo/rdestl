@@ -167,6 +167,31 @@ public:
 	{
 		TStorage::resize(size);
 	}
+	void make_lower()
+	{
+		const size_type len = length();
+		TStorage::make_unique(len);
+		static const int chDelta = 'a' - 'A';
+		E* data = TStorage::get_data();
+		for (size_type i = 0; i < len; ++i)
+		{
+			if (data[i] < 'a')
+				data[i] += chDelta;		
+		}
+	}
+	void make_upper()
+	{
+		const size_type len = length();
+		TStorage::make_unique(len);
+		static const int chDelta = 'a' - 'A';
+		E* data = TStorage::get_data();
+		for (size_type i = 0; i < len; ++i)
+		{
+			if (data[i] > 'Z')
+				data[i] -= chDelta;
+		}
+	}
+
 
 private:
 	bool invariant() const
