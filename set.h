@@ -81,10 +81,10 @@ class set : private rb_tree<T, TAllocator>
 	};
 
 public:
-	typedef T																value_type;
-	typedef node_iterator<node*, value_type*, value_type&>					iterator;
+	typedef T															value_type;
+	typedef node_iterator<node*, value_type*, value_type&>				iterator;
 	typedef node_iterator<node*, const value_type*, const value_type&>	const_iterator;
-	typedef TAllocator														allocator_type;
+	typedef TAllocator													allocator_type;
 
 	explicit set(const allocator_type& allocator = allocator_type())
 	:	rb_tree(allocator) {}
