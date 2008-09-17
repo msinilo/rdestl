@@ -28,6 +28,7 @@ public:
 
 	struct node
 	{
+		node() {}
 		color_e	color;
 		T		key;
 		node*	left;
@@ -73,10 +74,10 @@ public:
 		new_node->parent = parent;
 		if (parent != &m_sentinel)
 		{
-			if (key > parent->key)
-				parent->right = new_node;
-			else
+			if (key < parent->key)
 				parent->left = new_node;
+			else
+				parent->right = new_node;
 		}
 		else	// empty tree
 			m_root = new_node;
@@ -376,9 +377,10 @@ protected:
 
 	void validate() const
 	{
+#if RDE_DEBUG
 		RDE_ASSERT(m_root->color == black);
 		validate_node(m_root);
-
+#endif
 	}
 	void validate_node(node* n) const
 	{
@@ -448,7 +450,8 @@ protected:
 	}
 	node* alloc_node()
 	{
-		return (node*)m_allocator.allocate(sizeof(node));
+		node* mem = (node*)m_allocator.allocate(sizeof(node));
+		return new (mem) node();
 	}
 	void free_node(node* n, bool recursive)
 	{
@@ -460,7 +463,10 @@ protected:
 				free_node(n->right, true);
 		}
 		if (n != &m_sentinel)
+		{
+			n->~node();
 			m_allocator.deallocate(n, sizeof(node));
+		}
 	}
 
 	node			m_sentinel;
