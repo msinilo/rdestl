@@ -1,183 +1,124 @@
 #include <UnitTest++/src/UnitTest++.h>
+#include "rdestl/fixed_list.h"
 #include "rdestl/list.h"
+#include "rdestl/rdestl.h"
+#if !RDESTL_STANDALONE
+#	include "core/Console.h"
+#	include "core/Random.h"
+#	include "core/Timer.h"
+#	include "rdestl/vector.h"
+#endif
 
 namespace
 {
 	const int array [] = { 1, 4, 9, 16, 25, 36 }; 
 
-	TEST(ConstructEmpty)
-	{
-		rde::list<int> lst;
-		CHECK(lst.empty());
-		CHECK_EQUAL(0ul, lst.size());
-	}
-	TEST(PushFront)
-	{
-		rde::list<int> lst;
-		lst.push_front(5);
-		CHECK(!lst.empty());
-		CHECK_EQUAL(1ul, lst.size());
-		CHECK_EQUAL(5, lst.front());
-		lst.push_front(3);
-		CHECK_EQUAL(2ul, lst.size());
-		CHECK_EQUAL(3, lst.front());
-	}
-	TEST(PopFront)
-	{
-		rde::list<int> lst;
-		lst.push_front(5);
-		lst.push_front(3);
-		CHECK(!lst.empty());
-		lst.pop_front();
-		CHECK_EQUAL(5, lst.front());
-		lst.pop_front();
-		CHECK(lst.empty());
-	}
+#define CONCAT_(x, y)	x ## y
+#define CONCAT2_(x, y)	CONCAT_(x, y)
+#define TESTC(x)		TEST(CONCAT2_(x, POSTFIX))
 
-	TEST(PushBack)
-	{
-		rde::list<int> lst;
-		lst.push_back(5);
-		CHECK(!lst.empty());
-		CHECK_EQUAL(1ul, lst.size());
-		CHECK_EQUAL(5, lst.front());
-		CHECK_EQUAL(5, lst.back());
-		lst.push_back(3);
-		CHECK_EQUAL(2ul, lst.size());
-		CHECK_EQUAL(5, lst.front());
-		CHECK_EQUAL(3, lst.back());
-	}
-	TEST(PopBack)
-	{
-		rde::list<int> lst;
-		lst.push_front(5);
-		lst.push_back(3);
-		CHECK(!lst.empty());
-		lst.pop_back();
-		CHECK_EQUAL(5, lst.front());
-		lst.pop_back();
-		CHECK(lst.empty());
-	}
+#define POSTFIX	PtrBased
+#define tTestList	rde::list<int>
+#include "ListTestInc.h"
 
-	TEST(Clear)
-	{
-		rde::list<int> lst;
-		lst.push_front(5);
-		CHECK(!lst.empty());
-		lst.clear();
-		CHECK(lst.empty());
-	}
+#undef tTestList
+#undef POSTFIX
+#define POSTFIX	Linear
+#define tTestList	rde::fixed_list<int, 8>
+#include "ListTestInc.h"
 
-	TEST(IterEmpty)
+	TEST(FixedListEraseInsertIndicesReuse)
 	{
-		rde::list<int> lst;
-		CHECK(lst.begin() == lst.end());
-		const rde::list<int> lst2;
-		CHECK(lst2.begin() == lst2.end());
-	}
+		typedef rde::fixed_list<int, 4> TList;
+		TList lst;
+		for (int i = 0; i < 4; ++i)
+			lst.push_back((i + 1) * 2);
 
-	TEST(IterOneElem)
-	{
-		rde::list<int> lst;
-		lst.push_back(5);
-		rde::list<int>::iterator it = lst.begin();
-		CHECK(it != lst.end());
-		CHECK_EQUAL(5, *it);
+		TList::iterator it = lst.begin();
+		it = lst.erase(it);
+		++it, ++it;
+		lst.erase(it);
+		CHECK_EQUAL(2, lst.size());
+		lst.push_back(999);
+		lst.push_back(888);
+		CHECK_EQUAL(4, lst.size());
+		CHECK_EQUAL(4, lst.front());
+		it = lst.begin(); ++it;
+		CHECK_EQUAL(6, *it);
+		CHECK_EQUAL(888, lst.back());
 	}
-	TEST(IterTraverse)
+#if !RDESTL_STANDALONE
+	TEST(FixedListRelocation)
 	{
-		rde::list<int> lst;
-		lst.push_back(2);
-		lst.push_back(3);
-		lst.push_back(4);
-		lst.push_back(5);
-		lst.push_front(1);
-		rde::list<int>::const_iterator it = lst.end();
-		--it;
-		CHECK_EQUAL(5, *it);
-		it--;
-		CHECK_EQUAL(4, *it);
-		it--;
-		CHECK_EQUAL(3, *it);
-		it--;
-		CHECK_EQUAL(2, *it);
-		it--;
-		CHECK(it == lst.begin());
-		CHECK_EQUAL(1, *it);
+		typedef rde::fixed_list<int, 1000> TList;
+		TList lst;
+		rde::Random::Init(1001);
+		for (int i = 0; i < 1000; ++i)
+			lst.push_back(rde::Random::NextInt());
 
-		++it;
-		CHECK_EQUAL(2, *it);
-		CHECK_EQUAL(3, *(++it));
-		CHECK_EQUAL(4, *(++it));
-		it++;
-		CHECK_EQUAL(5, *it++);
-		CHECK(it == lst.end());
-	}
-	TEST(AssignCtor)
-	{
-		rde::list<int> lst(&array[0], &array[6]);
-		CHECK_EQUAL(6ul, lst.size());
-		CHECK_EQUAL(1, lst.front());
-		CHECK_EQUAL(36, lst.back());
-	}
-	TEST(Insert)
-	{
-		rde::list<int> lst(&array[0], &array[6]);
-		rde::list<int>::iterator it = lst.end();
-		--it, --it;
-		rde::list<int>::iterator it2 = lst.insert(it, 20);
-		CHECK_EQUAL(20, *it2);
-		CHECK_EQUAL(7ul, lst.size());
-		--it2;
-		CHECK_EQUAL(16, *it2);
-		++it2, ++it2;
-		CHECK_EQUAL(25, *it2);
-		it = lst.end(); --it, --it, --it;
-		CHECK_EQUAL(20, *it);
-	}
-
-	TEST(Erase)
-	{
-		rde::list<int> lst(&array[0], &array[6]);
-		rde::list<int>::iterator it = lst.begin(); // 1
-		++it, ++it, ++it; // 16
-		it = lst.erase(it); 
-		CHECK_EQUAL(25, *it);
-		CHECK_EQUAL(5ul, lst.size());
-		++it;
-		CHECK_EQUAL(36, *it);
-		--it, --it;
-		CHECK_EQUAL(9, *it);
-	}
-	TEST(EraseAll)
-	{
-		rde::list<int> lst(&array[0], &array[6]);
-		lst.erase(lst.begin(), lst.end());
-		CHECK(lst.empty());
-	}
-	TEST(AssignmentOp)
-	{
-		rde::list<int> lst(&array[0], &array[6]);
-		rde::list<int> lst2;
-		lst2 = lst;
-		CHECK_EQUAL(6ul, lst2.size());
-		CHECK_EQUAL(1, lst2.front());
-		CHECK_EQUAL(36, lst2.back());
-	}
-
-	TEST(IterArrowOp)
-	{
-		struct Foo
+		void* mem2 = new char[sizeof(lst)];
+		rde::Sys::MemCpy(mem2, &lst, sizeof(lst));
+		TList* lst2 = (TList*)mem2;
+		CHECK_EQUAL(lst.size(), lst2->size());
+		TList::iterator it = lst.begin();
+		TList::iterator it2 = lst2->begin();
+		while (it != lst.end())
 		{
-			int k;
-		};
-		rde::list<Foo> lst;
-		Foo f;
-		f.k = 11;
-		lst.push_front(f);
-		CHECK_EQUAL(11, lst.front().k);
-		CHECK_EQUAL(11, lst.begin()->k);
-		CHECK_EQUAL(11, (*lst.begin()).k);
+			CHECK_EQUAL(*it, *it2);
+			++it;
+			++it2;
+		}
+		CHECK(it2 == lst2->end());
+		delete[] (char*)mem2;
 	}
+
+	struct Observer
+	{
+	};
+
+	TEST(FixedListVersusVectorPerformance)
+	{
+		typedef rde::fixed_list<Observer*, 256>	ObserverList;
+		typedef rde::vector<Observer*>			ObserverVector;
+
+		rde::Timer timer;
+		timer.Start();
+		ObserverVector vObservers;
+		for (int i = 0; i < 256; ++i)
+			vObservers.push_back(new Observer);
+
+		static const int kNumFrames = 100000;
+		for (int i = 0; i < kNumFrames; ++i)
+		{
+			Observer* o = vObservers.front();
+			vObservers.erase(vObservers.begin());
+			vObservers.push_back(o);
+		}
+		timer.Stop();
+		rde::Console::Printf("Vector took %d ms\n", timer.GetTimeInMs());
+
+		timer.Start();
+		ObserverList lObservers;
+		for (int i = 0; i < 256; ++i)
+			lObservers.push_back(new Observer);
+
+		for (int i = 0; i < kNumFrames; ++i)
+		{
+			Observer* o = lObservers.front();
+			lObservers.pop_front();
+			lObservers.push_back(o);
+		}
+		timer.Stop();
+		rde::Console::Printf("List took %d ms\n", timer.GetTimeInMs());
+
+		for (ObserverVector::iterator it = vObservers.begin(); it != vObservers.end(); ++it)
+			delete *it;
+		for (ObserverList::iterator it = lObservers.begin(); it != lObservers.end(); ++it)
+			delete *it;
+
+		CHECK(true);
+	}
+#endif // RDESTL_STANDALONE
 }
+
 
