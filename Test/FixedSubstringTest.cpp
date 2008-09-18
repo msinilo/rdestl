@@ -25,5 +25,11 @@ namespace
 		CHECK(!str2.empty());
 		CHECK(str == str2);
 	}
+	TEST(Append)
+	{
+		rde::fixed_substring<char, 9> str("Hello ");
+		str.append("world");
+		CHECK_EQUAL(0, rde::strcompare(str.data(), "Hello wor"));
+	}
 }
 
