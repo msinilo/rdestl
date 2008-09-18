@@ -68,10 +68,10 @@ namespace
 	TEST(Clear)
 	{
 		rde::intrusive_slist<MyNode> l;
-		l.push_front(new MyNode(5));
-		l.push_front(new MyNode(6));
-		l.push_front(new MyNode(7));
-		l.push_front(new MyNode(8));
+		MyNode n0(5); l.push_front(&n0);
+		MyNode n1(6); l.push_front(&n1);
+		MyNode n2(7); l.push_front(&n2);
+		MyNode n3(8); l.push_front(&n3);
 		CHECK_EQUAL(4ul, l.size());
 		l.clear();
 		CHECK(l.empty());
@@ -80,13 +80,14 @@ namespace
 	TEST(GetIterator)
 	{
 		rde::intrusive_slist<MyNode> l;
-		l.push_front(new MyNode(5));
-		l.push_front(new MyNode(6));
+		MyNode n0(5); l.push_front(&n0);
+		MyNode n1(6); l.push_front(&n1);
 		MyNode* n(new MyNode(7));
 		l.push_front(n);
-		l.push_front(new MyNode(8));
+		MyNode n2(8); l.push_front(&n2);
 		rde::intrusive_slist<MyNode>::iterator it = l.get_iterator(n);
 		CHECK_EQUAL(7, it->data);
+		delete n;
 	}
 }
 
