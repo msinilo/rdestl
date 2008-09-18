@@ -265,11 +265,11 @@ namespace
 	TEST(AssertOnOverflow)
 	{
 		rde::fixed_vector<int, 10, false> v;
-		rde::assertion::Handler prevHandler = rde::assertion::SetHandler(AssertionHandler);
+		rde::Assertion::Handler prevHandler = rde::Assertion::SetHandler(AssertionHandler);
 		for (int i = 0; i < 11; ++i)
 			v.push_back(i);
 		CHECK_EQUAL(1, numFailedAssertions);
-		rde::assertion::SetHandler(prevHandler);
+		rde::Assertion::SetHandler(prevHandler);
 	}
 #endif
 }
