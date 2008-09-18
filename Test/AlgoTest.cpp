@@ -75,4 +75,16 @@ namespace
 		CHECK_EQUAL(5, rde::abs(-5));
 		CHECK_EQUAL(0, rde::abs(0));
 	}
+	TEST(AbsShort)
+	{
+		CHECK_EQUAL(5, rde::abs<short>(5));
+		short x(-5);
+		CHECK_EQUAL(5, rde::abs(x));
+		x = 0;
+		CHECK_EQUAL(0, rde::abs(x));
+	}
+	TEST(MinFloat)
+	{
+		CHECK_EQUAL(2.f, rde::min(2.f, 3.f));
+	}
 }
