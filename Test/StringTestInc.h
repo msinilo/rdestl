@@ -2,19 +2,19 @@
 	{
 		STRING_CLASS s;
 		CHECK(s.empty());
-		CHECK_EQUAL(0ul, s.length());
+		CHECK_EQUAL(0, s.length());
 	}
 	TESTC(LenOfCString)
 	{
 		STRING_CLASS s("alamakota");
 		CHECK(!s.empty());
-		CHECK_EQUAL(9ul, s.length());
+		CHECK_EQUAL(9, s.length());
 	}
 	TESTC(CopyCtorLen)
 	{
 		STRING_CLASS s("alamakota");
 		STRING_CLASS s2(s);
-		CHECK_EQUAL(9ul, s2.length());
+		CHECK_EQUAL(9, s2.length());
 		CHECK_EQUAL('a', s2[0]);
 		CHECK_EQUAL('l', s2[1]);
 		CHECK_EQUAL('a', s2[8]);
@@ -53,7 +53,7 @@
 		STRING_CLASS s;
 		s = "alamakota";
 		CHECK_EQUAL(0, s.compare("alamakota"));
-		CHECK_EQUAL(9ul, s.length());
+		CHECK_EQUAL(9, s.length());
 	}
 	TESTC(Substring)
 	{
@@ -93,4 +93,22 @@
 		STRING_CLASS s2("makota1234567890123456789012345678901234567890");
 		s.append(s2);
 		CHECK(s.compare("alamakota1234567890123456789012345678901234567890") == 0);
+	}
+	TESTC(MakeLower)
+	{
+		STRING_CLASS s("AlAMaKoTA");
+		s.make_lower();
+		CHECK(s.compare("alamakota") == 0);
+	}
+	TESTC(MakeUpper)
+	{
+		STRING_CLASS s("AlAMaKoTA");
+		s.make_upper();
+		CHECK(s.compare("ALAMAKOTA") == 0);
+	}
+	TESTC(CopyEmpty)
+	{
+		STRING_CLASS s;
+		STRING_CLASS s2(s);
+		CHECK(s2.empty());
 	}
