@@ -11,13 +11,12 @@ namespace rde
 // Never allocates memory.
 // !! WORK IN PROGRESS
 template<typename E, size_t N>
-class fixed_substring : private fixed_array<E, N>
+class fixed_substring : private fixed_array<E, N + 1>
 {
-	typedef char ERR_N_MustBeBiggerThanZero[N > 0 ? 1 : -1];
-	typedef fixed_array<E, N>	Base;
+	typedef fixed_array<E, N + 1>	Base;
 public:
-	typedef E			value_type;
-	typedef size_t		size_type;
+	typedef E		value_type;
+	typedef int		size_type;
 
 	fixed_substring()
 	{
@@ -34,10 +33,20 @@ public:
 	void assign(const value_type* str)
 	{
 		RDE_ASSERT(str != data());
-		const size_type len = rde::strlen(str);
-		const size_type toCopy = len < N-1 ? len : N-1;
-		sys::MemCpy(data(), str, toCopy);
+		const size_type len = (size_type)rde::strlen(str);
+		const size_type toCopy = len < N ? len : N;
+		Sys::MemCpy(data(), str, toCopy * sizeof(value_type));
 		data()[toCopy] = value_type(0);
+	}
+	void append(const value_type* str)
+	{
+		const size_type strLen = (size_type)rde::strlen(str);
+		const size_type ourLen = (size_type)rde::strlen(data());
+		size_type toAppend = strLen;
+		if (ourLen + toAppend > N)
+			toAppend = N - ourLen;
+		Sys::MemCpy(data() + ourLen, str, toAppend * sizeof(value_type));
+		data()[ourLen + toAppend] = value_type(0);
 	}
 
 	bool empty() const
