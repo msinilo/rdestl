@@ -9,5 +9,5 @@ ExceptionHandling=2
 Defines=RDE_DONT_CHECK_COMPILER_OPTIONS=1
 
 [Solution]
-Dependencies=rdestl;UnitTest++.vsnet2005;core;profile
+Dependencies=rdestl;UnitTest++.vsnet2005;core
 DependenciesPaths=../../../..;../../../../external
