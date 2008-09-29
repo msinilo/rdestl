@@ -8,451 +8,501 @@
 
 namespace rde
 {
+typedef unsigned long	hash_value_t;
 
-//=============================================================================
-class hash_map_base
+// Default implementations, just casts to hash_value.
+template<typename T>
+hash_value_t extract_int_key_value(const T& t)
 {
-public:
-	typedef size_t	size_type;
-protected:
-	static size_type get_next_capacity(size_type);
+	return (hash_value_t)t;
+}
+// Default implementation of hasher.
+// Works for keys that can be converted to 32-bit integer
+// with extract_int_key_value.
+// Algorithm by Robert Jenkins.
+// (see http://www.cris.com/~Ttwang/tech/inthash.htm for example).
+template<typename T>
+struct hash
+{
+	hash_value_t operator()(const T& t) const
+	{
+		hash_value_t a = extract_int_key_value(t);
+        a = (a+0x7ed55d16) + (a<<12);
+        a = (a^0xc761c23c) ^ (a>>19);
+        a = (a+0x165667b1) + (a<<5);
+        a = (a+0xd3a2646c) ^ (a<<9);
+        a = (a+0xfd7046c5) + (a<<3);
+        a = (a^0xb55a4f09) ^ (a>>16);
+        return a;
+	}
 };
 
-//=============================================================================
-// @todo: 2 allocators? one for buckets/one for single nodes?
 template<typename TKey, typename TValue, 
-	class THashFunc = rde::hash<TKey>, 
-	class TKeyEqualFunc = rde::equal_to<TKey>,
-	class TAllocator = rde::allocator>
-class hash_map : public hash_map_base
+		class THashFunc = rde::hash<TKey>,
+		int TLoadFactor4 = 6,
+		class TKeyEqualFunc = rde::equal_to<TKey>,
+		class TAllocator = rde::allocator>
+class hash_map
 {
 public:
-	typedef rde::pair<TKey, TValue>						value_type;
+	typedef rde::pair<TKey, TValue>         value_type;
 
 private:
 	struct node
-	{
-		node():	next(0), used(false) {/**/}
+    {
+		static const hash_value_t kUnusedHash       = 0xFFFFFFFF;
+        static const hash_value_t kDeletedHash      = 0xFFFFFFFE;
 
-		value_type		data;
-		node*			next;
-#if RDE_HASHMAP_CACHE_HASH
-		unsigned int	hash;
-#endif
-		bool			used;
+        node(): hash(kUnusedHash) {}
+
+        RDE_FORCEINLINE bool is_unused() const		{ return hash == kUnusedHash; }
+        RDE_FORCEINLINE bool is_deleted() const     { return hash == kDeletedHash; }
+        RDE_FORCEINLINE bool is_occupied() const	{ return hash < kDeletedHash; }
+
+        value_type      data;
+        hash_value_t    hash;
 	};
-
 	template<typename TNodePtr, typename TPtr, typename TRef>
-	class node_iterator
-	{
-	public:
-		typedef forward_iterator_tag	iterator_category;
+    class node_iterator
+    {
+		friend class hash_map;
+    public:
+		typedef forward_iterator_tag    iterator_category;
 
-		explicit node_iterator(TNodePtr node, const hash_map* map)
-		:	m_node(node),
-			m_map(map)
+        explicit node_iterator(TNodePtr node, const hash_map* map)
+        :	m_node(node),
+            m_map(map)
 		{/**/}
-		template<typename UNodePtr, typename UPtr, typename URef>
-		node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
-		:	m_node(rhs.node()),
-			m_map(rhs.get_map())
-		{
-			/**/
-		}
+        template<typename UNodePtr, typename UPtr, typename URef>
+        node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
+        :	m_node(rhs.node()),
+	  		m_map(rhs.get_map())
+		{/**/}
 
 		TRef operator*() const
-		{
+        {
 			RDE_ASSERT(m_node != 0);
-			return m_node->data;
+            return m_node->data;
 		}
-		TPtr operator->() const
-		{
+        TPtr operator->() const
+        {
 			return &m_node->data;
 		}
-		TNodePtr node() const
-		{
+        TNodePtr node() const
+        {
 			return m_node;
 		}
 
-		node_iterator& operator++() 
-		{
+		node_iterator& operator++()
+        {
 			RDE_ASSERT(m_node != 0);
-			TNodePtr next = m_node->next;
-			if (next == 0)
-				next = find_next_node(m_node);
-			m_node = next;
+			++m_node;
+            move_to_next_occupied_node();
 			return *this;
-		} 
+        }
 		node_iterator operator++(int)
-		{
+        {
 			node_iterator copy(*this);
-			++(*this);
-			return copy;
+            ++(*this);
+            return copy;
 		}
 
-		bool operator==(const node_iterator& rhs) const
-		{
+        bool operator==(const node_iterator& rhs) const
+        {
 			return rhs.m_node == m_node && m_map == rhs.get_map();
 		}
-		bool operator!=(const node_iterator& rhs) const
-		{
+        bool operator!=(const node_iterator& rhs) const
+        {
 			return !(rhs == *this);
 		}
 
-		const hash_map* get_map() const { return m_map; }
+        const hash_map* get_map() const { return m_map; }	
 	private:
-		TNodePtr find_next_node(TNodePtr node) const
-		{
-			const size_type nodeBucket = m_map->get_bucket(node);
-			const size_type numBuckets = m_map->bucket_count();
-			for (size_type i = nodeBucket + 1; i < numBuckets; ++i)
-			{
-				if (m_map->m_buckets[i].used)
-					return &m_map->m_buckets[i];
+		void move_to_next_occupied_node()
+        {
+			// @todo: save nodeEnd in constructor?
+			TNodePtr nodeEnd = m_map->m_nodes + m_map->bucket_count();
+            for (/**/; m_node < nodeEnd; ++m_node)
+            {
+				if (m_node->is_occupied())
+					break;
 			}
-			return 0;
 		}
-
-		TNodePtr	m_node;
-		const hash_map*	m_map;
+        TNodePtr		m_node;
+        const hash_map*	m_map;
 	};
 
 public:
-	typedef TKey															key_type;
-	typedef TValue															mapped_type;
-	typedef node_iterator<node*, value_type*, value_type&>					iterator;
-	typedef node_iterator<node*, const value_type*, const value_type&>		const_iterator;
-	typedef TAllocator														allocator_type;
-	static const size_type													kNodeSize = sizeof(node);
-
-	friend class iterator;
+	typedef TKey																key_type;
+    typedef TValue																mapped_type;
+    typedef TAllocator															allocator_type;
+	typedef node_iterator<node*, value_type*, value_type&>						iterator;
+	typedef node_iterator<const node*, const value_type*, const value_type&>	const_iterator;
+    typedef int																	size_type;
+	static const size_type														kNodeSize = sizeof(node);
+	static const size_type														kInitialCapacity = 64;
 
 	explicit hash_map(const allocator_type& allocator = allocator_type())
-	:	m_buckets(0),
-		m_capacity(0),
-		m_numEntries(0),
-		m_numCollisions(0),
-		m_allocator(allocator)
+    :	m_nodes(0),
+        m_size(0),
+        m_capacity(0),
+        m_numUsed(0),
+        m_allocator(allocator)
 	{
 		/**/
 	}
 	explicit hash_map(size_type initial_bucket_count,
 		const allocator_type& allocator = allocator_type())
-	:	m_buckets(0),
-		m_capacity(0),
-		m_numEntries(0),
-		m_numCollisions(0),
-		m_allocator(allocator)
+    :	m_nodes(0),
+        m_size(0),
+        m_capacity(0),
+        m_numUsed(0),
+        m_allocator(allocator)
 	{
-		resize(initial_bucket_count);
+		reserve(initial_bucket_count);
 	}
-	explicit hash_map(size_type initial_bucket_count,
+	hash_map(size_type initial_bucket_count,
 		const THashFunc& hashFunc, 
 		const allocator_type& allocator = allocator_type())
-	:	m_buckets(0),
-		m_capacity(0),
-		m_numEntries(0),
-		m_numCollisions(0),
+    :	m_nodes(0),
+        m_size(0),
+        m_capacity(0),
+        m_numUsed(0),
 		m_hashFunc(hashFunc),
-		m_allocator(allocator)
+        m_allocator(allocator)
 	{
-		resize(initial_bucket_count);
+		reserve(initial_bucket_count);
+	}
+	hash_map(const hash_map& rhs, const allocator_type& allocator = allocator_type())
+    :	m_nodes(0),
+        m_size(0),
+        m_capacity(0),
+        m_numUsed(0),
+        m_allocator(allocator)
+	{
+		*this = rhs;
 	}
 	~hash_map()
 	{
-		delete_buckets();
+		delete_nodes();
 	}
 
 	iterator begin()
-	{
-		// gaaah.. slow... record 'lowest used bucket'?
-		for (size_type i = 0; i < m_capacity; ++i)
-		{
-			for (node* it = &m_buckets[i]; it != 0; it = it->next)
-			{
-				if (it->used)
-					return iterator(it, this);
-			}
-		}
-		return end();
+    {
+		iterator it(m_nodes, this);
+		it.move_to_next_occupied_node();
+		return it;
 	}
 	const_iterator begin() const
-	{
-		for (size_type i = 0; i < m_capacity; ++i)
-		{
-			for (node* it = &m_buckets[i]; it != 0; it = it->next)
-			{
-				if (it->used)
-					return const_iterator(it, this);
-			}
-		}
-		return end();
+    {
+		const_iterator it(m_nodes, this);
+		it.move_to_next_occupied_node();
+		return it;
 	}
-	iterator end()				{ return iterator(0, this); }
-	const_iterator end() const	{ return const_iterator(0, this); }
+	iterator end()              { return iterator(m_nodes + m_capacity, this); }
+	const_iterator end() const	{ return const_iterator(m_nodes + m_capacity, this); }
 
-	pair<iterator, bool> insert(const value_type& value)
+	// @note:	Added for compatiblity sake.
+	//			Personally, I consider it "risky". Use find/insert for more
+	//			explicit operations.
+	mapped_type& operator[](const key_type& key)
 	{
-		// Grow at fixed % of size/capacity ratio.
-		if (m_numEntries * 4 >= m_capacity * 2)
-			grow(m_capacity);
-		bool found;
-		node* inserted = insert_noresize(value, found);
-		++m_numEntries;
-		return pair<iterator, bool>(iterator(inserted, this), !found);
+		hash_value_t hash;
+		node* n = find_for_insert(key, &hash);
+		if (n == 0 || !n->is_occupied())
+		{
+			return insert_at(value_type(key, TValue()), n, hash).first->second;
+		}
+		return n->data.second;
 	}
-	template<class InputIterator>
-	void insert(InputIterator first, InputIterator last)
+	hash_map& operator=(const hash_map& rhs)
 	{
-		for (InputIterator it = first; it != last; ++it)
-			insert(*it);
+		if (&rhs != this)
+		{
+			clear();
+			if (m_capacity < rhs.bucket_count())
+			{
+				delete_nodes();
+				m_nodes = allocate_nodes(rhs.bucket_count());
+				m_capacity = rhs.bucket_count();
+			}
+			rehash(m_capacity, m_nodes, m_capacity, rhs.m_nodes, false);
+			m_size = rhs.size();
+			m_numUsed = rhs.m_numUsed;
+		}
+		return *this;
+	}
+
+	rde::pair<iterator, bool> insert(const value_type& v)
+	{
+		typedef rde::pair<iterator, bool> ret_type_t;
+		RDE_ASSERT(invariant());
+		if (m_numUsed * TLoadFactor4 >= m_capacity * 4)
+			grow();
+
+		hash_value_t hash;
+		node* n = find_for_insert(v.first, &hash);
+		if (n->is_occupied())
+		{
+			RDE_ASSERT(hash == n->hash && m_keyEqualFunc(v.first, n->data.first));
+			return ret_type_t(iterator(n, this), false);
+		}
+		if (n->is_unused())
+			++m_numUsed;
+		rde::copy_construct(&n->data, v);
+        n->hash = hash;
+        ++m_size;
+		RDE_ASSERT(invariant());
+        return ret_type_t(iterator(n, this), true);
+	}
+
+	size_type erase(const key_type& key)
+    {
+		node* n = lookup(key);
+        if (n != 0 && n->is_occupied())
+        {
+			erase_node(n);
+            return 1;
+		}
+		return 0;
+	}
+    void erase(iterator it)
+    {
+		RDE_ASSERT(it.get_map() == this);
+        if (it != end())
+        {
+			RDE_ASSERT(!empty());
+            erase_node(it.node());
+		}
+	}
+	void erase(iterator from, iterator to)
+	{
+		for (/**/; from != to; ++from)
+        {
+			node* n = from.node();
+            if (n->is_occupied())
+				erase_node(n);
+		}
 	}
 
 	iterator find(const key_type& key)
-	{
-		return iterator(find_node(key), this);
+    {
+		node* n = lookup(key);
+        return n == 0 ? end() : iterator(n, this);
 	}
 	const_iterator find(const key_type& key) const
 	{
-		return const_iterator(find_node(key), this);
+		const node* n = lookup(key);
+		return n == 0 ? end() : const_iterator(n, this);
 	}
-
-	void erase(iterator it)
-	{
-		RDE_ASSERT(!empty());
-		node* itNode = it.node();
-		const size_type bucket = get_bucket(itNode);
-		node* prevNode(0);
-		node* nextNode(0);
-		for (node* first = &m_buckets[bucket]; first != 0; first = nextNode)
-		{
-			nextNode = first->next;
-			if (first->used && itNode == first)
-			{
-				first->used = false;
-				--m_numEntries;
-				if (first != &m_buckets[bucket])
-				{
-					prevNode->next = first->next;
-					destruct_node(first);
-				}
-				else
-				{
-					rde::destruct(&first->data);
-				}
-				break; // ??
-			}
-			prevNode = first;
-		}
-	}
-	size_type erase(const key_type& k)
-	{
-		iterator i(find(k));
-        if (i == end()) 
-			return 0;
-        erase(i);
-        return 1;
-	}
-
-	void resize(size_type new_bucket_count_hint)
-	{
-		grow(new_bucket_count_hint);
-	}
-
-	size_type size() const				{ return m_numEntries; }
-	bool empty() const					{ return m_numEntries == 0; }
-	size_type bucket_count() const		{ return m_capacity; }
-	size_type collisions() const		{ return m_numCollisions; }
 
 	void clear()
-	{
-		for (size_type i = 0; i < m_capacity; ++i)
-		{
-			for (node* it = &m_buckets[i]; it != 0; it = it->next)
-				it->used = false;
+    {
+		node* endNode = m_nodes + m_capacity;
+        for (node* iter = m_nodes; iter != endNode; ++iter)
+        {
+			if (iter->is_occupied())
+            {
+				// We can make them unused, because we clear whole hash_map,
+                // so we can guarantee there'll be no holes.
+                iter->hash = node::kUnusedHash;
+                rde::destruct(&iter->data);
+			}
 		}
-		m_numEntries = 0;
-		m_numCollisions = 0;
+        m_size = 0;
+        m_numUsed = 0;
 	}
 
-	size_type used_memory() const
+	// More like reserve.
+	// resize() name chosen for compatibility sake.
+	void reserve(size_type min_size)
 	{
-		size_type bytes(m_capacity * kNodeSize);
-		for (size_type i = 0; i < m_capacity; ++i)
-		{
-			for (const node* it = m_buckets[i].next; it != 0; it = it->next)
-				bytes += kNodeSize;
-		}
-		return bytes;
+		size_type newCapacity = (m_capacity == 0 ? kInitialCapacity : m_capacity);
+		while (newCapacity < min_size)
+			newCapacity *= 2;
+		if (newCapacity > m_capacity)
+			grow(newCapacity);
 	}
-	size_type longest_cluster() const
+
+	size_type bucket_count() const			{ return m_capacity; }
+	size_type size() const					{ return m_size; }
+	size_type empty() const					{ return size() == 0; }
+	size_type nonempty_bucket_count() const	{ return m_numUsed; }
+	size_t used_memory() const				
 	{
-#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
-		return m_longestCluster;
-#else
-		return 0xFFFFFFFF;
-#endif
+		return bucket_count() * kNodeSize;
 	}
 
 private:
-	node* insert_noresize(const value_type& data, bool& found)
+	void grow()
 	{
-		return insert(m_buckets, data, m_capacity, found);
+		const int newCapacity = (m_capacity == 0 ? kInitialCapacity : m_capacity * 2);
+		grow(newCapacity);
 	}
-	node* insert(node* buckets, const value_type& data, size_type capacity, bool& found)
+	void grow(int new_capacity)
 	{
-		const size_type bucket = get_bucket(data.first, capacity);
-		node* first = &buckets[bucket];
-		node* freeNode(0);
-		found = true;
-		for (node* cur = first; cur != 0; cur = cur->next)
-		{
-			if (!cur->used)
-				freeNode = cur;
-			else if (m_keyEqualFunc(data.first, cur->data.first))
-				return cur;
-		}
-		found = false;
-		if (freeNode == 0)
-		{
-			++m_numCollisions;
+		RDE_ASSERT((new_capacity & (new_capacity - 1)) == 0);
+		node* newNodes = allocate_nodes(new_capacity);
+		rehash(new_capacity, newNodes, m_capacity, m_nodes, true);
+		m_allocator.deallocate(m_nodes, sizeof(node) * m_capacity);
+		m_capacity = new_capacity;
+		m_nodes = newNodes;
+		m_numUsed = m_size;
+		RDE_ASSERT(m_numUsed < m_capacity);
+   }
+	rde::pair<iterator, bool> insert_at(const value_type& v, node* n, 
+		hash_value_t hash)
+	{
+		RDE_ASSERT(invariant());
+		if (n == 0 || m_numUsed * 3 >= m_capacity * 2)
+			return insert(v);
 
-			freeNode = construct_node();
-			freeNode->next = first->next;
-			first->next = freeNode;
-#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
-			size_type longestCluster(0);
-			for (node* cur = first; cur != 0; cur = cur->next)
-				++longestCluster;
-			if (longestCluster > m_longestCluster)
-				m_longestCluster = longestCluster;
-#endif
-		}
-		//freeNode->data = data;
-		rde::copy_construct(&freeNode->data, data);
-#if RDE_HASHMAP_CACHE_HASH
-		freeNode->hash = (unsigned int)m_hashFunc(data.first);
-#endif
-		freeNode->used = true;
-		return freeNode;
+		RDE_ASSERT(!n->is_occupied());
+		if (n->is_unused())
+			++m_numUsed;
+		rde::copy_construct(&n->data, v);
+		n->hash = hash;
+		++m_size;
+		RDE_ASSERT(invariant());
+		return rde::pair<iterator, bool>(iterator(n, this), true);
 	}
-	// @note: avoid!
-	void grow(size_type new_capacity_hint)
+	node* find_for_insert(const key_type& key, hash_value_t* out_hash)
 	{
-		new_capacity_hint = get_next_capacity(new_capacity_hint);
-#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
-		m_longestCluster = 0;
-#endif
-		if (new_capacity_hint > m_capacity)
-		{
-			node* newBuckets = allocate_buckets(new_capacity_hint);
-			m_numCollisions = 0;
-			for (size_type bucket = 0; bucket < m_capacity; ++bucket)
-			{
-				node* first = &m_buckets[bucket];
-				while (first != 0)
-				{
-					if (first->used)
-					{
-						bool found;
-						insert(newBuckets, first->data, new_capacity_hint, found);
-					}
-					first = first->next;
-				}
-			}
-			delete_buckets();
-			m_buckets = newBuckets;
-			m_capacity = new_capacity_hint;
-		}
-	}
+		if (m_capacity == 0)
+			return 0;
 
-	node* find_node(const key_type& key) const
+		const hash_value_t hash = hash_func(key);
+        const uint32_t mask = m_capacity - 1;
+        uint32_t i = hash & mask;
+
+        node* n = m_nodes + i;
+		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
+			return n;
+
+        node* freeNode(0);
+        if (n->is_deleted())
+			freeNode = n;
+		uint32_t numProbes(0);
+        // Guarantees loop termination.
+        RDE_ASSERT(m_numUsed < m_capacity);
+        while (!n->is_unused())
+        {
+			++numProbes;
+            i = (i + numProbes) & mask;
+            n = m_nodes + i;
+            if (n->is_deleted() && freeNode == 0)
+				freeNode = n;
+		}
+        *out_hash = hash;
+        return freeNode ? freeNode : n;
+	}
+	node* lookup(const key_type& key) const
 	{
 		if (empty())
 			return 0;
-		const size_type bucket = get_bucket(key);
-		node* first;
-		for (first = &m_buckets[bucket]; 
-			first && (!first->used || !m_keyEqualFunc(key, first->data.first)); first = first->next)
-		{
-			// empty
+
+		const hash_value_t hash = hash_func(key);
+        const uint32_t mask = m_capacity - 1;
+        uint32_t i = hash & mask;
+        node* n = m_nodes + i;
+		uint32_t numProbes(0);
+        // Guarantees loop termination.
+        RDE_ASSERT(m_numUsed < m_capacity);
+        while (!n->is_unused())
+        {
+			if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
+				return n;
+
+			++numProbes;
+            i = (i + numProbes) & mask;
+            n = m_nodes + i;
 		}
-		return first;
+        return 0;
 	}
 
-	RDE_FORCEINLINE size_type get_bucket(const key_type& key) const
+	static void rehash(int new_capacity, node* new_nodes,
+		int capacity, const node* nodes, bool destruct_original)
 	{
-		return (m_hashFunc(key) & 0x7FFFFFFF) % m_capacity;
-	}
-	RDE_FORCEINLINE size_type get_bucket(const node* n) const
-	{
-#if RDE_HASHMAP_CACHE_HASH
-		return (n->hash & 0x7FFFFFFF) % m_capacity;
-#else
-		return (m_hashFunc(n->data.first) & 0x7FFFFFFF) % m_capacity;
-#endif
-	}
-	RDE_FORCEINLINE size_type get_bucket(const key_type& key, size_type n) const
-	{
-		return (m_hashFunc(key) & 0x7FFFFFFF) % n;
+		const node* it = nodes;
+		const node* itEnd = nodes + capacity;
+		const uint32_t mask = new_capacity - 1;
+		while (it != itEnd)
+		{
+			if (it->is_occupied())
+			{
+				const hash_value_t hash = it->hash;
+				uint32_t i = hash & mask;
+
+				node* n = new_nodes + i;
+				uint32_t numProbes(0);
+				while (!n->is_unused())
+				{
+					++numProbes;
+					i = (i + numProbes) & mask;
+					n = new_nodes + i;
+				}
+				rde::copy_construct(&n->data, it->data);
+				n->hash = hash;
+				if (destruct_original)
+					rde::destruct(&it->data);
+			}
+			++it;
+		}
 	}
 
-	node* construct_node()
-	{
-		void* mem = m_allocator.allocate(sizeof(node));
-		//return new (mem) node();
-		node* n = (node*)mem;
-		return n;
-	}
-	void destruct_node(node* n)
-	{
-		n->~node();
-		m_allocator.deallocate(n, sizeof(node));
-	}
-	node* allocate_buckets(size_type n)
+	node* allocate_nodes(int n)
 	{
 		node* buckets = static_cast<node*>(m_allocator.allocate(n * sizeof(node)));
-		//rde::construct_n(buckets, n);
-		for (size_type i = 0; i < n; ++i)
-		{
-			buckets[i].used = false;
-			buckets[i].next = 0;
-		}
+        node* iterBuckets(buckets);
+        node* end = iterBuckets + n;
+        for (/**/; iterBuckets != end; ++iterBuckets)
+			iterBuckets->hash = node::kUnusedHash;
+
 		return buckets;
 	}
-	void delete_buckets()
+	void delete_nodes()
 	{
-		for (size_type i = 0; i < m_capacity; ++i)
-		{
-			for (node* it = m_buckets[i].next; it != 0; /**/)
-			{
-				node* itNext = it->next;
-				destruct_node(it);
-				it = itNext;
-			}
+		node* it = m_nodes;
+        node* itEnd = it + m_capacity;
+        while (it != itEnd)
+        {
+			if (it->is_occupied())
+				rde::destruct(&it->data);
+			++it;
 		}
-		//rde::destruct_n(m_buckets, m_capacity);
-		for (size_type i = 0; i < m_capacity; ++i)
-		{
-			if (m_buckets[i].used)
-				rde::destruct(&m_buckets[i].data);
-		}
-		m_allocator.deallocate(m_buckets, sizeof(node) * m_capacity);
+		m_allocator.deallocate(m_nodes, sizeof(node) * m_capacity);
+	}
+	void erase_node(node* n)
+	{
+		RDE_ASSERT(!empty());
+        RDE_ASSERT(n->is_occupied());
+        rde::destruct(&n->data);
+        n->hash = node::kDeletedHash;
+		--m_size;
 	}
 
-	node*			m_buckets;
-	size_type		m_capacity;
-	size_type		m_numEntries;
-	size_type		m_numCollisions;
-	THashFunc		m_hashFunc;
+	RDE_FORCEINLINE hash_value_t hash_func(const key_type& key) const
+	{
+		const hash_value_t h = m_hashFunc(key);
+		RDE_ASSERT(h < node::kDeletedHash);
+        return h;
+	}
+	bool invariant()
+	{
+		RDE_ASSERT((m_capacity & (m_capacity - 1)) == 0);
+		RDE_ASSERT(m_numUsed >= m_size);
+		return true;
+	}
+
+	node*           m_nodes;
+	int             m_size;
+	int             m_capacity;
+	int             m_numUsed;
+	THashFunc       m_hashFunc;
 	TKeyEqualFunc	m_keyEqualFunc;
-	allocator_type	m_allocator;
-#if RDE_HASHMAP_TRACK_LONGEST_CLUSTER
-	size_type		m_longestCluster;
-#endif
+	TAllocator      m_allocator;
 };
+}
 
-} // namespace rde
+#endif
 
-//-----------------------------------------------------------------------------
-#endif // #ifndef RDESTL_HASH_MAP_H
