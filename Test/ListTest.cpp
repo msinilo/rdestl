@@ -74,8 +74,12 @@ namespace
 
 	struct Observer
 	{
-	};
+		virtual void Notify()
+		{
 
+		}
+	};
+#if 0
 	TEST(FixedListVersusVectorPerformance)
 	{
 		typedef rde::fixed_list<Observer*, 256>	ObserverList;
@@ -116,8 +120,10 @@ namespace
 		for (ObserverList::iterator it = lObservers.begin(); it != lObservers.end(); ++it)
 			delete *it;
 
-		CHECK(true);
+		CHECK(1 == 1);	// Just to shut compiler up (unused variable testResults).
 	}
+#endif
+
 #endif // RDESTL_STANDALONE
 }
 

@@ -1,26 +1,28 @@
 #include "rdestl/hash_map.h"
-#include "rdestl/hash_map2.h"
-#include "rdestl/map.h"
-#include "rdestl/ternary_search_tree.h"
+
+#if !RDESTL_STANDALONE
+
+//#include "rdestl/map.h"
+//#include "rdestl/ternary_search_tree.h"
 #include "rdestl/vector.h"
 #include <hash_map>
 #include <map>
 #include <string>
-#if !RDESTL_STANDALONE
-#	include "core/Console.h"
-#	include "core/Random.h"
-#	include "core/Timer.h"
-#	include "core/win32/Windows.h"
-#endif
+
+#include "core/Console.h"
+#include "core/Random.h"
+#include "core/StackTrace.h"
+#include "core/Timer.h"
+#include "core/win32/Windows.h"
 
 namespace
 {
 	struct hasher
 	{
-		size_t operator()(const std::string& s) const
+		rde::hash_value_t operator()(const std::string& s) const
 		{
 			size_t len = s.length();
-			size_t hash(0);
+			rde::hash_value_t hash(0);
 			for (size_t i = 0; i < len; ++i)
 			{
 				hash *= 31;
@@ -30,14 +32,7 @@ namespace
 		}
 	};
 
-#if !RDESTL_STANDALONE
-	// List-based hash map.
-	typedef rde::hash_map<std::string, int, hasher, rde::equal_to<std::string> >	tMap;
-	// Closed hash-map, pow2 number of buckets.
-	typedef rde::hash_map2<std::string, int, hasher>								tMap2;
-	// Closed hash-map, prime number of buckets.
-	typedef rde::hash_map2<std::string, int, hasher, rde::equal_to<std::string>, 
-		rde::hash_map_base2_prime> tMap3;
+	typedef rde::hash_map<std::string, int, hasher>	tMap;
 
 	struct mycomp
 	{ // define hash function for strings
@@ -61,9 +56,9 @@ namespace
 	// STL map
 	typedef std::map<std::string, int>					tMap5;
 	// RDE map
-	typedef rde::map<std::string, int>					tMap6;
+	//typedef rde::map<std::string, int>					tMap6;
 	// TST
-	typedef rde::ternary_search_tree<int>				tMap7;
+	//typedef rde::ternary_search_tree<int>				tMap7;
 
 	template<typename T>
 	struct HasUsedMemoryMethod
@@ -92,9 +87,11 @@ namespace
 
 	struct ProfileResult
 	{
-		explicit ProfileResult(const char* name_): enumTime(0), findTime(0), name(name_) {}
+		explicit ProfileResult(const char* name_)
+		: enumTime(0), findTime(0), removeTime(0), name(name_) {}
 		long		enumTime;
 		long		findTime;
+		long		removeTime;
 		std::string	name;
 	};
 
@@ -146,17 +143,26 @@ namespace
 		timer.Stop();
 		RDE_ASSERT(notFound==0);
 		res.findTime += timer.GetTimeInMs();
+
+		timer.Start();
+		for (int i = 0; i < numLookUps; ++i)
+		{
+			const int j = rand() % allFiles.size();
+			const std::string& str = allFiles[j];
+			fileMap.erase(str);
+		}
+		timer.Stop();
+		res.removeTime += timer.GetTimeInMs();
+
 		return notFound;
 	}
 
 	void MapSpeedTest()
 	{
 		const int kNumTests = 10;
-		ProfileResult results[7] = 
+		ProfileResult results[] = 
 		{
-			ProfileResult("RDE open hashmap"),
 			ProfileResult("RDE closed hashmap, pow2 num of buckets"),
-			ProfileResult("RDE closed hashmap, prime num of buckets"),
 			ProfileResult("STD hashmap"),
 			ProfileResult("STD map"),
 			ProfileResult("RDE map"),
@@ -165,105 +171,27 @@ namespace
 		for (int i = 0; i < kNumTests; ++i)
 		{
 			MapSpeedTest<tMap, tMap::value_type>(results[0]);
-			MapSpeedTest<tMap2, tMap2::value_type>(results[1]);
-			MapSpeedTest<tMap3, tMap3::value_type>(results[2]);
-			MapSpeedTest<tMap4, tMap4::value_type>(results[3]);
-			MapSpeedTest<tMap5, tMap5::value_type>(results[4]);
-			//MapSpeedTest<tMap6, tMap6::value_type>(results[5]);
+			MapSpeedTest<tMap4, tMap4::value_type>(results[1]);
+			MapSpeedTest<tMap5, tMap5::value_type>(results[2]);
+			//MapSpeedTest<tMap6, tMap6::value_type>(results[3]);
 			//MapSpeedTest<tMap6, tMap6::pair_type>(results[5]);
 		}
 		for (int i = 0; i < RDE_ARRAY_COUNT(results); ++i)
 		{
-			rde::Console::Printf("%d: %s: %d - %d\n", i, 
+			rde::Console::Printf("%d: %s: enumeration %dms, find %dms, remove %dms, total: %dms\n", i, 
 				results[i].name.c_str(),
-				results[i].enumTime, results[i].findTime);
+				results[i].enumTime, results[i].findTime, results[i].removeTime,
+				(results[i].enumTime + results[i].findTime + results[i].removeTime));
 		}
 	} 
-#endif
 }
-
-#include <algorithm>
-#include <vector>
-
-void remove_duplicates( std::vector<int> &v ) {
-        for (int i=0; i < (int)v.size(); ++i) {
-            for (int j=0; j < (int)v.size(); ++j) {
-                if ( i != j && v[i] == v[j] ) {
-                    v.erase( v.begin() + j );
-                    --j;
-                }
-            }
-        }
-    }
-
-	struct int_hasher
-	{
-		size_t operator()(int i) const
-		{
-			return (size_t)i;
-		}
-	};
-
-bool validate(const std::vector<int>& v)
-{
-        for (int i=0; i < (int)v.size(); ++i) {
-            for (int j=0; j < (int)v.size(); ++j) {
-                if ( i != j && v[i] == v[j] ) 
-				{
-					return false;
-                }
-            }
-        }
-		return true;
-}
-
-void remove_duplicates2( std::vector<int> &v ) 
-{
-	std::sort(v.begin(), v.end());
-	for (int i=0; i < (int)v.size() - 1; ++i)
-	{
-		int j = i + 1;
-		while (v[j] == i)
-		{
-			v.erase( v.begin() + j );
-		}
-	}
-	//RDE_ASSERT(validate(v));
-}
-
-#if !RDE_STANDALONE
-void Vector_SpeedTest()
-{
-	std::vector<int> v;
-	rde::Random::Init(1001);
-	for (int i = 0; i < 50000; ++i)
-	{
-		v.push_back(rde::Random::NextInt());
-	}
-	rde::Timer t;
-	t.Start();
-	remove_duplicates(v);
-	t.Stop();
-	rde::Console::Printf("Removing std: %d ms\n", t.GetTimeInMs());
-
-	v.clear();
-	for (int i = 0; i < 50000; ++i)
-	{
-		v.push_back(rde::Random::NextInt());
-	}
-
-	t.Start();
-	remove_duplicates2(v);
-	t.Stop();
-	rde::Console::Printf("Removing std: %d ms\n", t.GetTimeInMs());
-}
-#endif
 
 void Map_SpeedTest()
 {
-	//Vector_SpeedTest();
-#if !RDESTL_STANDALONE
 	::MapSpeedTest();
-#endif
 }
+
+#endif
+
+
 
