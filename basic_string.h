@@ -192,7 +192,6 @@ public:
 		}
 	}
 
-
 private:
 	bool invariant() const
 	{
