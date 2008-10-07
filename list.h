@@ -251,6 +251,12 @@ public:
 		return size;
 	}
 
+	const allocator_type& get_allocator() const	{ return m_allocator; }
+	void set_allocator(const allocator_type& allocator)
+	{
+		m_allocator = allocator;
+	}
+
 private:
 	node* construct_node(const T& value)
 	{
