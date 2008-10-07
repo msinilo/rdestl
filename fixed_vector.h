@@ -5,6 +5,11 @@
 
 #define RDESTL_RECORD_WATERMARKS	0
 
+// @TODO Wont work on 64-bit!
+// 4267 -- conversion from size_t to int.
+#pragma warning(push)
+#pragma warning(disable: 4267)
+
 namespace rde
 {
 //=============================================================================
@@ -35,7 +40,7 @@ struct fixed_vector_storage
 			}
 
 			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-			const base_vector::size_type currSize(m_end - m_begin);
+			const base_vector::size_type currSize((size_t)(m_end - m_begin));
 			const base_vector::size_type newSize = currSize < newCapacity ? 
 				currSize : newCapacity;
 			// Copy old data if needed.
@@ -62,7 +67,7 @@ struct fixed_vector_storage
 				RDE_ASSERT(!"fixed_vector cannot grow");
 			}
 			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-			const base_vector::size_type currSize(m_end - m_begin);
+			const base_vector::size_type currSize((size_t)(m_end - m_begin));
 			if (m_begin)
 				destroy(m_begin, currSize);
 			m_begin = newBegin;
@@ -85,7 +90,7 @@ struct fixed_vector_storage
 	RDE_FORCEINLINE void record_high_watermark()
 	{
 #if RDESTL_RECORD_WATERMARKS
-		const base_vector::size_type curr_size(m_end - m_begin);
+		const base_vector::size_type curr_size((size_t)(m_end - m_begin));
 		if (curr_size > m_max_size)
 			m_max_size = curr_size;
 #endif
@@ -156,6 +161,8 @@ public:
 		return *this;
 	}
 };
+
+#pragma warning(pop)
 
 } // rde
 
