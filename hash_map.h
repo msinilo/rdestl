@@ -215,6 +215,7 @@ public:
 		}
 		return n->data.second;
 	}
+	// @mote:	Doesnt copy allocator.
 	hash_map& operator=(const hash_map& rhs)
 	{
 		if (&rhs != this)
@@ -331,6 +332,12 @@ public:
 	size_t used_memory() const				
 	{
 		return bucket_count() * kNodeSize;
+	}
+
+	const allocator_type& get_allocator() const	{ return m_allocator; }
+	void set_allocator(const allocator_type& allocator)
+	{
+		m_allocator = allocator;
 	}
 
 private:
