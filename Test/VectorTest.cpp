@@ -49,7 +49,7 @@ namespace
 	{
 		tTestVector v;
 		CHECK(v.empty());
-		CHECK_EQUAL(0ul, v.size());
+		CHECK_EQUAL(0, v.size());
 		CHECK_EQUAL(v.begin(), v.end());
 		printf("Sizeof(v) = %d\n", sizeof(v));
 	}
@@ -57,7 +57,7 @@ namespace
 	{
 		tTestVector v;
 		v.push_back(2);
-		CHECK_EQUAL(1ul, v.size());
+		CHECK_EQUAL(1, v.size());
 		CHECK_EQUAL(2, v[0]);
 		CHECK(!v.empty());
 		CHECK(v.begin() != v.end());
@@ -71,7 +71,7 @@ namespace
 		CHECK_EQUAL(3, v.back());
 		v.pop_back();
 		CHECK(!v.empty());
-		CHECK_EQUAL(1ul, v.size());
+		CHECK_EQUAL(1, v.size());
 		CHECK_EQUAL(2, v[0]);
 		tTestVector::const_iterator it = v.begin();
 		++it;
@@ -82,22 +82,22 @@ namespace
 		tTestVector v;
 		CHECK(v.empty());
 		v.assign(array, array + 6);
-		CHECK_EQUAL(6ul, v.size());
+		CHECK_EQUAL(6, v.size());
 		CHECK_EQUAL(0, memcmp(array, v.data(), sizeof(array)));
 	}
 	TEST(AssignTabConstruct)
 	{
 		tTestVector v(array, array + 6);
-		CHECK_EQUAL(6ul, v.size());
+		CHECK_EQUAL(6, v.size());
 		CHECK_EQUAL(0, memcmp(array, v.data(), sizeof(array)));
 	}
 
 	TEST(Clear)
 	{
 		tTestVector v(array, array + 6);
-		CHECK_EQUAL(6ul, v.size());
+		CHECK_EQUAL(6, v.size());
 		v.clear();
-		CHECK_EQUAL(0ul, v.size());
+		CHECK_EQUAL(0, v.size());
 		CHECK(v.empty());
 		// Make sure it doesnt free mem.
 		CHECK(v.capacity() > 0);
@@ -120,7 +120,7 @@ namespace
 		tTestVector::iterator it2 = it;
 		it2 += 2;
 		v.erase(it, it2);
-		CHECK_EQUAL(4ul, v.size());
+		CHECK_EQUAL(4, v.size());
 		CHECK_EQUAL(1, v.front());
 		CHECK_EQUAL(16, v[1]);
 		CHECK_EQUAL(25, v[2]);
@@ -133,7 +133,7 @@ namespace
 		CHECK_EQUAL(9, *it);
 		v.erase(it + 1); // 16
 		
-		CHECK_EQUAL(4ul, v.size());
+		CHECK_EQUAL(4, v.size());
 		//PrintVector(v);
 	}
 	TEST(EraseEnd)
@@ -142,7 +142,7 @@ namespace
 		tTestVector::iterator it = v.begin();
 		it += 2;
 		v.erase(it, v.end());
-		CHECK_EQUAL(2ul, v.size());
+		CHECK_EQUAL(2, v.size());
 	}
 	TEST(EraseAll)
 	{
@@ -160,13 +160,13 @@ namespace
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
-		v.insert(size_t(0), 1, "Hello");
-		CHECK_EQUAL(4ul, v.size());
+		v.insert(0, 1, "Hello");
+		CHECK_EQUAL(4, v.size());
 		v.insert(4, 3, ".");
-		CHECK_EQUAL(7ul, v.size());
+		CHECK_EQUAL(7, v.size());
 		PrintVector(v);
 		v.insert(1, 10, "very");
-		CHECK_EQUAL(17ul, v.size());
+		CHECK_EQUAL(17, v.size());
 		PrintVector(v);
 	}
 
@@ -177,9 +177,9 @@ namespace
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
-		CHECK_EQUAL(4ul, v.size());
+		CHECK_EQUAL(4, v.size());
 		v.erase(v.begin() + 1, v.end() - 1);
-		CHECK_EQUAL(2ul, v.size());
+		CHECK_EQUAL(2, v.size());
 	}
 	TEST(IndexOf)
 	{
@@ -188,7 +188,7 @@ namespace
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
-		CHECK_EQUAL(2ul, v.index_of("new"));
+		CHECK_EQUAL(2, v.index_of("new"));
 		CHECK_EQUAL(tStringVector::npos, v.index_of("blah"));
 		CHECK_EQUAL(tStringVector::npos, v.index_of("brave", 2));
 	}
@@ -197,7 +197,7 @@ namespace
 	{
 		tTestVector v(array, array + 6);
 		v.insert(v.begin(), 2, -1);
-		CHECK_EQUAL(8ul, v.size());
+		CHECK_EQUAL(8, v.size());
 		CHECK_EQUAL(-1, v.front());
 		CHECK_EQUAL(-1, v[1]);
 		CHECK_EQUAL(1, v[2]);
@@ -209,7 +209,7 @@ namespace
 		tTestVector v(array, array + 6);
 		tTestVector::iterator it = v.begin() + 2;
 		v.insert(it, 3, 5);
-		CHECK_EQUAL(9ul, v.size());
+		CHECK_EQUAL(9, v.size());
 		CHECK_EQUAL(5, v[2]);
 		it = v.begin() + 2;
 		v.insert(it, 4);
@@ -219,14 +219,14 @@ namespace
 	{
 		tTestVector v(array, array + 6);
 		v.insert(v.end(), 1, 49);
-		CHECK_EQUAL(7ul, v.size());
+		CHECK_EQUAL(7, v.size());
 		CHECK_EQUAL(49, v[6]);
 	}
 	TEST(InsertToEmpty)
 	{
 		tTestVector v;
 		v.insert(v.begin(), 1, 2);
-		CHECK_EQUAL(1ul, v.size());
+		CHECK_EQUAL(1, v.size());
 		CHECK_EQUAL(2, v.front());
 	}
 
@@ -234,7 +234,7 @@ namespace
 	{
 		tTestVector v(array, array + 6);
 		v.resize(4);
-		CHECK_EQUAL(4ul, v.size());
+		CHECK_EQUAL(4, v.size());
 		CHECK_EQUAL(16, v[3]);
 	}
 
@@ -242,7 +242,7 @@ namespace
 	{
 		tTestVector v(array, array + 6);
 		tTestVector v2(v);
-		CHECK_EQUAL(6ul, v2.size());
+		CHECK_EQUAL(6, v2.size());
 		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
 	}
 
@@ -251,7 +251,7 @@ namespace
 		tTestVector v(array, array + 6);
 		tTestVector v2;
 		v2 = v;
-		CHECK_EQUAL(6ul, v2.size());
+		CHECK_EQUAL(6, v2.size());
 		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
 	}
 
@@ -260,16 +260,16 @@ namespace
 		tTestVector v(array, array + 6);
 		v.push_back(49);
 		v.set_capacity(v.size());
-		CHECK_EQUAL(7ul, v.capacity());
+		CHECK_EQUAL(7, v.capacity());
 	}
 	TEST(Reserve)
 	{
 		tTestVector v;
-		CHECK_EQUAL(0ul, v.capacity());
+		CHECK_EQUAL(0, v.capacity());
 		v.push_back(1); v.push_back(2); v.push_back(3);
 		v.reserve(10);
 		CHECK(v.capacity() >= 10);
-		CHECK_EQUAL(3ul, v.size());
+		CHECK_EQUAL(3, v.size());
 		CHECK_EQUAL(1, v[0]);
 		CHECK_EQUAL(2, v[1]);
 		CHECK_EQUAL(3, v[2]);
