@@ -5,13 +5,18 @@
 #include "rdestl/allocator.h"
 #include "rdestl/rdestl.h"
 
+// @TODO Wont work on 64-bit!
+// 4267 -- conversion from size_t to int.
+#pragma warning(push)
+#pragma warning(disable: 4267)
+
 namespace rde
 {
 //=============================================================================
 struct base_vector
 {
-	typedef size_t				size_type;
-	static const size_type		npos = size_type(-1);
+	typedef int				size_type;
+	static const size_type	npos = size_type(-1);
 };
 
 //=============================================================================
@@ -34,7 +39,8 @@ struct standard_vector_storage
 		if (canShrink || newCapacity > m_capacity)
 		{
 			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-			const base_vector::size_type currSize(m_end - m_begin);
+			const size_t s(m_end - m_begin);
+			const base_vector::size_type currSize(s);
 			const base_vector::size_type newSize = currSize < newCapacity ? currSize : newCapacity;
 			// Copy old data if needed.
 			if (m_begin)
@@ -54,7 +60,7 @@ struct standard_vector_storage
 	{
 		RDE_ASSERT(newCapacity > m_capacity);
 		T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-		const base_vector::size_type currSize(m_end - m_begin);
+		const base_vector::size_type currSize((size_t)(m_end - m_begin));
 		if (m_begin)
 			destroy(m_begin, currSize);
 		m_begin = newBegin;
@@ -127,8 +133,9 @@ public:
 			TStorage::destroy(m_begin, size());
 	}
 
-	// @note: allocator is not copied!
-	// @note: will not perform default constructor for newly created objects.
+	// @note:	allocator is not copied!
+	// @note:	will not perform default constructor for newly created objects,
+	//			just initialize with copy ctor of elements of rhs.
 	vector& operator=(const vector& rhs)
 	{
 		const size_type newSize = rhs.size();
@@ -151,16 +158,26 @@ public:
 	iterator end()					{ return m_end; }
 	const_iterator end() const		{ return m_end; }
 	size_type size() const			{ return size_type(m_end - m_begin); }
-	size_type empty() const			{ return m_begin == m_end; }
+	bool empty() const				{ return m_begin == m_end; }
 	size_type capacity() const		{ return m_capacity; }
 
 	T* data()				{ return empty() ? 0 : m_begin; }
 	const T* data() const	{ return empty() ? 0 : m_begin; }
 
+	T& front()
+	{
+		RDE_ASSERT(!empty());
+		return *begin();
+	}
 	const T& front() const
 	{
 		RDE_ASSERT(!empty());
 		return *begin();
+	}
+	T& back()
+	{
+		RDE_ASSERT(!empty());
+		return *(end() - 1);
 	}
 	const T& back() const
 	{
@@ -265,7 +282,7 @@ public:
 	{
 		RDE_ASSERT(validate_iterator(it));
 		RDE_ASSERT(invariant());
-		const size_type index = it - m_begin;
+		const size_type index = (size_t)(it - m_begin);
 		const size_type prevSize = size();
 		RDE_ASSERT(index <= prevSize);
 		const size_type toMove = prevSize - index;
@@ -416,6 +433,7 @@ private:
 	}
 };
 
+#pragma warning(pop)
 
 } // namespace rde
 
