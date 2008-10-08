@@ -17,7 +17,10 @@
 #	endif
 	namespace rde 
 	{ 
-		namespace sys 
+		// # Meh. MSVC doesnt seem to have <stdint.h>
+		// @todo	Fixes to make this portable.
+		typedef unsigned long	uint32_t;
+		namespace Sys 
 		{
 			RDE_FORCEINLINE void MemCpy(void* to, const void* from, size_t bytes)
 			{
