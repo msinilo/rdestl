@@ -1,7 +1,9 @@
 #include <UnitTest++/src/UnitTest++.h>
-#include "core/Console.h"
+#include "rdestl/rdestl.h"
 
-#define SPEED_TEST	1
+#if !RDESTL_STANDALONE
+#	define SPEED_TEST	1
+#endif
 
 void RunSpeedTests();
 
