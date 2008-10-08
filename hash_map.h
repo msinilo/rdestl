@@ -379,6 +379,7 @@ private:
 			return 0;
 
 		const hash_value_t hash = hash_func(key);
+        *out_hash = hash;
         const uint32_t mask = m_capacity - 1;
         uint32_t i = hash & mask;
 
@@ -400,7 +401,6 @@ private:
             if (n->is_deleted() && freeNode == 0)
 				freeNode = n;
 		}
-        *out_hash = hash;
         return freeNode ? freeNode : n;
 	}
 	node* lookup(const key_type& key) const
