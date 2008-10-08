@@ -398,6 +398,8 @@ private:
 			++numProbes;
             i = (i + numProbes) & mask;
             n = m_nodes + i;
+			if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
+				return n;
             if (n->is_deleted() && freeNode == 0)
 				freeNode = n;
 		}
