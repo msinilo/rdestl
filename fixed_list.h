@@ -3,6 +3,7 @@
 
 #include "rdestl/int_to_type.h"
 #include "rdestl/iterator.h"
+#include "rdestl/type_traits.h"
 
 namespace rde
 {
