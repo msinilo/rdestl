@@ -492,8 +492,8 @@ private:
 
 	RDE_FORCEINLINE hash_value_t hash_func(const key_type& key) const
 	{
-		const hash_value_t h = m_hashFunc(key);
-		RDE_ASSERT(h < node::kDeletedHash);
+		const hash_value_t h = m_hashFunc(key) & 0xFFFFFFFD;
+		//RDE_ASSERT(h < node::kDeletedHash);
         return h;
 	}
 	bool invariant()
