@@ -218,6 +218,7 @@ public:
 	// @mote:	Doesnt copy allocator.
 	hash_map& operator=(const hash_map& rhs)
 	{
+		RDE_ASSERT(invariant());
 		if (&rhs != this)
 		{
 			clear();
@@ -231,7 +232,28 @@ public:
 			m_size = rhs.size();
 			m_numUsed = rhs.m_numUsed;
 		}
+		RDE_ASSERT(invariant());
 		return *this;
+	}
+	void swap(hash_map& rhs)
+	{
+		if (&rhs != this)
+		{
+			RDE_ASSERT(invariant());
+			node* newNodes = allocate_nodes(rhs.bucket_count());
+			rehash(rhs.bucket_count(), newNodes, m_capacity, rhs.m_nodes, true);
+			const size_type newSize = rhs.size();
+			const size_type newCapacity = rhs.m_capacity;
+			const size_type newUsed = rhs.m_numUsed;
+			rhs = *this;
+
+			delete_nodes();
+			m_nodes = newNodes;
+			m_size = newSize;
+			m_capacity = newCapacity;
+			m_numUsed = newUsed;
+			RDE_ASSERT(invariant());
+		}
 	}
 
 	rde::pair<iterator, bool> insert(const value_type& v)
@@ -304,11 +326,11 @@ public:
         {
 			if (iter->is_occupied())
             {
-				// We can make them unused, because we clear whole hash_map,
-                // so we can guarantee there'll be no holes.
-                iter->hash = node::kUnusedHash;
                 rde::destruct(&iter->data);
 			}
+			// We can make them unused, because we clear whole hash_map,
+            // so we can guarantee there'll be no holes.
+            iter->hash = node::kUnusedHash;
 		}
         m_size = 0;
         m_numUsed = 0;
