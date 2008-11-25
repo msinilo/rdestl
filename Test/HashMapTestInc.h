@@ -143,6 +143,36 @@
 		CHECK_EQUAL(10, it->second);
 		CHECK(it->first == "world");
 	}
+	// Special case reported via blog.
+	TESTC(InsertAfterEraseAndClear)
+	{
+		tMap h;
+		h.insert(rde::make_pair(std::string("hello"), 5));
+		h.insert(rde::make_pair(std::string("brave"), 7));
+		h.insert(rde::make_pair(std::string("world"), 10));
+		h.erase("hello");
+		h.clear();
+		CHECK(h.empty());
+		h.insert(rde::make_pair(std::string("hello"), 5));
+		CHECK_EQUAL(1, h.size());
+	}
+	TESTC(SwapTest)
+	{
+		tMap a;
+		a.insert(rde::make_pair(std::string("hello"), 5));
+		a.insert(rde::make_pair(std::string("brave"), 7));
+		a.insert(rde::make_pair(std::string("world"), 10));
+		tMap b;
+		b.insert(rde::make_pair(std::string("something else"), 12));
+		a.swap(b);
+		CHECK_EQUAL(1, a.size());
+		CHECK_EQUAL(3, b.size());
+		CHECK_EQUAL(12, a["something else"]);
+		CHECK_EQUAL(5, b["hello"]);
+		CHECK_EQUAL(7, b.find("brave")->second);
+		CHECK_EQUAL(10, b["world"]);
+		CHECK(b.find("something else") == b.end());
+	}
 	TESTC(FindEmpty)
 	{
 		tMap h;
