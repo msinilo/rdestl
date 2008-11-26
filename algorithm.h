@@ -253,6 +253,15 @@ T min(const T& x, const T& y)
 	return result;
 }*/
 
+//-----------------------------------------------------------------------------
+template<typename TAssignable>
+void swap(TAssignable& a, TAssignable& b)
+{
+	TAssignable tmp(a);
+	a = b;
+	b = tmp;
+}
+
 } // namespace rde
 
 //-----------------------------------------------------------------------------
