@@ -21,6 +21,12 @@ private:
 	const char*	m_name;
 };
 
+// True if lhs can free memory allocated by rhs and vice-versa.
+inline bool operator==(const allocator& /*lhs*/, const allocator& /*rhs*/)
+{
+	return true;
+}
+
 } // namespace rde
 
 //-----------------------------------------------------------------------------
