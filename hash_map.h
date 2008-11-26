@@ -240,18 +240,13 @@ public:
 		if (&rhs != this)
 		{
 			RDE_ASSERT(invariant());
-			node* newNodes = allocate_nodes(rhs.bucket_count());
-			rehash(rhs.bucket_count(), newNodes, m_capacity, rhs.m_nodes, true);
-			const size_type newSize = rhs.size();
-			const size_type newCapacity = rhs.m_capacity;
-			const size_type newUsed = rhs.m_numUsed;
-			rhs = *this;
-
-			delete_nodes();
-			m_nodes = newNodes;
-			m_size = newSize;
-			m_capacity = newCapacity;
-			m_numUsed = newUsed;
+			RDE_ASSERT(m_allocator == rhs.m_allocator);
+			rde::swap(m_nodes, rhs.m_nodes);
+			rde::swap(m_size, rhs.m_size);
+			rde::swap(m_capacity, rhs.m_capacity);
+			rde::swap(m_numUsed, rhs.m_numUsed);
+			rde::swap(m_hashFunc, rhs.m_hashFunc);
+			rde::swap(m_keyEqualFunc, rhs.m_keyEqualFunc);
 			RDE_ASSERT(invariant());
 		}
 	}
@@ -525,10 +520,10 @@ private:
 		return true;
 	}
 
-	node*           m_nodes;
-	int             m_size;
-	int             m_capacity;
-	int             m_numUsed;
+	node*			m_nodes;
+	int				m_size;
+	int				m_capacity;
+	int				m_numUsed;
 	THashFunc       m_hashFunc;
 	TKeyEqualFunc	m_keyEqualFunc;
 	TAllocator      m_allocator;
