@@ -173,6 +173,15 @@
 		CHECK_EQUAL(10, b["world"]);
 		CHECK(b.find("something else") == b.end());
 	}
+	TESTC(SwapEmpty)
+	{
+		tMap a;
+		a.insert(rde::make_pair(std::string("hello"), 5));
+		tMap b;
+		a.swap(b);
+		CHECK(a.empty());
+		CHECK(!b.empty());
+	}
 	TESTC(FindEmpty)
 	{
 		tMap h;
