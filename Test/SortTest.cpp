@@ -40,8 +40,7 @@ namespace
 			data[i] = rand() - (rand() / 2);
 
 		rde::radix_sorter<rde::int32_t> r;
-		r.Resize(N);
-		r.Sort<r.data_signed>(data, N, as_int<rde::int32_t>());
+		r.sort<r.data_signed>(data, N, as_int<rde::int32_t>());
 		CHECK(IsSorted(data, N));
 
 		delete[] data;
@@ -55,8 +54,7 @@ namespace
 			data[i] = (rde::uint16_t)(rand());
 
 		rde::radix_sorter<rde::uint16_t> r;
-		r.Resize(N);
-		r.Sort<r.data_unsigned>(data, N, as_int<rde::uint16_t>());
+		r.sort<r.data_unsigned>(data, N, as_int<rde::uint16_t>());
 		CHECK(IsSorted(data, N));
 
 		delete[] data;
@@ -80,6 +78,10 @@ namespace
 	{
 		return a.x < b.x;
 	}
+	int razy2(int x)
+	{
+		return x * 2;
+	}
 	TEST(RadixSpeedTest)
 	{
 		static const int N = 300 * 1000;
@@ -88,6 +90,8 @@ namespace
 		srand(1011);
 		for (int i = 0; i < N; ++i)
 			data[i].x = rand();
+
+		rde::Console::Printf("Wynik = %d\n", razy2(1296));
 
 		rde::Timer t;
 		t.Start();
@@ -99,12 +103,11 @@ namespace
 			double(ticks) / N);
 
 		rde::radix_sorter<Foo> r;
-		r.Resize(N);
 		for (int i = 0; i < N; ++i)
 			data[i].x = rand();
 		t.Start();
 		ticks = __rdtsc();
-		r.Sort<r.data_unsigned>(data, N, FooToInt());
+		r.sort<r.data_unsigned>(data, N, FooToInt());
 		ticks = __rdtsc() - ticks;
 		t.Stop();
 		rde::Console::Printf("Radix took %dms [%f ticks per iter]\n", t.GetTimeInMs(),
