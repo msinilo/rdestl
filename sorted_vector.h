@@ -41,7 +41,7 @@ public:
 	typedef TValue							mapped_type;
 	typedef typename Base::size_type		size_type;
 	typedef typename Base::value_type		value_type;
-	typedef typename Base::iterator			iterator;
+	typedef typename Base::iterator		iterator;
 	typedef typename Base::const_iterator	const_iterator;
 	typedef typename Base::allocator_type	allocator_type;
 

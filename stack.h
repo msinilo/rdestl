@@ -11,10 +11,10 @@ template<typename T, class TAllocator = rde::allocator,
 class stack
 {
 public:
-	typedef TContainer						container_type;
+	typedef TContainer							container_type;
 	typedef typename TContainer::value_type	value_type;
 	typedef typename TContainer::size_type	size_type;
-	typedef TAllocator						allocator_type;
+	typedef TAllocator							allocator_type;
 
 	explicit stack(const allocator_type& allocator = allocator_type())
 	:	m_container(allocator)
