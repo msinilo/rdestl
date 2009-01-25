@@ -105,7 +105,7 @@ struct fixed_vector_storage
 #endif
 	}
 
-	typedef aligned_as<T>	etype_t;	
+	typedef typename aligned_as<T>::res	etype_t;	
 	
 	T*						m_begin;
 	T*						m_end;
