@@ -1,5 +1,6 @@
 #include <UnitTest++/src/UnitTest++.h>
 #include "rdestl/radix_sorter.h"
+#include "rdestl/sort.h"
 
 #if !RDESTL_STANDALONE
 #	include "core/Console.h"
@@ -59,6 +60,28 @@ namespace
 
 		delete[] data;
 	}
+	TEST(InsertionSort)
+	{
+		static const int N = 200 * 1000;
+		rde::uint16_t* data = new rde::uint16_t[N];
+		srand(1011);
+		for (int i = 0; i < N; ++i)
+			data[i] = (rde::uint16_t)(rand());
+
+		rde::insertion_sort(&data[0], &data[N]);
+		CHECK(IsSorted(data, N));
+	}
+	TEST(QuickSort)
+	{
+		static const int N = 200 * 1000;
+		rde::uint16_t* data = new rde::uint16_t[N];
+		srand(1011);
+		for (int i = 0; i < N; ++i)
+			data[i] = (rde::uint16_t)(rand());
+
+		rde::quick_sort(&data[0], &data[N]);
+		CHECK(IsSorted(data, N));
+	}
 
 #if !RDESTL_STANDALONE
 	struct Foo
@@ -78,10 +101,6 @@ namespace
 	{
 		return a.x < b.x;
 	}
-	int razy2(int x)
-	{
-		return x * 2;
-	}
 	TEST(RadixSpeedTest)
 	{
 		static const int N = 300 * 1000;
@@ -90,8 +109,6 @@ namespace
 		srand(1011);
 		for (int i = 0; i < N; ++i)
 			data[i].x = rand();
-
-		rde::Console::Printf("Wynik = %d\n", razy2(1296));
 
 		rde::Timer t;
 		t.Start();
@@ -111,6 +128,16 @@ namespace
 		ticks = __rdtsc() - ticks;
 		t.Stop();
 		rde::Console::Printf("Radix took %dms [%f ticks per iter]\n", t.GetTimeInMs(),
+			double(ticks) / N);
+
+		for (int i = 0; i < N; ++i)
+			data[i].x = rand();
+		t.Start();
+		ticks = __rdtsc();
+		rde::quick_sort(data, data + N);
+		ticks = __rdtsc() - ticks;
+		t.Stop();
+		rde::Console::Printf("RDE quick sort took %dms [%f ticks per iter]\n", t.GetTimeInMs(),
 			double(ticks) / N);
 
 		CHECK(1 == 1);

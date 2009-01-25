@@ -1,5 +1,6 @@
 #include <UnitTest++/src/UnitTest++.h>
 #include "rdestl/hash_map.h"
+#include "rdestl/stack_allocator.h"
 #include <cstdio>
 
 namespace
@@ -75,6 +76,43 @@ template rde::hash_map<std::string, int, hasher, 6>;
 		m.erase(1);
 		CHECK_EQUAL(9, m.size());
 		rde::hash_map<int, int>::iterator it = m.find(1111);
+		m.erase(it);
+		CHECK_EQUAL(8, m.size());
+		it = m.find(22222);
+		m.erase(it);
+		CHECK_EQUAL(8, m.size());
+		m.erase(m.begin(), m.end());
+		CHECK(m.empty());
+	}
+	TEST(GoogleIntHashFixed)
+    {
+		typedef rde::hash_map<int, int, rde::hash<int>, 6, rde::equal_to<int>, rde::stack_allocator<1000> > TestMap;
+		TestMap m;
+		CHECK(m.empty());
+		m.insert(rde::make_pair(1, 0));
+		CHECK(!m.empty());
+		m.insert(rde::make_pair(11, 0));
+		m.insert(rde::make_pair(111, 0));
+		m.insert(rde::make_pair(1111, 0));
+		m.insert(rde::make_pair(11111, 0));
+		m.insert(rde::make_pair(111111, 0));
+		m.insert(rde::make_pair(1111111, 0));
+		m.insert(rde::make_pair(11111111, 0));
+		m.insert(rde::make_pair(111111111, 0));
+		m.insert(rde::make_pair(1111111111, 0));
+		CHECK_EQUAL(10, m.size());
+		m.erase(11111);
+		CHECK_EQUAL(9, m.size());
+		m.insert(rde::make_pair(11111, 0));
+		CHECK_EQUAL(10, m.size());
+		m.erase(11111);
+		m.insert(rde::make_pair(11111, 0));
+		CHECK_EQUAL(10, m.size());
+		CHECK_EQUAL(0, m.erase(-11111));
+		CHECK_EQUAL(10, m.size());
+		m.erase(1);
+		CHECK_EQUAL(9, m.size());
+		TestMap::iterator it = m.find(1111);
 		m.erase(it);
 		CHECK_EQUAL(8, m.size());
 		it = m.find(22222);
