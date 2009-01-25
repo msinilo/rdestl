@@ -138,11 +138,18 @@ public:
     typedef TAllocator															allocator_type;
 	typedef node_iterator<node*, value_type*, value_type&>						iterator;
 	typedef node_iterator<const node*, const value_type*, const value_type&>	const_iterator;
-    typedef int																	size_type;
+    typedef int																size_type;
 	static const size_type														kNodeSize = sizeof(node);
 	static const size_type														kInitialCapacity = 64;
 
-	explicit hash_map(const allocator_type& allocator = allocator_type())
+	hash_map()
+	:	m_nodes(0),
+		m_size(0),
+		m_capacity(0),
+		m_numUsed(0)
+	{
+	}
+	explicit hash_map(const allocator_type& allocator)
     :	m_nodes(0),
         m_size(0),
         m_capacity(0),
