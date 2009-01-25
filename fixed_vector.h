@@ -1,6 +1,7 @@
 #ifndef RDESTL_FIXED_VECTOR_H
 #define RDESTL_FIXED_VECTOR_H
 
+#include "rdestl/alignment.h"
 #include "rdestl/vector.h"
 
 #define RDESTL_RECORD_WATERMARKS	0
@@ -80,7 +81,7 @@ struct fixed_vector_storage
 	RDE_FORCEINLINE void destroy(T* ptr, base_vector::size_type n)
 	{
 		rde::destruct_n(ptr, n);
-		if ((unsigned char*)ptr != &m_data[0])
+		if ((etype_t*)ptr != &m_data[0])
 			m_allocator.deallocate(ptr, n * sizeof(T));
 	}
 	bool invariant() const
@@ -103,13 +104,13 @@ struct fixed_vector_storage
 		return m_capacity;	// ???
 #endif
 	}
+
+	typedef aligned_as<T>	etype_t;	
 	
 	T*						m_begin;
 	T*						m_end;
-	typedef char ERR_InvalidUCharSize[sizeof(unsigned char) == 1 ? 1 : -1];
 	// Not T[], because we need uninitialized memory.
-	// @todo: solve potential alignment problems.
-	unsigned char			m_data[TCapacity * sizeof(T)];
+	etype_t					m_data[(TCapacity * sizeof(T)) / sizeof(etype_t)];
 	// @todo: m_capacity is not really needed for containers that
 	// cant overflow.
 	base_vector::size_type	m_capacity;

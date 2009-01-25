@@ -1,6 +1,7 @@
 #ifndef RDESTL_FIXED_LIST_H
 #define RDESTL_FIXED_LIST_H
 
+#include "rdestl/alignment.h"
 #include "rdestl/int_to_type.h"
 #include "rdestl/iterator.h"
 #include "rdestl/type_traits.h"
@@ -334,7 +335,9 @@ private:
 		return (node*)(&m_node_mem[0]);
 	}
 
-	unsigned char	m_node_mem[sizeof(node) * (TCapacity + 1)];
+	typedef aligned_as<node>	etype_t;
+
+	etype_t			m_node_mem[sizeof(node) * (TCapacity + 1) / sizeof(etype_t)];
 	index_type		m_free_indices[TCapacity + 1];
 	int				m_free_index_top;
 	size_type		m_num_nodes;	// Excluding root!
