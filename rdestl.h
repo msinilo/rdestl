@@ -19,7 +19,11 @@
 	{ 
 		// # Meh. MSVC doesnt seem to have <stdint.h>
 		// @todo	Fixes to make this portable.
-		typedef unsigned long	uint32_t;
+		typedef unsigned char		uint8_t;
+		typedef unsigned short	uint16_t;
+		typedef signed long		int32_t;
+		typedef unsigned long		uint32_t;
+		typedef unsigned __int64 uint64_t;
 		namespace Sys 
 		{
 			RDE_FORCEINLINE void MemCpy(void* to, const void* from, size_t bytes)
@@ -37,13 +41,8 @@
 		} // sys
 	}
 #else
-#	include "core/RdeDebug.h"
+#	include "core/RdeAssert.h"
 #	include "core/System.h"
 #endif
-
-// Cache hash value in the node structure.
-// Costs 4 bytes per node, but hash doesnt have to be calculated during
-// rehashing and removing nodes in clusters.
-#define RDE_HASHMAP_CACHE_HASH	1
 
 #endif // #ifndef RDESTL_H
