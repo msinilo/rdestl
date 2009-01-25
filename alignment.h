@@ -20,8 +20,8 @@ namespace internal
 	};
 	template<> struct type_with_alignment<0> {};
 	template<> struct type_with_alignment<1> { uint8_t member; };
-	template<> struct type_with_alignment<2> { unsigned short member; };
-	template<> struct type_with_alignment<4> { unsigned long member; };
+	template<> struct type_with_alignment<2> { uint16_t member; };
+	template<> struct type_with_alignment<4> { uint32_t member; };
 	template<> struct type_with_alignment<8> { uint64_t member; };
 }
 template<typename T>
