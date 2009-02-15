@@ -17,6 +17,7 @@ namespace internal
 		char	x;
 		T		y;
 	};
+	__declspec(align(128)) struct aligned16 { uint64_t member[2]; };
 #pragma warning(pop)
 	template<size_t N> struct type_with_alignment
 	{
@@ -27,6 +28,7 @@ namespace internal
 	template<> struct type_with_alignment<2> { uint16_t member; };
 	template<> struct type_with_alignment<4> { uint32_t member; };
 	template<> struct type_with_alignment<8> { uint64_t member; };
+	template<> struct type_with_alignment<16> { aligned16 member; };
 }
 template<typename T>
 struct alignof
