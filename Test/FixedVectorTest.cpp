@@ -1,5 +1,7 @@
 #include <UnitTest++/src/UnitTest++.h>
 #include "rdestl/fixed_vector.h"
+#include <xmmintrin.h>
+
 
 namespace
 {
@@ -13,6 +15,15 @@ namespace
 		for (tStringVector::const_iterator it = v.begin(); it != v.end(); ++it)
 			printf("%s, ", it->c_str());
 		printf("\n");
+	}
+
+	TEST(NonStandardAlign)
+	{
+		rde::fixed_vector<__m128, 64, false> v;
+		CHECK_EQUAL(16, rde::alignof<__m128>::res);
+		CHECK(v.empty());
+		CHECK_EQUAL(0, v.size());
+		CHECK_EQUAL(v.begin(), v.end());
 	}
 
 	TEST(DefaultCtorEmpty)
