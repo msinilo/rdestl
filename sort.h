@@ -7,6 +7,9 @@ namespace rde
 {
 namespace internal
 {
+// Partitions set of elements in respect to given predicate and pivot point,
+// so that all elements before pivot satisfy pred(elem, pivot) condition and
+// all elements after -- pred(pivot, elem).
 template<typename T, class TPredicate>
 size_t partition(T* data, size_t low, size_t high, TPredicate pred, const T& pivot)
 {
@@ -14,13 +17,17 @@ size_t partition(T* data, size_t low, size_t high, TPredicate pred, const T& piv
 	size_t j = high;
 	while (true)
 	{
+		// Skip elements that are OK (left part)
 		while (pred(data[i], pivot))
 			++i;
 		--j;
+		// Skip elements that are OK (right part)
 		while (pred(pivot, data[j]))
 			--j;
+		// Everything's OK, nothing to swap.
 		if (i >= j)
 			return i;
+
 		rde::swap(data[i], data[j]);
 		++i;
 	}
