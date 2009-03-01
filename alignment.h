@@ -17,7 +17,7 @@ namespace internal
 		char	x;
 		T		y;
 	};
-	__declspec(align(128)) struct aligned16 { uint64_t member[2]; };
+	__declspec(align(16)) struct aligned16 { uint64_t member[2]; };
 #pragma warning(pop)
 	template<size_t N> struct type_with_alignment
 	{
