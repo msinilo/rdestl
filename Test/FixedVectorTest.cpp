@@ -19,7 +19,10 @@ namespace
 
 	TEST(NonStandardAlign)
 	{
-		rde::fixed_vector<__m128, 64, false> v;
+		rde::fixed_vector<__m128, 1, false> v;
+		rde::aligned_as<__m128>::res r;
+		CHECK_EQUAL(16ul, sizeof(r));
+		CHECK_EQUAL(16ul, sizeof(__m128));
 		CHECK_EQUAL(16, rde::alignof<__m128>::res);
 		CHECK(v.empty());
 		CHECK_EQUAL(0, v.size());
