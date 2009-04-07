@@ -9,14 +9,13 @@ namespace rde
 // "Substring" of fixed size.
 // Cannot grow.
 // Never allocates memory.
-// !! WORK IN PROGRESS
 template<typename E, size_t N>
 class fixed_substring : private fixed_array<E, N + 1>
 {
 	typedef fixed_array<E, N + 1>	Base;
 public:
 	typedef E		value_type;
-	typedef int		size_type;
+	typedef int	size_type;
 
 	fixed_substring()
 	{
@@ -25,6 +24,18 @@ public:
 	explicit fixed_substring(const value_type* str)
 	{
 		assign(str);
+	}
+	template<size_t M>
+	fixed_substring(const fixed_substring<E, M>& rhs)
+	{
+		assign(rhs.data());
+	}
+
+	template<size_t M>
+	fixed_substring& operator=(const fixed_substring<E, M>& rhs)
+	{
+		assign(rhs.data());
+		return *this;
 	}
 
 	using Base::operator[];
@@ -38,6 +49,11 @@ public:
 		Sys::MemCpy(data(), str, toCopy * sizeof(value_type));
 		data()[toCopy] = value_type(0);
 	}
+	void assign(const fixed_substring& rhs)
+	{
+		assign(rhs.data());
+	}
+
 	void append(const value_type* str)
 	{
 		const size_type strLen = (size_type)rde::strlen(str);
@@ -48,6 +64,10 @@ public:
 		Sys::MemCpy(data() + ourLen, str, toAppend * sizeof(value_type));
 		data()[ourLen + toAppend] = value_type(0);
 	}
+	void append(const fixed_substring& rhs)
+	{
+		append(rhs.data());
+	}
 
 	bool empty() const
 	{
@@ -57,6 +77,10 @@ public:
 	bool operator==(const fixed_substring& rhs) const
 	{
 		return rde::strcompare(data(), rhs.data()) == 0;
+	}
+	bool operator!=(const fixed_substring& rhs) const
+	{
+		return !(*this == rhs);
 	}
 };
 
