@@ -68,7 +68,8 @@ public:
 			++h3[px[3]];
 		}
 
-		const bool canBreakAfter16Bits = (h2[0] == (uint32_t)num);
+		// 3rd byte == 0
+		const bool canBreakAfter16Bits = (h2[0] == (uint32_t)num && h3[0] == (uint32_t)num);
 		(void)canBreakAfter16Bits;
 
 		if (TDataType == data_signed)
@@ -105,7 +106,7 @@ private:
 	{
 		m_dst.resize(num);
 	}
-	RDE_FORCEINLINE void calculate_offsets(uint32_t* histogram)
+	void calculate_offsets(uint32_t* histogram)
 	{
 		uint32_t offsets[4] = { 1, 1, 1, 1 };
 		for (int i = 0; i < kHistogramSize; ++i)
@@ -127,7 +128,7 @@ private:
 			offsets[3] = temp;
 		}
 	}
-	RDE_FORCEINLINE void calculate_offsets_signed(uint32_t* histogram)
+	void calculate_offsets_signed(uint32_t* histogram)
 	{
 		uint32_t offsets[4] = { 1, 1, 1, 1 };
 		int numNeg(0);
