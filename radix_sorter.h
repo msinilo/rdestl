@@ -17,13 +17,13 @@ public:
 		data_signed,
 	};
 
+	// User-provided temporary buffer for intermediate operations.
+	// It has to be at least 'num' elements big.
 	template<data_type TDataType, typename TFunc>
-	void sort(T* src, int num, const TFunc& func)
+	void sort(T* src, int num, const TFunc& func, T* help_buffer)
 	{
 		if (num == 0)
 			return;
-		if (num > m_dst.size())
-			resize(num);
 
 		uint32_t histogram[kHistogramSize * 4];
 		Sys::MemSet(histogram, 0, sizeof(histogram));
@@ -80,25 +80,34 @@ public:
 		for (int i = 0; i < num; ++i)
 		{
 			const uint32_t pos = func(src[i]) & 0xFF;
-			m_dst[histogram[pos]++] = src[i];
+			help_buffer[histogram[pos]++] = src[i];
 		}
 		for (int i = 0; i < num; ++i)
 		{
 			const uint32_t pos = (func(m_dst[i]) >> 8) & 0xFF;
-			src[h1[pos]++] = m_dst[i];
+			src[h1[pos]++] = help_buffer[i];
 		}
 		if (TDataType == data_unsigned && canBreakAfter16Bits)
 			return;
 		for (int i = 0; i < num; ++i)
 		{
 			const uint32_t pos = (func(src[i]) >> 16) & 0xFF;
-			m_dst[h2[pos]++] = src[i];
+			help_buffer[h2[pos]++] = src[i];
 		}
 		for (int i = 0; i < num; ++i)
 		{
 			const uint32_t pos = (func(m_dst[i]) >> 24) & 0xFF;
-			src[h3[pos]++] = m_dst[i];
+			src[h3[pos]++] = help_buffer[i];
 		}
+	}
+
+	// Version that uses internal buffer.
+	template<data_type TDataType, typename TFunc>
+	void sort(T* src, int num, const TFunc& func)
+	{
+		if (num > m_dst.size())
+			resize(num);
+		sort<TDataType, TFunc>(src, num, func, m_dst.begin());
 	}		
 
 private:
