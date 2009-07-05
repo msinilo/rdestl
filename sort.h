@@ -92,6 +92,30 @@ void quick_sort(T* begin, T* end)
 	quick_sort(begin, end, less<T>());
 }
 
+// True if given set of data is sorted according to given predicate.
+// Ie, for every pair of objects x = data[i], y = data[i + 1], pred(y, x) doesn't return true;
+template<typename TIter, typename TPredicate>
+bool is_sorted(TIter begin, TIter end, TPredicate pred)
+{
+	TIter it = begin;
+	TIter it_prev = it;
+	bool is_sorted = true;
+	while (it != end)
+	{
+		if (it_prev != it)
+		{
+			if (pred(*it, *it_prev))
+			{
+				is_sorted = false;
+				break;
+			}
+		}
+		it_prev = it;
+		++it;
+	}
+	return is_sorted;
 }
+
+} // rde
 
 #endif 
