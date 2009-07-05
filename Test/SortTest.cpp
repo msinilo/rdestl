@@ -82,6 +82,16 @@ namespace
 		rde::quick_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
 	}
+	TEST(IsSortedWhenSorted)
+	{
+		const int data[4] = { -1, 2, 3, 8 };
+		CHECK(rde::is_sorted(&data[0], &data[4], rde::less<int>()));
+	}
+	TEST(IsSortedReturnsFalseWhenNotSorted)
+	{
+		const int data[4] = { -1, 9, 3, 8 };
+		CHECK(!rde::is_sorted(&data[0], &data[4], rde::less<int>()));
+	}
 
 #if !RDESTL_STANDALONE
 	struct Foo
