@@ -5,7 +5,11 @@
 
 namespace rde
 {
-
+// Stack based allocator.
+// Traits:
+//	- operates on buffer of TBytes bytes of stack memory
+//	- never frees memory
+//	- cannot be copied
 template<int TBytes>
 class stack_allocator
 {
@@ -37,8 +41,8 @@ private:
 	stack_allocator& operator=(const stack_allocator&);
 
 	const char*	m_name;
-	char			m_buffer[TBytes];
-	size_t			m_bufferTop;
+	char		m_buffer[TBytes];
+	size_t		m_bufferTop;
 };
 
 } // namespace rde
