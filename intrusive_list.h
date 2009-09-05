@@ -121,7 +121,8 @@ private:
 };
 
 //=============================================================================
-// Can store pointers only!
+// Can store pointers only.
+// Type should be derived from intrusive_list_node.
 template<class T>
 class intrusive_list : public intrusive_list_base
 {
