@@ -3,6 +3,7 @@
 
 #include "rdestl/functional.h"
 #include "rdestl/pair.h"
+#include "rdestl/sort.h"
 #include "rdestl/vector.h"
 
 namespace rde
@@ -41,7 +42,7 @@ public:
 	typedef TValue							mapped_type;
 	typedef typename Base::size_type		size_type;
 	typedef typename Base::value_type		value_type;
-	typedef typename Base::iterator		iterator;
+	typedef typename Base::iterator			iterator;
 	typedef typename Base::const_iterator	const_iterator;
 	typedef typename Base::allocator_type	allocator_type;
 
@@ -50,15 +51,14 @@ public:
 	{
 		/**/
 	}
-#if 0
 	template <class InputIterator>
 	sorted_vector(InputIterator first, InputIterator last, 
 		const allocator_type& allocator = allocator_type())
 	:	vector(first, last, allocator)
 	{
-		// @todo: sort!
+		rde::quick_sort(begin(), end(), m_compare);
+		RDE_ASSERT(invariant());
 	}
-#endif
 
 	// @note: no non-const operator[], it may cause performance problems.
 	// use explicit ways: insert or find.
