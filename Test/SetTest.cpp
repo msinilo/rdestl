@@ -7,7 +7,7 @@ namespace
 	{
 		rde::set<int> t;
 		CHECK(t.empty());
-		CHECK_EQUAL(0ul, t.size());
+		CHECK_EQUAL(0, t.size());
 	}
 	TEST(IteratorBasic)
 	{
@@ -43,6 +43,6 @@ namespace
 		CHECK(it == t.end());
 		t.erase(2); t.erase(15); t.erase(7);
 		CHECK(t.empty());
-		CHECK_EQUAL(0ul, t.size());
+		CHECK_EQUAL(0, t.size());
 	}
 }

@@ -13,13 +13,13 @@ namespace
 	{
 		rde::rb_tree<int> t;
 		CHECK(t.empty());
-		CHECK_EQUAL(0ul, t.size());
+		CHECK_EQUAL(0, t.size());
 	}
 	TEST(InsertIncreasesSize)
 	{
 		rde::rb_tree<int> t;
 		t.insert(5);
-		CHECK_EQUAL(1ul, t.size());
+		CHECK_EQUAL(1, t.size());
 	}
 
 	void PrintNode(rde::rb_tree<int>::node* n, int left, int depth)
@@ -40,7 +40,7 @@ namespace
 		t.insert(7);
 		t.insert(5);
 		t.insert(8);
-		CHECK_EQUAL(8ul, t.size());
+		CHECK_EQUAL(8, t.size());
 		t.traverse(PrintNode);
 	}
 
@@ -55,9 +55,9 @@ namespace
 		t.insert(7);
 		t.insert(5);
 		t.insert(8);
-		CHECK_EQUAL(8ul, t.size());
+		CHECK_EQUAL(8, t.size());
 		t.erase(2);
-		CHECK_EQUAL(7ul, t.size());
+		CHECK_EQUAL(7, t.size());
 		t.traverse(PrintNode);
 	}
 	TEST(ClearMakesEmpty)
@@ -71,11 +71,14 @@ namespace
 		t.insert(7);
 		t.insert(5);
 		t.insert(8);
-		CHECK_EQUAL(8ul, t.size());
+		CHECK_EQUAL(8, t.size());
 		t.clear();
-		CHECK_EQUAL(0ul, t.size());
+		CHECK_EQUAL(0, t.size());
 		CHECK(t.empty());
 	}
+
+
+	// Make find_next_node public to test it.
 	/*TEST(IterationFromSmallest)
 	{
 		rde::rb_tree<int> t;
