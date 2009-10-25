@@ -10,7 +10,7 @@ namespace internal
 {
 	struct rb_tree_base
 	{
-		typedef size_t	size_type;
+		typedef int	size_type;
 		enum color_e
 		{
 			red,
@@ -243,7 +243,7 @@ protected:
 	{
 		return n == &m_sentinel ? 0 : 1 + num_nodes(n->left) + num_nodes(n->right);
 	}
-	void rebalance(node* new_node)
+	RDE_FORCEINLINE void rebalance(node* new_node)
 	{
 		RDE_ASSERT(new_node->color == red);
 		node* iter(new_node);
