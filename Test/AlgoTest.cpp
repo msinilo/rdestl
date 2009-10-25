@@ -59,7 +59,7 @@ namespace
 	TEST(FindIf)
 	{
 		const int array [] = { 1, 4, 9, 16, 25, 36 }; 
-		const int* it = rde::find(&array[0], &array[6], 16);
+		const int* it = rde::find_if(&array[0], &array[6], 16, rde::equal_to<int>());
 		CHECK_EQUAL(it, &array[3]);
 		CHECK_EQUAL(16, *it);
 	}
