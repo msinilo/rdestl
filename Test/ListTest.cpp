@@ -48,6 +48,7 @@ namespace
 		CHECK_EQUAL(888, lst.back());
 	}
 #if !RDESTL_STANDALONE
+	// Tests if list can be copied by memcopying.
 	TEST(FixedListRelocation)
 	{
 		typedef rde::fixed_list<int, 1000> TList;
