@@ -7,90 +7,72 @@ namespace rde
 {
 namespace internal
 {
-// Partitions set of elements in respect to given predicate and pivot point,
-// so that all elements before pivot satisfy pred(elem, pivot) condition and
-// all elements after -- pred(pivot, elem).
-template<typename T, class TPredicate>
-size_t partition(T* data, size_t low, size_t high, TPredicate pred, const T& pivot)
-{
-	size_t i = low;
-	size_t j = high;
-	while (true)
-	{
-		// Skip elements that are OK (left part)
-		while (pred(data[i], pivot))
-			++i;
-		--j;
-		// Skip elements that are OK (right part)
-		while (pred(pivot, data[j]))
-			--j;
-		// Everything's OK, nothing to swap.
-		if (i >= j)
-			return i;
-
-		rde::swap(data[i], data[j]);
-		++i;
-	}
-}
-template<typename T, class TPredicate>
-inline const T& median_of_3(T* data, size_t low, size_t mid, size_t high, TPredicate pred)
-{
-	if (pred(data[mid], data[low]))
-		return pred(data[high], data[mid]) ? data[high] : pred(data[high], data[low]) ? data[high] : data[low];
-	else
-		return pred(data[high], data[mid]) ? pred(data[high], data[low]) ? data[low] : data[high] : data[mid];
-}
 template<typename T, class TPredicate>
 void quick_sort(T* data, size_t low, size_t high, TPredicate pred)
 {
-	while (high - low > 16)
+	while (true)
 	{
-		const size_t mid = low + (high - low) / 2 + 1;
-		const T& med3 = median_of_3(data, low, mid, high - 1, pred);
-		const size_t p = partition(data, low, high, pred, med3);
-		quick_sort(data, p, high, pred);
-		high = p;
+		size_t i = low;
+		size_t j = high;
+		const T pivot = data[(low + high) >> 1];
+		do
+		{
+			// Jump over elements that are OK (smaller than pivot)
+			while (pred(data[i], pivot))
+				++i;
+			// Jump over elements that are OK (greater than pivot)
+			while (pred(pivot, data[j]))
+				--j;
+			// Anything to swap?
+			if (j >= i)
+			{
+				if (i != j)
+				{
+					// Swap
+					const T tmp(data[i]);
+					data[i] = data[j];
+					data[j] = tmp;
+				}
+				++i;
+				--j;
+			}
+		} while (i <= j);
+
+		if (low < j)
+			quick_sort(data, low, j, pred);
+
+		if (i < high)
+			low = i;	// that's basically quick_sort(data, i, high, pred), but we avoid recursive call.
+		else
+			break;
 	}
 }
 
 template<typename T, class TPredicate>
-void quick_sort_i(T* data, size_t low, size_t high, TPredicate pred)
+void down_heap(T* data, size_t k, size_t n, TPredicate pred)
 {
-	size_t highStack[128];
-	size_t lowStack[128];
-
-	highStack[0] = high;
-	lowStack[0] = low;
-	int stackTop = 1;
-
-	while (stackTop > 0)
+	const T temp = data[k - 1];
+	while (k <= n / 2)
 	{
-		high = highStack[--stackTop];
-		low = lowStack[stackTop];
-
-		while (high - low > 16)
+		size_t child = 2 * k;
+		if (child < n && pred(data[child - 1], data[child]))
+			++child;
+		if (pred(temp, data[child - 1]))
 		{
-			const size_t mid = low + (high - low) / 2 + 1;
-			const T& med3 = median_of_3(data, low, mid, high - 1, pred);
-			const size_t p = partition(data, low, high, pred, med3);
-
-			lowStack[stackTop] = p;
-			highStack[stackTop++] = high;
-
-			high = p;
+			data[k - 1] = data[child - 1];
+			k = child;
 		}
+		else
+			break;
 	}
+	data[k - 1] = temp;
 }
-
 
 } // internal
 
 template<typename T, class TPredicate>
 void insertion_sort(T* begin, T* end, TPredicate pred)
 {
-	if (begin == end)
-		return;
-
 	const size_t num = end - begin;	
 	for (size_t i = 0; i < num; ++i)
 	{
@@ -113,8 +95,8 @@ void insertion_sort(T* begin, T* end)
 template<typename T, class TPredicate>
 void quick_sort(T* begin, T* end, TPredicate pred)
 {
-	internal::quick_sort(begin, 0, end - begin, pred);
-	insertion_sort(begin, end, pred);
+	if (end - begin > 1)
+		internal::quick_sort(begin, 0, end - begin - 1, pred);
 }
 template<typename T>
 void quick_sort(T* begin, T* end)
@@ -123,15 +105,26 @@ void quick_sort(T* begin, T* end)
 }
 
 template<typename T, class TPredicate>
-void quick_sort_iterative(T* begin, T* end, TPredicate pred)
+void heap_sort(T* begin, T* end, TPredicate pred)
 {
-	internal::quick_sort_i(begin, 0, end - begin, pred);
-	insertion_sort(begin, end, pred);
+	size_t n = end - begin;
+	for (size_t k = n / 2; k != 0; --k)
+		internal::down_heap(begin, k, n, pred);
+
+	while (n >= 1)
+	{
+		const T temp = begin[0];
+		begin[0] = begin[n - 1];
+		begin[n - 1] = temp;
+		
+		--n;
+		internal::down_heap(begin, 1, n, pred);
+	}
 }
 template<typename T>
-void quick_sort_iterative(T* begin, T* end)
+void heap_sort(T* begin, T* end)
 {
-	quick_sort_iterative(begin, end, less<T>());
+	heap_sort(begin, end, rde::less<T>());
 }
 
 // True if given set of data is sorted according to given predicate.
