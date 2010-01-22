@@ -62,7 +62,7 @@ namespace
 	}
 	TEST(InsertionSort)
 	{
-		static const int N = 200 * 1000;
+		static const int N = 200;
 		rde::uint16_t* data = new rde::uint16_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
@@ -92,6 +92,19 @@ namespace
 		const int data[4] = { -1, 9, 3, 8 };
 		CHECK(!rde::is_sorted(&data[0], &data[4], rde::less<int>()));
 	}
+	// Issue reported by Daniel Treble: http://code.google.com/p/rdestl/issues/detail?id=2
+	// (used to crash).
+	TEST(QuickSortIssue2)
+	{
+		rde::vector<int> foo;
+		foo.push_back(70);
+		foo.push_back(60);
+		foo.push_back(50);
+		foo.push_back(40);
+	    rde::quick_sort(foo.begin(), foo.end());
+		CHECK(rde::is_sorted(foo.begin(), foo.end(), rde::less<int>()));
+	}
+
 
 #if !RDESTL_STANDALONE
 	struct Foo
@@ -111,6 +124,11 @@ namespace
 	{
 		return a.x < b.x;
 	}
+	bool operator>(const Foo& a, const Foo& b)
+	{
+		return a.x > b.x;
+	}
+
 	TEST(RadixSpeedTest)
 	{
 		static const int N = 300 * 1000;
@@ -128,6 +146,7 @@ namespace
 		t.Stop();
 		rde::Console::Printf("Std took %dms [%f ticks per element]\n", t.GetTimeInMs(),
 			double(ticks) / N);
+		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 
 		rde::radix_sorter<Foo> r;
 		for (int i = 0; i < N; ++i)
@@ -139,6 +158,7 @@ namespace
 		t.Stop();
 		rde::Console::Printf("Radix took %dms [%f ticks per iter]\n", t.GetTimeInMs(),
 			double(ticks) / N);
+		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 
 		for (int i = 0; i < N; ++i)
 			data[i].x = rand();
@@ -149,8 +169,18 @@ namespace
 		t.Stop();
 		rde::Console::Printf("RDE quick sort took %dms [%f ticks per iter]\n", t.GetTimeInMs(),
 			double(ticks) / N);
+		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 
-		CHECK(1 == 1);
+		for (int i = 0; i < N; ++i)
+			data[i].x = rand();
+		t.Start();
+		ticks = __rdtsc();
+		rde::heap_sort(data, data + N);
+		ticks = __rdtsc() - ticks;
+		t.Stop();
+		rde::Console::Printf("RDE heap sort took %dms [%f ticks per iter]\n", t.GetTimeInMs(),
+			double(ticks) / N);
+		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 	}
 #endif
 }
