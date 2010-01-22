@@ -10,35 +10,65 @@ namespace internal
 template<typename T, class TPredicate>
 void quick_sort(T* data, long low, long high, TPredicate pred)
 {
-	long i = (long)low;
-	long j = (long)high;
-	const T pivot = data[(low + high) >> 1];
-	do
+	while (true)
 	{
-		while (pred(data[i], pivot))
-			++i;
-		while (pred(pivot, data[j]))
-			--j;
-		if (j >= i)
+		long i = low;
+		long j = high;
+		const T pivot = data[(low + high) >> 1];
+		do
 		{
-			if (i != j)
+			// Jump over elements that are OK (smaller than pivot)
+			while (pred(data[i], pivot))
+				++i;
+			// Jump over elements that are OK (greater than pivot)
+			while (pred(pivot, data[j]))
+				--j;
+			// Anything to swap?
+			if (j >= i)
 			{
-				// Swap
-				T tmp(data[i]);
-				data[i] = data[j];
-				data[j] = tmp;
+				if (i != j)
+				{
+					// Swap
+					T tmp(data[i]);
+					data[i] = data[j];
+					data[j] = tmp;
+				}
+				++i;
+				--j;
 			}
-			++i;
-			--j;
 		}
-	}
-	while (i <= j);
+		while (i <= j);
 
-	if (low < j)
-		quick_sort(data, low, j, pred);
-	if (i < high)
-		quick_sort(data, i, high, pred);
+		if (low < j)
+			quick_sort(data, low, j, pred);
+
+		if (i < high)
+			low = i;	// that's basically quick_sort(data, i, high, pred), but we avoid recursive call.
+		else
+			break;
+	} // while (true)
 }
+
+template<typename T, class TPredicate>
+void down_heap(T* data, size_t k, size_t n, TPredicate pred)
+{
+	const T temp = data[k - 1];
+	while (k <= n / 2)
+	{
+		size_t child = 2 * k;
+		if (child < n && pred(data[child - 1], data[child]))
+			++child;
+		if (pred(temp, data[child - 1]))
+		{
+			data[k - 1] = data[child - 1];
+			k = child;
+		}
+		else
+			break;
+	}
+	data[k - 1] = temp;
+}
+
 } // internal
 
 template<typename T, class TPredicate>
@@ -73,6 +103,29 @@ template<typename T>
 void quick_sort(T* begin, T* end)
 {
 	quick_sort(begin, end, less<T>());
+}
+
+template<typename T, class TPredicate>
+void heap_sort(T* begin, T* end, TPredicate pred)
+{
+	size_t n = end - begin;
+	for (size_t k = n / 2; k != 0; --k)
+		internal::down_heap(begin, k, n, pred);
+
+	while (n >= 1)
+	{
+		const T temp = begin[0];
+		begin[0] = begin[n - 1];
+		begin[n - 1] = temp;
+		
+		--n;
+		internal::down_heap(begin, 1, n, pred);
+	}
+}
+template<typename T>
+void heap_sort(T* begin, T* end)
+{
+	heap_sort(begin, end, rde::less<T>());
 }
 
 // True if given set of data is sorted according to given predicate.
