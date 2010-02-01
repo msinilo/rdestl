@@ -189,6 +189,10 @@ public:
 	{
 		*this = rhs;
 	}
+	explicit hash_map(e_noinitialize)
+	{
+		/**/
+	}
 	~hash_map()
 	{
 		delete_nodes();
@@ -404,8 +408,8 @@ private:
 
 		const hash_value_t hash = hash_func(key);
         *out_hash = hash;
-        const uint32_t mask = m_capacity - 1;
-        uint32_t i = hash & mask;
+        const uint32 mask = m_capacity - 1;
+        uint32 i = hash & mask;
 
         node* n = m_nodes + i;
 		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
@@ -414,7 +418,7 @@ private:
         node* freeNode(0);
         if (n->is_deleted())
 			freeNode = n;
-		uint32_t numProbes(0);
+		uint32 numProbes(0);
         // Guarantees loop termination.
         RDE_ASSERT(m_numUsed < m_capacity);
         while (!n->is_unused())
@@ -435,10 +439,10 @@ private:
 			return 0;
 
 		const hash_value_t hash = hash_func(key);
-        const uint32_t mask = m_capacity - 1;
-        uint32_t i = hash & mask;
+        const uint32 mask = m_capacity - 1;
+        uint32 i = hash & mask;
         node* n = m_nodes + i;
-		uint32_t numProbes(0);
+		uint32 numProbes(0);
         // Guarantees loop termination.
         RDE_ASSERT(m_numUsed < m_capacity);
         while (!n->is_unused())
@@ -458,16 +462,16 @@ private:
 	{
 		const node* it = nodes;
 		const node* itEnd = nodes + capacity;
-		const uint32_t mask = new_capacity - 1;
+		const uint32 mask = new_capacity - 1;
 		while (it != itEnd)
 		{
 			if (it->is_occupied())
 			{
 				const hash_value_t hash = it->hash;
-				uint32_t i = hash & mask;
+				uint32 i = hash & mask;
 
 				node* n = new_nodes + i;
-				uint32_t numProbes(0);
+				uint32 numProbes(0);
 				while (!n->is_unused())
 				{
 					++numProbes;

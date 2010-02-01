@@ -33,6 +33,9 @@ struct standard_vector_storage
 	{
 		/**/
 	}	
+	explicit standard_vector_storage(e_noinitialize) 
+	{
+	}
 
 	void reallocate(base_vector::size_type newCapacity, bool canShrink = false)
 	{
@@ -72,6 +75,14 @@ struct standard_vector_storage
 	{
 		rde::destruct_n(ptr, n);
 		m_allocator.deallocate(ptr, n * sizeof(T));
+	}
+	void reset()
+	{
+		if (m_begin)
+			m_allocator.deallocate(m_begin, (m_end - m_begin) * sizeof(T));
+
+		m_begin = m_end = 0;
+		m_capacity = 0;
 	}
 	bool invariant() const
 	{
@@ -126,6 +137,10 @@ public:
 		m_end = m_begin + rhs.size();
 		TStorage::record_high_watermark();
 		RDE_ASSERT(invariant());
+	}
+	explicit vector(e_noinitialize n)
+	:	TStorage(n)
+	{
 	}
 	~vector()
 	{
@@ -371,6 +386,14 @@ public:
 	void clear()
 	{
 		shrink(0);
+		RDE_ASSERT(invariant());
+	}
+	// EA STL concept.
+	// Resets container to an initialized, unallocated state.
+	// Safe only for value types with trivial destructor.
+	void reset()
+	{
+		TStorage::reset();
 		RDE_ASSERT(invariant());
 	}
 

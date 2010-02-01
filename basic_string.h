@@ -192,6 +192,38 @@ public:
 		}
 	}
 
+	size_type find_index_of(value_type ch) const
+	{
+		size_type retIndex(-1);
+		const E* ptr = c_str();
+		size_type currentIndex(0);
+		while (*ptr != value_type(0))
+		{
+			if (*ptr == ch)
+			{
+				retIndex = currentIndex;
+				break;
+			}
+			++ptr;
+			++currentIndex;
+		}
+		return retIndex;
+	}
+	size_type find_index_of_last(value_type ch) const
+	{
+		size_type retIndex(-1);
+		const value_type* ptr = c_str();
+		size_type currentIndex(0);
+		while (*ptr != value_type(0))
+		{
+			if (*ptr == ch)
+				retIndex = currentIndex;
+			++ptr;
+			++currentIndex;
+		}
+		return retIndex;
+	}
+
 private:
 	bool invariant() const
 	{

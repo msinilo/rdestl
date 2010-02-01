@@ -148,6 +148,10 @@ public:
 		copy(rhs, 
 			int_to_type<has_trivial_copy<T>::value>());
 	}
+	explicit fixed_list(e_noinitialize)
+	{
+		/**/
+	}
 	~fixed_list()
 	{
 		clear();

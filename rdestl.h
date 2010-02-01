@@ -2,7 +2,7 @@
 #define RDESTL_H
 
 #ifndef RDESTL_STANDALONE
-#	define RDESTL_STANDALONE	1
+#	define RDESTL_STANDALONE	0
 #endif
 
 #if RDESTL_STANDALONE
@@ -19,11 +19,11 @@
 	{ 
 		// # Meh. MSVC doesnt seem to have <stdint.h>
 		// @todo	Fixes to make this portable.
-		typedef unsigned char		uint8_t;
-		typedef unsigned short	uint16_t;
-		typedef signed long		int32_t;
-		typedef unsigned long		uint32_t;
-		typedef unsigned __int64 uint64_t;
+		typedef unsigned char		uint8;
+		typedef unsigned short		uint16;
+		typedef signed long			int32;
+		typedef unsigned long		uint32;
+		typedef unsigned __int64	uint64;
 		namespace Sys 
 		{
 			RDE_FORCEINLINE void MemCpy(void* to, const void* from, size_t bytes)
@@ -44,5 +44,13 @@
 #	include "core/RdeAssert.h"
 #	include "core/System.h"
 #endif
+
+namespace rde
+{
+enum e_noinitialize
+{
+	noinitialize
+};
+}
 
 #endif // #ifndef RDESTL_H

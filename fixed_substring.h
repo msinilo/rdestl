@@ -14,7 +14,7 @@ class fixed_substring : private fixed_array<E, N + 1>
 {
 	typedef fixed_array<E, N + 1>	Base;
 public:
-	typedef E		value_type;
+	typedef E	value_type;
 	typedef int	size_type;
 
 	fixed_substring()
@@ -37,9 +37,20 @@ public:
 		assign(rhs.data());
 		return *this;
 	}
+	fixed_substring& operator=(const value_type* str)
+	{
+		assign(str);
+		return *this;
+	}
 
 	using Base::operator[];
 	using Base::data;
+
+	// For rde::string compatibility.
+	const char* c_str() const
+	{
+		return data();
+	}
 
 	void assign(const value_type* str)
 	{
@@ -69,11 +80,58 @@ public:
 		append(rhs.data());
 	}
 
+	size_type find_index_of(value_type ch) const
+	{
+		size_type retIndex(-1);
+		const E* ptr = data();
+		size_type currentIndex(0);
+		while (*ptr != value_type(0))
+		{
+			if (*ptr == ch)
+			{
+				retIndex = currentIndex;
+				break;
+			}
+			++ptr;
+			++currentIndex;
+		}
+		return retIndex;
+	}
+	size_type find_index_of_last(value_type ch) const
+	{
+		size_type retIndex(-1);
+		const value_type* ptr = data();
+		size_type currentIndex(0);
+		while (*ptr != value_type(0))
+		{
+			if (*ptr == ch)
+				retIndex = currentIndex;
+			++ptr;
+			++currentIndex;
+		}
+		return retIndex;
+	}
+
+	// Removes all characters from [index, end) range.
+	void trim_end(size_type index)
+	{
+		if (index >= 0)
+		{
+			RDE_ASSERT(index < (size_type)rde::strlen(data()));
+			data()[index] = value_type(0);
+		}
+	}
+
 	bool empty() const
 	{
 		// @todo: consider caching string len
-		return rde::strlen(data()) == 0;
+		return length() == 0;
 	}
+	size_type length() const
+	{
+		return rde::strlen(data());
+	}
+
 	bool operator==(const fixed_substring& rhs) const
 	{
 		return rde::strcompare(data(), rhs.data()) == 0;

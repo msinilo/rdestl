@@ -28,6 +28,9 @@ struct fixed_vector_storage
 	{
 		/**/
 	}	
+	explicit fixed_vector_storage(e_noinitialize)
+	{
+	}
 
 	// @note	Cant shrink
 	void reallocate(base_vector::size_type newCapacity, bool /*canShrink*/ = false)
@@ -148,6 +151,11 @@ public:
 	// @note: will not perform default constructor for newly created objects.
 	fixed_vector(const fixed_vector& rhs, const allocator_type& allocator = allocator_type())
 	:	super(rhs, allocator)
+	{
+		/**/
+	}
+	explicit fixed_vector(e_noinitialize n)
+	:	super(n)
 	{
 		/**/
 	}
