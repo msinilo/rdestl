@@ -2,12 +2,12 @@
 #include "rdestl/vector.h"
 #include <cstdio>
 
-	struct MyStruct
-	{
-		int i;
-		char c;
-		float f;
-	};
+struct MyStruct
+{
+	int i;
+	char c;
+	float f;
+};
 namespace rde
 {
 	template<> struct is_pod<MyStruct>
@@ -18,16 +18,6 @@ namespace rde
 
 namespace
 {
-	void CopyConstruct0(int* mem, int orig)
-	{	
-		new (mem) int(orig);
-		//mem->~int();
-	}
-	void CopyConstruct1(int* mem, int orig)
-	{
-		mem[0] = orig;
-	}
-
 	typedef rde::vector<int>			tTestVector;
 	typedef rde::vector<std::string>	tStringVector;
 
