@@ -9,6 +9,8 @@ namespace
 
 	bool hasKeyType = sizeof(HasKeyType<std::map<int, int> >(0)) != sizeof(char);
 
+
+
 	TEST(DefaultCtorEmptyTree)
 	{
 		rde::rb_tree<int> t;
@@ -25,7 +27,7 @@ namespace
 	void PrintNode(rde::rb_tree<int>::node* n, int left, int depth)
 	{
 		static const char* s_left[] = { "[root]", "right", "left" };
-		printf("%*s %d: Node %d, [%s, %s]\n", (depth*2), "", depth, n->key, 
+		printf("%*s %d: Node %d, [%s, %s]\n", (depth*2), "", depth, n->value, 
 			s_left[left + 1], n->color == 0 ? "red" : "black");
 	}
 
@@ -41,6 +43,7 @@ namespace
 		t.insert(5);
 		t.insert(8);
 		CHECK_EQUAL(8, t.size());
+		//RDE_ASSERT_MSG(t.size() == 8, ("Size == %d", t.size()));
 		t.traverse(PrintNode);
 	}
 
@@ -98,5 +101,4 @@ namespace
 		CHECK(n == 0);
 	}*/
 }
-
 
