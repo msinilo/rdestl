@@ -9,17 +9,19 @@
 #	include <algorithm>	// sort (for comparison)
 #endif
 
-template<typename T>
-struct as_int
-{
-	rde::uint32 operator()(const T& x) const
-	{
-		return x;
-	}
-};
+#define SORT_SPEED_TEST	0
 
 namespace
 {
+	template<typename T>
+	struct as_int
+	{
+		rde::uint32 operator()(const T& x) const
+		{
+			return x;
+		}
+	};
+
 	template<typename T>
 	bool IsSorted(T* data, size_t num)
 	{
@@ -120,7 +122,7 @@ namespace
 	}
 
 
-#if !RDESTL_STANDALONE
+#if !RDESTL_STANDALONE && SORT_SPEED_TEST
 	struct Foo
 	{
 		rde::uint32 x;
