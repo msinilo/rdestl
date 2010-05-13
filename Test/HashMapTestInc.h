@@ -4,7 +4,7 @@
 		CHECK(h.empty());
 		CHECK_EQUAL(0, h.size());
 		CHECK_EQUAL(0, h.bucket_count());
-		CHECK_EQUAL(0ul, h.used_memory());
+		CHECK_EQUAL(0, h.used_memory());
 	}
 	TESTC(ConstructorInitialCapacity)
 	{
@@ -12,7 +12,7 @@
 		CHECK(h.empty());
 		CHECK_EQUAL(0, h.size());
 		CHECK(h.bucket_count() >= 256);
-		CHECK_EQUAL((size_t)(h.bucket_count() * h.kNodeSize), h.used_memory());
+		CHECK_EQUAL((h.bucket_count() * h.kNodeSize), h.used_memory());
 	}
 	TESTC(Insert)
 	{
@@ -106,10 +106,9 @@
 		h.insert(rde::make_pair(std::string("hello"), 5));
 		h.insert(rde::make_pair(std::string("brave"), 7));
 		h.insert(rde::make_pair(std::string("world"), 10));
-		// @todo: different for hash_map/hash_map2 :/
-		//CHECK_EQUAL(h.bucket_count() * h.kNodeSize + h.kNodeSize*2, h.used_memory());
-		//CHECK_EQUAL(2ul, h.collisions());
-		CHECK_EQUAL(1, 1);
+		CHECK_EQUAL(h.bucket_count() * h.kNodeSize, h.used_memory());
+		CHECK_EQUAL(3, h.nonempty_bucket_count());	// every entry in own bucket.
+//		CHECK_EQUAL(2ul, h.collisions());
 	}
 	TESTC(IterPoorHash)
 	{

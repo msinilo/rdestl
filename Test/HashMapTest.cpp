@@ -2,6 +2,7 @@
 #include "rdestl/hash_map.h"
 #include "rdestl/stack_allocator.h"
 #include <cstdio>
+#include <iostream>
 
 namespace
 {
@@ -31,11 +32,6 @@ namespace
 #define CONCAT2_(x, y)	CONCAT_(x, y)
 #define TESTC(x)		TEST(CONCAT2_(x, POSTFIX))
 
-//#define POSTFIX				Linked
-//#define tMap				rde::hash_map<std::string, int, hasher>
-//#define tPoorlyHashedMap	rde::hash_map<std::string, int, poor_hasher>
-//#include "HashMapTestInc.h"
-	
 #undef tMap
 #undef tPoorlyHashedMap
 #undef POSTFIX
