@@ -342,8 +342,6 @@ public:
         m_numUsed = 0;
 	}
 
-	// More like reserve.
-	// resize() name chosen for compatibility sake.
 	void reserve(size_type min_size)
 	{
 		size_type newCapacity = (m_capacity == 0 ? kInitialCapacity : m_capacity);
@@ -357,7 +355,7 @@ public:
 	size_type size() const					{ return m_size; }
 	size_type empty() const					{ return size() == 0; }
 	size_type nonempty_bucket_count() const	{ return m_numUsed; }
-	size_t used_memory() const				
+	size_type used_memory() const				
 	{
 		return bucket_count() * kNodeSize;
 	}
@@ -376,7 +374,7 @@ private:
 	}
 	void grow(int new_capacity)
 	{
-		RDE_ASSERT((new_capacity & (new_capacity - 1)) == 0);
+		RDE_ASSERT((new_capacity & (new_capacity - 1)) == 0);	// Must be power-of-two
 		node* newNodes = allocate_nodes(new_capacity);
 		rehash(new_capacity, newNodes, m_capacity, m_nodes, true);
 		m_allocator.deallocate(m_nodes, sizeof(node) * m_capacity);
