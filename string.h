@@ -1,11 +1,11 @@
-#ifndef RDESTL_CORE_H
-#define RDESTL_CORE_H
+#ifndef RDESTL_STRING_H
+#define RDESTL_STRING_H
 
 #include "rdestl/basic_string.h"
 
 namespace rde
 {
-	typedef basic_string<char>	string;
+typedef basic_string<char>	string;
 }
 
-#endif // RDESTL_CORE_H
+#endif // RDESTL_STRING_H
