@@ -121,7 +121,7 @@
     {
         STRING_CLASS t("hello world rde stl is fast");
         
-        int x = t.find("hello");
+        STRING_CLASS::size_type x = t.find("hello");
         CHECK( x == 0 );
         
         x = t.find("is");
@@ -147,7 +147,7 @@
     {
         STRING_CLASS t("hello world rde stl is fast");
         
-        int x = t.rfind("hello");
+		STRING_CLASS::size_type x = t.rfind("hello");
         CHECK( x == 0 );
         
         x = t.rfind("is");
@@ -167,7 +167,7 @@
         CHECK_EQUAL( STRING_CLASS::npos, x );
         
         x = t.rfind("fastideous");
-        CHECK_EQUAL( std::string::npos, x );
+        CHECK_EQUAL( STRING_CLASS::npos, x );
 
 		t = STRING_CLASS("ste stf stg sth");
 		x = t.rfind("stf");
