@@ -1,7 +1,7 @@
 #ifndef RDESTL_PAIR_H
 #define RDESTL_PAIR_H
 
-#include "rdestl/type_traits.h"
+#include "type_traits.h"
 
 namespace rde
 {
@@ -16,6 +16,15 @@ struct pair
 	pair(const T1& a, const T2& b):	first(a), second(b) {/**/}
 	explicit pair(const T1& a):	first(a) {/**/}
 
+    pair(const pair<T1,T2>& rhs) : first(rhs.first), second(rhs.second) {/**/}
+    
+    pair& operator=(const pair<T1,T2>& rhs) 
+    {
+        first = rhs.first;
+        second = rhs.second;
+        return *this;
+    }
+    
 	T1	first;
 	T2	second;
 };

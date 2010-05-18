@@ -1,7 +1,7 @@
 #ifndef RDESTL_STACK_H
 #define RDESTL_STACK_H
 
-#include "rdestl/vector.h"
+#include "vector.h"
 
 namespace rde
 {

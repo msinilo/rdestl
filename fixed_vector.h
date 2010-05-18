@@ -1,8 +1,8 @@
 #ifndef RDESTL_FIXED_VECTOR_H
 #define RDESTL_FIXED_VECTOR_H
 
-#include "rdestl/alignment.h"
-#include "rdestl/vector.h"
+#include "alignment.h"
+#include "vector.h"
 
 #define RDESTL_RECORD_WATERMARKS	0
 
@@ -130,42 +130,43 @@ class fixed_vector : public vector<T, TAllocator,
 	fixed_vector_storage<T, TAllocator, TCapacity, TGrowOnOverflow> >
 {
 	typedef vector<T, TAllocator, 
-		fixed_vector_storage<T, TAllocator, TCapacity, TGrowOnOverflow> > super;
+		fixed_vector_storage<T, TAllocator, TCapacity, TGrowOnOverflow> > base_vector;
+    typedef TAllocator allocator_type;
+    typedef typename base_vector::size_type size_type;
+    typedef T value_type;
 public:
 	explicit fixed_vector(const allocator_type& allocator = allocator_type())
-	:	super(allocator)
+	:	base_vector(allocator)
 	{
 		/**/
 	}
 	explicit fixed_vector(size_type initialSize, const allocator_type& allocator = allocator_type())
-	:	super(initialSize, allocator)
+	:	base_vector(initialSize, allocator)
 	{
 		/**/
 	}
 	fixed_vector(const T* first, const T* last, const allocator_type& allocator = allocator_type())
-	:	super(first, last, allocator)
+	:	base_vector(first, last, allocator)
 	{
 		/**/
 	}
 	// @note: allocator is not copied from rhs.
 	// @note: will not perform default constructor for newly created objects.
 	fixed_vector(const fixed_vector& rhs, const allocator_type& allocator = allocator_type())
-	:	super(rhs, allocator)
+	:	base_vector(rhs, allocator)
 	{
 		/**/
 	}
 	explicit fixed_vector(e_noinitialize n)
-	:	super(n)
+	:	base_vector(n)
 	{
 		/**/
 	}
 
 	fixed_vector& operator=(const fixed_vector& rhs)
 	{
-		if (&rhs != this)
-		{
-			super& superThis = *this;
-			superThis = rhs;
+		if (&rhs != this){
+            base_vector::copy(rhs);
 		}
 		return *this;
 	}

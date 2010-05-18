@@ -1,8 +1,8 @@
 #ifndef RDESTL_SLIST_H
 #define RDESTL_SLIST_H
 
-#include "rdestl/allocator.h"
-#include "rdestl/iterator.h"
+#include "allocator.h"
+#include "iterator.h"
 
 namespace rde
 {

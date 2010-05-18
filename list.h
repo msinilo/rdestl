@@ -1,8 +1,8 @@
 #ifndef RDESTL_LIST_H
 #define RDESTL_LIST_H
 
-#include "rdestl/allocator.h"
-#include "rdestl/iterator.h"
+#include "allocator.h"
+#include "iterator.h"
 
 namespace rde
 {
@@ -53,7 +53,10 @@ private:
 	public:
 		typedef bidirectional_iterator_tag	iterator_category;
 
-		explicit node_iterator(TNodePtr node):	m_node(node) {/**/}
+        explicit node_iterator(): m_node(NULL) {/**/}
+		
+        explicit node_iterator(TNodePtr node):	m_node(node) {/**/}
+        
 		template<typename UNodePtr, typename UPtr, typename URef>
 		node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
 		:	m_node(rhs.node())

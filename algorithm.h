@@ -1,10 +1,10 @@
 #ifndef RDESTL_ALGORITHM_H
 #define RDESTL_ALGORITHM_H
 
-#include "rdestl/int_to_type.h"
-#include "rdestl/iterator.h"
-#include "rdestl/type_traits.h"
-#include "rdestl/utility.h"
+#include "int_to_type.h"
+#include "iterator.h"
+#include "type_traits.h"
+#include "utility.h"
 
 namespace rde
 {
@@ -126,14 +126,14 @@ void fill_n(T* first, size_t n, const T& val)
 template<typename TIter, typename TDist> inline
 void distance(TIter first, TIter last, TDist& dist)
 {
-	internal::distance(first, last, dist, iterator_traits<TIter>::iterator_category());
+	internal::distance(first, last, dist, typename iterator_traits<TIter>::iterator_category());
 }
 
 //-----------------------------------------------------------------------------
 template<typename TIter, typename TDist> inline
 void advance(TIter& iter, TDist off)
 {
-	internal::advance(iter, off, iterator_traits<TIter>::iterator_category());
+	internal::advance(iter, off, typename iterator_traits<TIter>::iterator_category());
 }
 
 //-----------------------------------------------------------------------------
@@ -182,7 +182,7 @@ TIter find(TIter first, TIter last, const T& val)
 {
 	while (first != last)
 	{
-		if (*first == val)
+		if ((*first) == val)
 			return first;
 		++first;
 	}
@@ -229,6 +229,13 @@ RDE_FORCEINLINE short abs(short x)
 {
 	const short y = x >> 15;
 	return (x ^ y) - y;
+}
+
+//-----------------------------------------------------------------------------
+template<typename T> inline
+T max(const T& x, const T& y)
+{
+    return x > y ? x : y;
 }
 
 //-----------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 #ifndef RDESTL_FIXED_SUBSTRING_H
 #define RDESTL_FIXED_SUBSTRING_H
 
-#include "rdestl/fixed_array.h"
-#include "rdestl/string_utils.h"
+#include "fixed_array.h"
+#include "string_utils.h"
 
 namespace rde
 {

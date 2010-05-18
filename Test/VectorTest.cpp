@@ -264,4 +264,107 @@ namespace
 		CHECK_EQUAL(2, v[1]);
 		CHECK_EQUAL(3, v[2]);
 	}
+    
+
+    //-----------------------------------------------------------------
+    //Vector tests by Danushka Abeysuriya silvermace@gmail.com
+
+    TEST(Resize)
+    {
+        rde::vector<int> myFoos;
+        myFoos.resize(20);
+        
+        CHECK(myFoos.size() == 20);
+        CHECK(myFoos.capacity() >= 20);
+    }
+
+    //Regression test:
+    //The bug is caused when the copy constructor is invoked on a vector where 
+    //the rhs is an empty (and non-preallocated) vector - i.e. there is nothing to copy
+    TEST(Resize_Regression_1)
+    {
+        rde::vector< rde::vector<int> > myFoosFoos;
+        myFoosFoos.push_back(rde::vector<int>());
+        myFoosFoos.push_back(rde::vector<int>());
+        myFoosFoos[1].push_back(42);
+        
+        CHECK(myFoosFoos.size() == 2);
+        CHECK(myFoosFoos[0].size() == 0);
+        CHECK(myFoosFoos[1].size() == 1);
+    }
+
+    TEST(Resize_Regression_2)
+    {
+        rde::vector< rde::vector<int> > myFoosFoos;
+        rde::vector<int> a;
+        rde::vector<int> b;
+
+        a.push_back(42);
+        a.push_back(24);
+
+        myFoosFoos.push_back(a);
+        myFoosFoos.push_back(b);
+        myFoosFoos[1].push_back(4224);
+        
+        CHECK(myFoosFoos.size() == 2);
+        
+        CHECK(myFoosFoos[0].size() == 2);
+        CHECK(myFoosFoos[0][0] == 42);
+        CHECK(myFoosFoos[0][1] == 24);
+        
+        CHECK(myFoosFoos[1].size() == 1);
+        CHECK(myFoosFoos[1][0] == 4224);
+    }
+
+    TEST(Insert)
+    {
+        rde::vector<int> myFoos;
+        
+        myFoos.push_back(42);
+        CHECK(myFoos.size() == 1);
+        CHECK(myFoos[0] == 42);
+        
+        myFoos.insert(myFoos.begin(), 24);
+        CHECK(myFoos.size() == 2);
+        CHECK(myFoos[0] == 24);
+        CHECK(myFoos[1] == 42);
+        
+        myFoos.clear();
+        CHECK(myFoos.size() == 0);
+        
+        myFoos.insert(myFoos.begin(), 42);
+        CHECK(myFoos.size() == 1);
+        CHECK(myFoos[0] == 42);
+    }
+
+    TEST(VectorOfVectors)
+    {
+        rde::vector< rde::vector<int> > myFoosFoos;
+        myFoosFoos.push_back(rde::vector<int>(10));
+        myFoosFoos.push_back(rde::vector<int>(20));
+        CHECK(myFoosFoos.size() == 2);
+        CHECK(myFoosFoos[0].size() == 10);
+        CHECK(myFoosFoos[1].size() == 20);
+    }
+
+    //typedef rde::fixed_vector<int, 3, false> fvector;
+
+    //TEST(fixedvec_copy)
+    //{
+    //    fvector a;
+    //    fvector b;
+    //    a.push_back(42);
+    //    a.push_back(24);
+    //    a.push_back(4224);
+    //    
+    //    b = a;
+    //    
+    //    CHECK(b.size() == 3);
+    //    CHECK(b[0] == 42);
+    //    CHECK(b[1] == 24);
+    //    CHECK(b[2] == 4224);
+    //    
+    //    b = fvector();
+    //    CHECK(b.size() == 3);
+    //}
 }

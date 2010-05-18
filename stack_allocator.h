@@ -1,7 +1,7 @@
 #ifndef RDESTL_STACK_ALLOCATOR_H
 #define RDESTL_STACK_ALLOCATOR_H
 
-#include "rdestl/rdestl.h"
+#include "rdestl_common.h"
 
 namespace rde
 {

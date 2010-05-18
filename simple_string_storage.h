@@ -39,25 +39,25 @@ public:
 	}
 	simple_string_storage(const simple_string_storage& rhs, const allocator_type& allocator)
 	:	m_allocator(allocator),
-		m_capacity(0)
+		m_capacity(0), m_length(0)
 	{
-		*this = rhs;
+		if (m_data != rhs.c_str()) {
+			assign(rhs.c_str(), rhs.length());
+		}
 	}
-	~simple_string_storage()
-	{
+	~simple_string_storage()	{
 		release_string();
 	}
 
 	// @note: doesnt copy allocator
-	simple_string_storage& operator=(const simple_string_storage& rhs)
+    simple_string_storage& operator=(const simple_string_storage& rhs)
 	{
-		if (m_data != rhs.c_str())
-		{
+		if (m_data != rhs.c_str()) {
 			assign(rhs.c_str(), rhs.length());
 		}
 		return *this;
 	}
-
+        
 	void assign(const value_type* str, size_type len)
 	{
 		// Do not use with str = str.c_str()!
@@ -80,8 +80,12 @@ public:
 		{
 			value_type* newData = construct_string(newLen);
 			Sys::MemCpy(newData, m_data, prevLen * sizeof(value_type));
-			release_string();
-			m_data = newData;
+            //fixed: release's assert fails because construct_string changes m_capacity
+            //to reflect newData's capacity and not m_data's actual capacity so we use the 
+            //new function release_string_nocheck which just releases the memory without
+            //paying too much attention to the m_capacity disparity
+			release_string_nocheck(); 			
+            m_data = newData;
 		}
 		Sys::MemCpy(m_data + prevLen, str, len * sizeof(value_type));
 		m_data[newLen] = 0;
@@ -93,10 +97,21 @@ public:
 	{
 		return m_data;
 	}
-	inline size_type length() const
+	
+    inline size_type length() const
 	{
 		return m_length;
 	}
+    
+    inline size_type capacity() const { return m_capacity; }
+    
+    void clear() 
+    {
+        release_string();
+        m_data = construct_string(0);
+        m_length = 0;
+    }
+    
 	const allocator_type& get_allocator() const	{ return m_allocator; }
 
 	void make_unique(size_type) {}
@@ -113,22 +128,23 @@ protected:
 	}
 private:
 	value_type* construct_string(size_type capacity)
-	{
-		value_type* data(0);
-		if (capacity != 0)
-		{
-			capacity = (capacity+kGranularity-1) & ~(kGranularity-1);
-			if (capacity < kGranularity)
-				capacity = kGranularity;
+	{  
+        value_type* data(0);
+        if (capacity != 0)
+        {
+            capacity = (capacity+kGranularity-1) & ~(kGranularity-1);
+            if (capacity < kGranularity)
+                capacity = kGranularity;
 
-			const size_type toAlloc = sizeof(value_type)*(capacity + 1);
-			void* mem = m_allocator.allocate(toAlloc);
-			data = static_cast<value_type*>(mem);
-		}
-		else	// empty string, no allocation needed. Use our internal buffer.
-		{
-			data = &m_end_of_data;
-		}
+            const size_type toAlloc = sizeof(value_type)*(capacity + 1);
+            void* mem = m_allocator.allocate(toAlloc);
+            data = static_cast<value_type*>(mem);
+        }
+        else	// empty string, no allocation needed. Use our internal buffer.
+        {
+            data = &m_end_of_data;
+        }
+    
 		m_capacity = capacity;
 		*data = 0;
 		return data;
@@ -141,6 +157,13 @@ private:
 			m_allocator.deallocate(m_data, m_capacity);
 		}
 	}
+    
+    void release_string_nocheck()
+    {
+        //dont free in our empty string situation(s):
+        if( m_capacity && (m_data != &m_end_of_data) )
+            m_allocator.deallocate(m_data, m_capacity);
+    }
 
 	E*			m_data;
 	E			m_end_of_data;

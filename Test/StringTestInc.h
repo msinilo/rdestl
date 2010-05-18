@@ -112,3 +112,92 @@
 		STRING_CLASS s2(s);
 		CHECK(s2.empty());
 	}
+    
+    
+    //-----------------------------------------------------------------
+    //Test search
+
+    TESTC(Find)
+    {
+        STRING_CLASS t("hello world rde stl is fast");
+        
+        int x = t.find("hello");
+        CHECK( x == 0 );
+        
+        x = t.find("is");
+        CHECK( x == 20 );
+
+        x = t.find("fast");
+        CHECK( x == 23 );
+        
+        x = t.find("st"); //start of 'stl'
+        CHECK( x == 16 );
+        
+        x = t.find(" ");
+        CHECK( x == 5 );
+        
+        x = t.find("java");
+        CHECK( x == STRING_CLASS::npos );
+        
+        x = t.find("fastideous");
+        CHECK( x == STRING_CLASS::npos );
+    }
+
+    TESTC(ReverseFind)
+    {
+        STRING_CLASS t("hello world rde stl is fast");
+        
+        int x = t.rfind("hello");
+        CHECK( x == 0 );
+        
+        x = t.rfind("is");
+        CHECK( x == 20 );
+        
+        x = t.rfind("fast");
+        CHECK( x == 23 );
+
+        // these are different for rfind
+        x = t.rfind("st");
+        CHECK( x == 25 ); //end of 'fast'
+        
+        x = t.rfind(" ");
+        CHECK( x == 22 ); //just before 'fast'
+        
+        x = t.rfind("java");
+        CHECK_EQUAL( STRING_CLASS::npos, x );
+        
+        x = t.rfind("fastideous");
+        CHECK_EQUAL( std::string::npos, x );
+
+		t = STRING_CLASS("ste stf stg sth");
+		x = t.rfind("stf");
+		CHECK_EQUAL( 4, x );
+    }
+
+    //-----------------------------------------------------------------
+    //Test string storage
+
+    TESTC(Append)
+    {
+        STRING_CLASS s;
+        s.append("hello");
+        CHECK( s.compare( STRING_CLASS("hello") ) == 0 );
+        
+        s.append("world");
+        CHECK( s.compare( STRING_CLASS("helloworld") ) == 0 );
+        
+        s.append("rde");
+        CHECK( s.compare( STRING_CLASS("helloworldrde") ) == 0 );
+        
+    }
+
+    TESTC(CopyStorage)
+    {
+        STRING_CLASS t("HelloWorldThisIsALongString");
+        STRING_CLASS s("HelloWorldThisIsAReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyReallyLongString");
+        STRING_CLASS x(t);
+        x.clear();
+        x = s;
+        CHECK(x.length() == s.length());
+        CHECK(x.compare(s) == 0);
+    }

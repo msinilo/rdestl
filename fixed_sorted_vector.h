@@ -1,8 +1,8 @@
 #ifndef RDESTL_FIXED_SORTED_VECTOR_H
 #define RDESTL_FIXED_SORTED_VECTOR_H
 
-#include "rdestl/fixed_vector.h"
-#include "rdestl/sorted_vector.h"
+#include "fixed_vector.h"
+#include "sorted_vector.h"
 
 namespace rde
 {

@@ -1,21 +1,23 @@
 #ifndef RDESTL_HASH_MAP_H
 #define RDESTL_HASH_MAP_H
 
-#include "rdestl/algorithm.h"
-#include "rdestl/allocator.h"
-#include "rdestl/functional.h"
-#include "rdestl/pair.h"
+#include "algorithm.h"
+#include "allocator.h"
+#include "functional.h"
+#include "pair.h"
+#include "rde_string.h"
 
 namespace rde
 {
 typedef unsigned long	hash_value_t;
-
+    
 // Default implementations, just casts to hash_value.
 template<typename T>
 hash_value_t extract_int_key_value(const T& t)
 {
 	return (hash_value_t)t;
 }
+ 
 // Default implementation of hasher.
 // Works for keys that can be converted to 32-bit integer
 // with extract_int_key_value.
@@ -35,6 +37,21 @@ struct hash
         a = (a^0xb55a4f09) ^ (a>>16);
         return a;
 	}
+};
+ 
+//Added specialisation for rde::string so you can have MyHashMap["MyLiteralKey"] type operations
+template< > 
+struct hash< rde::string >
+{
+    hash_value_t operator()( const rde::string& x ) const 
+    {
+        //derived from: http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/142054
+        hash_value_t h = 0;
+        for(size_t p=0; p<(size_t)x.length(); ++p) {
+            h = x[p] + (h<<6) + (h<<16) - h;
+        }
+        return h & 0x7FFFFFFF;
+    }
 };
 
 template<typename TKey, typename TValue, 
@@ -261,7 +278,7 @@ public:
 			RDE_ASSERT(invariant());
 		}
 	}
-
+    
 	rde::pair<iterator, bool> insert(const value_type& v)
 	{
 		typedef rde::pair<iterator, bool> ret_type_t;
@@ -330,18 +347,23 @@ public:
 		node* endNode = m_nodes + m_capacity;
         for (node* iter = m_nodes; iter != endNode; ++iter)
         {
-			if (iter->is_occupied())
+            if( iter )
             {
-                rde::destruct(&iter->data);
-			}
-			// We can make them unused, because we clear whole hash_map,
-            // so we can guarantee there'll be no holes.
-            iter->hash = node::kUnusedHash;
+                if (iter->is_occupied())
+                {
+                    rde::destruct(&iter->data);
+                }
+                // We can make them unused, because we clear whole hash_map,
+                // so we can guarantee there'll be no holes.
+                iter->hash = node::kUnusedHash;
+            }
 		}
         m_size = 0;
         m_numUsed = 0;
 	}
 
+	// More like reserve.
+	// resize() name chosen for compatibility sake.
 	void reserve(size_type min_size)
 	{
 		size_type newCapacity = (m_capacity == 0 ? kInitialCapacity : m_capacity);
@@ -355,7 +377,7 @@ public:
 	size_type size() const					{ return m_size; }
 	size_type empty() const					{ return size() == 0; }
 	size_type nonempty_bucket_count() const	{ return m_numUsed; }
-	size_type used_memory() const				
+	size_t used_memory() const				
 	{
 		return bucket_count() * kNodeSize;
 	}
@@ -374,7 +396,7 @@ private:
 	}
 	void grow(int new_capacity)
 	{
-		RDE_ASSERT((new_capacity & (new_capacity - 1)) == 0);	// Must be power-of-two
+		RDE_ASSERT((new_capacity & (new_capacity - 1)) == 0);
 		node* newNodes = allocate_nodes(new_capacity);
 		rehash(new_capacity, newNodes, m_capacity, m_nodes, true);
 		m_allocator.deallocate(m_nodes, sizeof(node) * m_capacity);
@@ -458,6 +480,9 @@ private:
 	static void rehash(int new_capacity, node* new_nodes,
 		int capacity, const node* nodes, bool destruct_original)
 	{
+        if( !nodes || !new_nodes ) //incomplete initialization, nothing to do
+            return;
+        
 		const node* it = nodes;
 		const node* itEnd = nodes + capacity;
 		const uint32 mask = new_capacity - 1;
@@ -501,11 +526,13 @@ private:
         node* itEnd = it + m_capacity;
         while (it != itEnd)
         {
-			if (it->is_occupied())
+			if (it && it->is_occupied())
 				rde::destruct(&it->data);
 			++it;
 		}
 		m_allocator.deallocate(m_nodes, sizeof(node) * m_capacity);
+        m_capacity = 0;
+        m_size = 0;
 	}
 	void erase_node(node* n)
 	{

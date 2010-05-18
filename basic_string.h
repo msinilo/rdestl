@@ -1,10 +1,14 @@
 #ifndef RDESTL_BASIC_STRING_H
 #define RDESTL_BASIC_STRING_H
 
-#include "rdestl/allocator.h"
-#include "rdestl/cow_string_storage.h"
-#include "rdestl/rdestl.h"
-#include "rdestl/string_utils.h"
+#include "allocator.h"
+#include "cow_string_storage.h"
+#include "simple_string_storage.h"
+#include "rdestl_common.h"
+#include "string_utils.h"
+
+#include <istream>
+#include <ostream>
 
 namespace rde
 {
@@ -13,7 +17,7 @@ namespace rde
 // one way conversion should work, ie rde --> STL.
 template<typename E, 
 	class TAllocator = rde::allocator,
-	typename TStorage = cow_string_storage<E, TAllocator> >
+	typename TStorage = rde::simple_string_storage<E, TAllocator> >
 class basic_string : private TStorage
 {
 public:
@@ -21,7 +25,10 @@ public:
 	typedef typename TStorage::size_type		size_type;
 	typedef typename TStorage::const_iterator	const_iterator;
 	typedef typename TStorage::allocator_type	allocator_type;
-
+    
+    //For find
+    static const size_type npos = size_type(-1);
+    
 	explicit basic_string(const allocator_type& allocator = allocator_type())
 	:	TStorage(allocator)
 	{
@@ -50,6 +57,8 @@ public:
 	{
 		/**/
 	}
+    
+    size_type capacity() const { return TStorage::capacity(); }
 
 	// No operator returning ref for the time being. It's dangerous with COW.
 	value_type operator[](size_type i) const
@@ -62,10 +71,8 @@ public:
 	basic_string& operator=(const basic_string& rhs)
 	{
 		RDE_ASSERT(rhs.invariant());
-		if (this != &rhs)
-		{
-			TStorage& s = *this;
-			s = rhs;
+		if (this != &rhs) {
+            TStorage::operator=((TStorage&)rhs);
 		}
 		RDE_ASSERT(invariant());
 		return *this;
@@ -94,6 +101,8 @@ public:
 
 	void append(const value_type* str, size_type len)
 	{
+        if( !str || len == 0 || *str == 0 )
+            return;
 		TStorage::append(str, len);
 	}
 	void append(const basic_string& str)
@@ -104,9 +113,13 @@ public:
 	{
 		append(str, strlen(str));
 	}
+	void append(const value_type ch)
+	{
+		append(&ch, 1);
+	}
 	basic_string& operator+=(const basic_string& rhs)
 	{
-		append(str);
+		append(rhs);
 		return *this;
 	}
 
@@ -192,9 +205,9 @@ public:
 		}
 	}
 
-	size_type find_index_of(value_type ch) const
+	size_type find_index_of(const value_type ch) const
 	{
-		size_type retIndex(-1);
+		size_type retIndex(basic_string::npos);
 		const E* ptr = c_str();
 		size_type currentIndex(0);
 		while (*ptr != value_type(0))
@@ -209,9 +222,9 @@ public:
 		}
 		return retIndex;
 	}
-	size_type find_index_of_last(value_type ch) const
+	size_type find_index_of_last(const value_type ch) const
 	{
-		size_type retIndex(-1);
+		size_type retIndex(basic_string::npos);
 		const value_type* ptr = c_str();
 		size_type currentIndex(0);
 		while (*ptr != value_type(0))
@@ -223,7 +236,65 @@ public:
 		}
 		return retIndex;
 	}
+    
+    size_type find(const value_type* needle) const
+    {       
+        const value_type* s(c_str());    
+        size_type si(0);
+        while(*s)
+        {
+            const value_type* n = needle;
+            if( *s == *n ) //first character matches
+            {
+                //go through the sequence, and make sure while(x) x == n for all of n
+                const value_type* x = s; 
+                size_type match = 0;
+                while(*x && *n) 
+                {
+                    if( *n == *x )
+                        ++match;
+                    ++n;
+                    ++x;
+                }
+                if( match == strlen(needle) )
+                    return si;
+            }
+            ++s;
+            ++si;
+        }
+        return basic_string::npos;
+    }
+    
+    size_type rfind(const value_type* needle) const
+    {   
+		const value_type* s(c_str() + length());
+		size_type si(length()+1); 
 
+		//find the last index of the first char in needle
+		//searching from end->start for obvious reasons
+		while(--si >= 0) 
+		{
+			//if the first character matches, run our check
+			if( *s-- == *needle ) {
+
+				//go through the sequence, and make sure while(x) x == n for all of n
+				const value_type* x = c_str() + si; 
+				const value_type* n = needle;
+				size_type match = 0;
+				while(*x && *n) 
+				{
+					if( *n == *x )
+						++match;
+					++n;
+					++x;
+				}
+				if( match == strlen(needle) )
+					return si;
+			}
+		}
+		return basic_string::npos;
+    }
+    
 private:
 	bool invariant() const
 	{

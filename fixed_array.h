@@ -1,7 +1,7 @@
 #ifndef RDESTL_FIXED_ARRAY_H
 #define RDESTL_FIXED_ARRAY_H
 
-#include "rdestl/algorithm.h"
+#include "algorithm.h"
 
 namespace rde
 {

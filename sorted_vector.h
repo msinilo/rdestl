@@ -1,10 +1,10 @@
 #ifndef RDESTL_SORTED_VECTOR_H
 #define RDESTL_SORTED_VECTOR_H
 
-#include "rdestl/functional.h"
-#include "rdestl/pair.h"
-#include "rdestl/sort.h"
-#include "rdestl/vector.h"
+#include "functional.h"
+#include "pair.h"
+#include "sort.h"
+#include "vector.h"
 
 namespace rde
 {
@@ -47,14 +47,14 @@ public:
 	typedef typename Base::allocator_type	allocator_type;
 
 	explicit sorted_vector(const allocator_type& allocator = allocator_type())
-	:	vector(allocator)
+	:	Base(allocator)
 	{
 		/**/
 	}
 	template <class InputIterator>
 	sorted_vector(InputIterator first, InputIterator last, 
 		const allocator_type& allocator = allocator_type())
-	:	vector(first, last, allocator)
+	:	Base(first, last, allocator)
 	{
 		rde::quick_sort(begin(), end(), m_compare);
 		RDE_ASSERT(invariant());

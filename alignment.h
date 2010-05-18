@@ -1,7 +1,7 @@
 #ifndef RDESTL_ALIGNMENT_H
 #define RDESTL_ALIGNMENT_H
 
-#include "rdestl/rdestl.h"
+#include "rdestl_common.h"
 #include <cstddef>
 
 namespace rde
@@ -17,7 +17,12 @@ namespace internal
 		char	x;
 		T		y;
 	};
+#ifdef _MSC_VER
 	__declspec(align(16)) struct aligned16 { uint64 member[2]; };
+#else
+    struct __attribute__ ((aligned (16))) aligned16 { uint64 member[2]; } ;
+#endif
+    
 #pragma warning(pop)
 	template<size_t N> struct type_with_alignment
 	{

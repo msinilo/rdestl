@@ -1,8 +1,8 @@
 #ifndef RDESTL_INTRUSIVE_SLIST_H
 #define RDESTL_INTRUSIVE_SLIST_H
 
-#include "rdestl/iterator.h"
-#include "rdestl/type_traits.h"
+#include "iterator.h"
+#include "type_traits.h"
 
 namespace rde
 {

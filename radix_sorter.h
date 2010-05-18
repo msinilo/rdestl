@@ -1,7 +1,7 @@
 #ifndef RDESTL_RADIX_SORTER_H
 #define RDESTL_RADIX_SORTER_H
 
-#include "rdestl/vector.h"
+#include "vector.h"
 
 namespace rde
 {

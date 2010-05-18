@@ -1,7 +1,7 @@
 #ifndef RDESTL_ITERATOR_H
 #define RDESTL_ITERATOR_H
 
-#include "rdestl/rdestl.h"
+#include "rdestl_common.h"
 
 namespace rde
 {

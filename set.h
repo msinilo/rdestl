@@ -1,8 +1,8 @@
 #ifndef RDESTL_SET_H
 #define RDESTL_SET_H
 
-#include "rdestl/rb_tree.h"
-#include "rdestl/iterator.h"
+#include "rb_tree.h"
+#include "iterator.h"
 
 namespace rde
 {
@@ -10,7 +10,8 @@ template<typename T,
 	class TAllocator = rde::allocator>
 class set : private rb_tree<T, TAllocator>
 {
-	typedef rb_tree<T, TAllocator>	Base;
+	typedef rb_tree<T, TAllocator>  Base;
+    typedef typename Base::node     BaseNode;
 
 	template<typename TNodePtr, typename TPtr, typename TRef>
 	class node_iterator
@@ -82,12 +83,12 @@ class set : private rb_tree<T, TAllocator>
 
 public:
 	typedef T															value_type;
-	typedef node_iterator<node*, value_type*, value_type&>				iterator;
-	typedef node_iterator<node*, const value_type*, const value_type&>	const_iterator;
+	typedef node_iterator<BaseNode*, value_type*, value_type&>				iterator;
+	typedef node_iterator<BaseNode*, const value_type*, const value_type&>	const_iterator;
 	typedef TAllocator													allocator_type;
 
 	explicit set(const allocator_type& allocator = allocator_type())
-	:	rb_tree(allocator) {}
+	:	Base(allocator) {}
 
 	iterator begin()
 	{

@@ -211,3 +211,22 @@
 		it = h2.find("brave");
 		CHECK_EQUAL(7, it->second);
 	}
+
+
+	//-----------------------------------------------------------------
+	//Regression test:
+	//added by Danushka Abeysuriya (silvermace@gmail.com)
+	//See vec_resize_special_a unit test - believe this is a similar problem
+	//When an uninitialized/unused hash_map instance is the rhs of a copy-constructor 
+	//for a init'ed/used hash_map the rehash method falls over because the un-init'd 
+	//hash_maps node ptr is NULL
+	TEST(HashMapResize_Regression_1)
+	{
+		rde::hash_map<int,int> a;
+
+		a.insert(rde::pair<int,int>(42,24));
+		CHECK(a.size() == 1);
+
+		a = rde::hash_map<int,int>();
+		CHECK(a.size() == 0);
+	}

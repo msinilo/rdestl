@@ -1,7 +1,7 @@
 #ifndef RDESTL_UTILITY_H
 #define RDESTL_UTILITY_H
 
-#include "rdestl/rdestl.h"
+#include "rdestl_common.h"
 #include <new.h>
 
 namespace rde

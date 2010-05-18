@@ -1,10 +1,10 @@
 #ifndef RDESTL_FIXED_LIST_H
 #define RDESTL_FIXED_LIST_H
 
-#include "rdestl/alignment.h"
-#include "rdestl/int_to_type.h"
-#include "rdestl/iterator.h"
-#include "rdestl/type_traits.h"
+#include "alignment.h"
+#include "int_to_type.h"
+#include "iterator.h"
+#include "type_traits.h"
 
 namespace rde
 {

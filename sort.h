@@ -1,7 +1,7 @@
 #ifndef RDESTL_SORT_H
 #define RDESTL_SORT_H
 
-#include "rdestl/functional.h"
+#include "functional.h"
 
 namespace rde
 {

@@ -1,125 +1,100 @@
 #ifndef RDESTL_RB_TREE_H
 #define RDESTL_RB_TREE_H
 
-#include "rdestl/rdestl.h"
-#include "rdestl/allocator.h"
+#include "rdestl_common.h"
+#include "allocator.h"
 
 namespace rde
 {
 namespace internal
 {
-struct rb_tree_base
-{
-	typedef int	size_type;
-	enum color_e
+	struct rb_tree_base
 	{
-		red,
-		black
+		typedef int	size_type;
+		enum color_e
+		{
+			red,
+			black
+		};
 	};
-};
-template<typename TKey>
-struct rb_tree_key_wrapper
-{
-	TKey	key;
-	rb_tree_key_wrapper() {}
-	rb_tree_key_wrapper(const TKey& key_): key(key_) {}
-	const TKey& get_key() const { return key; }
-};
-template<typename TKey>
-struct rb_tree_traits
-{
-	typedef	TKey	key_type;
-	typedef rb_tree_key_wrapper<TKey>	value_type;
-};
-
 } // internal
 
-template<class TTreeTraits, class TAllocator = rde::allocator>
-class rb_tree_base : public internal::rb_tree_base
+template<typename T, class TAllocator = rde::allocator>
+class rb_tree : private internal::rb_tree_base
 {
 public:
-	typedef typename TTreeTraits::key_type		key_type;
-	typedef typename TTreeTraits::value_type	value_type;
-	typedef TAllocator							allocator_type;
+	typedef T				key_type;
+	typedef TAllocator		allocator_type;
 
 	struct node
 	{
 		node() {}
-		node(color_e color_, node* left_, node* right_, node* parent_)
-		:	left(left_), parent(parent_), right(right_), color(color_)
-		{
-		}
-
-		node*		left;
-		node*		parent;
-		node*		right;
-		value_type	value;
-		color_e		color;
+		color_e	color;
+		T		key;
+		node*	left;
+		node*	right;
+		node*	parent;
 	};
 
-	explicit rb_tree_base(const allocator_type& allocator = allocator_type())
+	explicit rb_tree(const allocator_type& allocator = allocator_type())
 	:	m_size(0),
 		m_allocator(allocator)
 	{
-		ms_sentinel.color	= black;
-		ms_sentinel.left		= &ms_sentinel;
-		ms_sentinel.right	= &ms_sentinel;
-		ms_sentinel.parent	= &ms_sentinel;
-		m_root				= &ms_sentinel;
+		m_sentinel.color	= black;
+		m_sentinel.left		= &m_sentinel;
+		m_sentinel.right	= &m_sentinel;
+		m_sentinel.parent	= &m_sentinel;
+		m_root				= &m_sentinel;
 	}
-	~rb_tree_base()
+	~rb_tree()
 	{
 		clear();
 	}
 
-	node* insert(const value_type& v)
+	void insert(const key_type& key)
 	{
 		node* iter(m_root);
-		node* parent(&ms_sentinel);
-		while (iter != &ms_sentinel)
+		node* parent(&m_sentinel);
+		while (iter != &m_sentinel)
 		{
 			parent = iter;
-			if (iter->value.get_key() < v.get_key())
+			if (iter->key < key)
 				iter = iter->right;
-			else if (v.get_key() < iter->value.get_key())
+			else if (key < iter->key)
 				iter = iter->left;
-			else	// v.key == iter->key
-				return iter;
+			else	// key == iter->key
+				return;
 		}
 
 		node* new_node = alloc_node();
 		new_node->color = red;
-		new_node->value	= v;
-		new_node->left	= &ms_sentinel;
-		new_node->right	= &ms_sentinel;
+		new_node->key	= key;
+		new_node->left	= &m_sentinel;
+		new_node->right	= &m_sentinel;
 		new_node->parent = parent;
-		if (parent != &ms_sentinel)
+		if (parent != &m_sentinel)
 		{
-			if (v.get_key() < parent->value.get_key())
+			if (key < parent->key)
 				parent->left = new_node;
 			else
 				parent->right = new_node;
 		}
 		else	// empty tree
-		{
 			m_root = new_node;
-		}
 
 		rebalance(new_node);
 		validate();
 		++m_size;
-		return new_node;
 	}
 
 	node* find_node(const key_type& key) 
 	{
 		node* iter(m_root);
-		while (iter != &ms_sentinel)
+		while (iter != &m_sentinel)
 		{
-			const key_type& iter_key = iter->value.get_key();
-			if (iter_key < key)
+			if (iter->key < key)
 				iter = iter->right;
-			else if (key < iter_key)
+			else if (key < iter->key)
 				iter = iter->left;
 			else // key == iter->key
 				return iter;
@@ -127,56 +102,48 @@ public:
 		return 0;	// not found
 	}
 
-	size_type erase(const key_type& key)
+	void erase(const key_type& key)
 	{
 		node* toErase = find_node(key);
-		size_type erased(0);
 		if (toErase != 0)
-		{
 			erase(toErase);
-			erased = 1;
-		}
-		return erased;
 	}
 	void erase(node* n)
 	{
 		RDE_ASSERT(m_size > 0);
 		node* toErase;
-		// "End" node, can be just unlinked from the tree (less than 2 children)
-		if (n->left == &ms_sentinel || n->right == &ms_sentinel)
-		{
+		if (n->left == &m_sentinel || n->right == &m_sentinel)
 			toErase = n;
-		}
 		else
 		{
-			// Cannot remove node, it's part of the tree, needs to overwrite the value
-			// and remove successor.
 			toErase = n->right;
-			while (toErase->left != &ms_sentinel)
+			while (toErase->left != &m_sentinel)
 				toErase = toErase->left;
 		}
 
-		node* eraseChild = (toErase->left != &ms_sentinel ? toErase->left : toErase->right);
-		eraseChild->parent = toErase->parent;
-		if (toErase->parent != &ms_sentinel)
+		node* x = toErase->left;
+		if (x == &m_sentinel)
+			x = toErase->right;
+		x->parent = toErase->parent;
+		if (toErase->parent != &m_sentinel)
 		{
 			if (toErase == toErase->parent->left)
-				toErase->parent->left = eraseChild;
+				toErase->parent->left = x;
 			else
-				toErase->parent->right = eraseChild;
+				toErase->parent->right = x;
 		}
-		else	// we are erasing root of the tree.
+		else
 		{
-			m_root = eraseChild;
+			m_root = x;
 		}
 
 		// Branching is probably worse than key copy anyway.
 		// $$$ unless key is very expensive?
 		//if (toErase != n)
-		n->value = toErase->value;
+		n->key = toErase->key;
 
 		if (toErase->color == black)
-			rebalance_after_erase(eraseChild);
+			rebalance_after_erase(x);
 
 		free_node(toErase, false);
 
@@ -189,21 +156,8 @@ public:
 		if (!empty())
 		{
 			free_node(m_root, true);
-			m_root = &ms_sentinel;
+			m_root = &m_sentinel;
 			m_size = 0;
-		}
-	}
-
-	// @NOTE: Swapping trees with different allocator types results in undefined behavior.
-	void swap(rb_tree_base& other)
-	{
-		if (&other != this)
-		{
-			validate();
-			RDE_ASSERT(m_allocator == other.m_allocator);
-			rde::swap(m_root, other.m_root);
-			rde::swap(m_size, other.m_size);
-			validate();
 		}
 	}
 
@@ -218,14 +172,14 @@ public:
 	void traverse_node(node* n, TravFunc func, int depth)
 	{
 		int left(-1);
-		if (n->parent != &ms_sentinel)
+		if (n->parent != &m_sentinel)
 		{
 			left = n->parent->left == n;
 		}
 		func(n, left, depth);
-		if (n->left != &ms_sentinel)
+		if (n->left != &m_sentinel)
 			traverse_node(n->left, func, depth + 1);
-		if (n->right != &ms_sentinel)
+		if (n->right != &m_sentinel)
 			traverse_node(n->right, func, depth + 1);
 	}
 
@@ -235,37 +189,37 @@ public:
 		traverse_node(m_root, func, depth);
 	}
 
+protected:
 	node* get_begin_node() const
 	{
 		node* iter(0);
-		if (m_root != &ms_sentinel)
+		if (m_root != &m_sentinel)
 		{
 			iter = m_root;
-			while (iter->left != &ms_sentinel)
+			while (iter->left != &m_sentinel)
 				iter = iter->left;
 		}
 		return iter;
 	}
-
 	node* find_next_node(node* n) const
 	{
 		node* next(0);
 		if (n != 0)
 		{
-			if (n->right != &ms_sentinel)
+			if (n->right != &m_sentinel)
 			{
 				next = n->right;
-				while (next->left != &ms_sentinel)
+				while (next->left != &m_sentinel)
 					next = next->left;
 			}
-			else if (n->parent != &ms_sentinel)
+			else if (n->parent != &m_sentinel)
 			{
 				if (n == n->parent->left)
 					return n->parent;
 				else
 				{
 					next = n;
-					while (next->parent != &ms_sentinel)
+					while (next->parent != &m_sentinel)
 					{
 						if (next == next->parent->right)
 							next = next->parent;
@@ -287,7 +241,7 @@ public:
 
 	size_type num_nodes(const node* n) const
 	{
-		return n == &ms_sentinel ? 0 : 1 + num_nodes(n->left) + num_nodes(n->right);
+		return n == &m_sentinel ? 0 : 1 + num_nodes(n->left) + num_nodes(n->right);
 	}
 	RDE_FORCEINLINE void rebalance(node* new_node)
 	{
@@ -418,7 +372,7 @@ public:
 				}
 			}
 		}
-		iter->color = black;
+		m_root->color = black;
 	}
 
 	void validate() const
@@ -431,7 +385,7 @@ public:
 	void validate_node(node* n) const
 	{
 		// - we're child of our parent.
-		RDE_ASSERT(n->parent == &ms_sentinel ||
+		RDE_ASSERT(n->parent == &m_sentinel ||
 			n->parent->left == n || n->parent->right == n);
 		// - both children of red node are black
 		if (n->color == red)
@@ -439,9 +393,9 @@ public:
 			RDE_ASSERT(n->left->color == black);
 			RDE_ASSERT(n->right->color == black);
 		}
-		if (n->left != &ms_sentinel)
+		if (n->left != &m_sentinel)
 			validate_node(n->left);
-		if (n->right != &ms_sentinel)
+		if (n->right != &m_sentinel)
 			validate_node(n->right);
 	}
 
@@ -452,12 +406,12 @@ public:
 		// Right child's left child becomes n's right child.
 		node* rightChild = n->right;
 		n->right = rightChild->left;
-		if (n->right != &ms_sentinel)
+		if (n->right != &m_sentinel)
 			n->right->parent = n;
 
 		// n's right child replaces n
 		rightChild->parent = n->parent;
-		if (n->parent == &ms_sentinel)
+		if (n->parent == &m_sentinel)
 		{
 			m_root = rightChild;
 		}
@@ -475,11 +429,11 @@ public:
 	{
 		node* leftChild(n->left);
 		n->left = leftChild->right;
-		if (n->left != &ms_sentinel)
+		if (n->left != &m_sentinel)
 			n->left->parent = n;
 
 		leftChild->parent = n->parent;
-		if (n->parent == &ms_sentinel)
+		if (n->parent == &m_sentinel)
 		{
 			m_root = leftChild;
 		}
@@ -503,37 +457,22 @@ public:
 	{
 		if (recursive)
 		{
-			if (n->left != &ms_sentinel)
+			if (n->left != &m_sentinel)
 				free_node(n->left, true);
-			if (n->right != &ms_sentinel)
+			if (n->right != &m_sentinel)
 				free_node(n->right, true);
 		}
-		if (n != &ms_sentinel)
+		if (n != &m_sentinel)
 		{
 			n->~node();
 			m_allocator.deallocate(n, sizeof(node));
 		}
 	}
 
-private:
-	// Block copy for the time being
-	rb_tree_base(const rb_tree_base&);
-	rb_tree_base& operator=(const rb_tree_base&);
-
+	node			m_sentinel;
 	node*			m_root;
 	size_type		m_size;
 	allocator_type	m_allocator;
-	static node		ms_sentinel;
-};
-template<class TTreeTraits, class TAllocator>
-typename rb_tree_base<TTreeTraits, TAllocator>::node rb_tree_base<TTreeTraits, TAllocator>::ms_sentinel(
-	internal::rb_tree_base::black, &ms_sentinel, &ms_sentinel, &ms_sentinel);
-
-template<typename TKey, class TAllocator = rde::allocator>
-class rb_tree : public rb_tree_base<internal::rb_tree_traits<TKey>, TAllocator>
-{
-public:
-	explicit rb_tree(allocator_type allocator = allocator_type()): rb_tree_base(allocator) {}
 };
 
 } // rde

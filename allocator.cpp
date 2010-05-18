@@ -1,8 +1,12 @@
-#include "rdestl/allocator.h"
-#include <malloc.h>
+
+#include <cstring>
+
+#include "allocator.h"
 
 namespace rde
 {
+typedef unsigned int size_t;
+    
 //-----------------------------------------------------------------------------
 void* allocator::allocate(size_t bytes, int /*flags*/)
 {

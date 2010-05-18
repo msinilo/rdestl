@@ -1,9 +1,9 @@
 #ifndef RDESTL_VECTOR_H
 #define RDESTL_VECTOR_H
 
-#include "rdestl/algorithm.h"
-#include "rdestl/allocator.h"
-#include "rdestl/rdestl.h"
+#include "rdestl_common.h"
+#include "algorithm.h"
+#include "allocator.h"
 
 // @TODO Wont work on 64-bit!
 // 4267 -- conversion from size_t to int.
@@ -106,12 +106,20 @@ template<typename T, class TAllocator = rde::allocator,
 	class TStorage = standard_vector_storage<T, TAllocator> >
 class vector : public base_vector, private TStorage
 {
+private:
+    using TStorage::m_begin;
+    using TStorage::m_end;
+    using TStorage::m_capacity;
+    using TStorage::m_allocator;
+    using TStorage::invariant;
+    using TStorage::reallocate;
+    
 public:
 	typedef T			value_type;
 	typedef T*			iterator;
 	typedef const T*	const_iterator;
 	typedef TAllocator	allocator_type;
-
+   
 	explicit vector(const allocator_type& allocator = allocator_type())
 	:	TStorage(allocator)
 	{
@@ -132,6 +140,8 @@ public:
 	vector(const vector& rhs, const allocator_type& allocator = allocator_type())
 	:	TStorage(allocator)
 	{
+        if( rhs.size() == 0 ) // nothing to do
+            return;
 		reallocate_discard_old(rhs.capacity());
 		rde::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
 		m_end = m_begin + rhs.size();
@@ -144,8 +154,8 @@ public:
 	}
 	~vector()
 	{
-		if (m_begin != 0)
-			TStorage::destroy(m_begin, size());
+		if (TStorage::m_begin != 0)
+			TStorage::destroy(TStorage::m_begin, size());
 	}
 
 	// @note:	allocator is not copied!
@@ -153,18 +163,23 @@ public:
 	//			just initialize with copy ctor of elements of rhs.
 	vector& operator=(const vector& rhs)
 	{
+        copy(rhs);		
+		return *this;
+	}
+    
+    void copy(const vector& rhs)
+    {
+        if( rhs.size() == 0 ) // nothing to do
+            return;
 		const size_type newSize = rhs.size();
-		if (newSize > m_capacity)
-		{
+		if (newSize > m_capacity) {
 			reallocate_discard_old(rhs.capacity());
 		}
 		rde::copy_construct_n(rhs.m_begin, newSize, m_begin);
 		m_end = m_begin + newSize;
 		TStorage::record_high_watermark();
 		RDE_ASSERT(invariant());
-		
-		return *this;
-	}
+    }
 
 	// @note: swap() not provided for the time being.
 
@@ -200,17 +215,28 @@ public:
 		return *(end() - 1);
 	}
 
-	T& operator[](size_type i)
-	{
-		RDE_ASSERT(i < size());
-		return m_begin[i];
-	}
-	const T& operator[](size_type i) const
-	{
-		RDE_ASSERT(i < size());
-		return m_begin[i];
+	T& operator[](size_type i) 
+    {
+		return at(i);
 	}
 
+	const T& operator[](size_type i) const 
+    {
+        return at(i);
+	}
+
+    T& at(size_type i) 
+    {
+        RDE_ASSERT(i < size());
+		return m_begin[i];
+    }
+
+    const T& at(size_type i) const
+    {
+        RDE_ASSERT(i < size());
+		return m_begin[i];
+    }
+    
 	void push_back(const T& v)
 	{
 		if (size() == m_capacity)
