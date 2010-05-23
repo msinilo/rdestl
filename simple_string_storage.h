@@ -17,13 +17,13 @@ public:
 	:	m_allocator(allocator),
 		m_length(0)
 	{
-		m_data = construct_string(0);
+		m_data = construct_string(0, m_capacity);
 	}
 	simple_string_storage(const value_type* str, const allocator_type& allocator)
 	:	m_allocator(allocator)
 	{
 		const int len = strlen(str);
-		m_data = construct_string(len);
+		m_data = construct_string(len, m_capacity);
 		Sys::MemCpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
@@ -32,7 +32,7 @@ public:
 		const allocator_type& allocator)
 	:	m_allocator(allocator)
 	{
-		m_data = construct_string(len);
+		m_data = construct_string(len, m_capacity);
 		Sys::MemCpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
@@ -41,18 +41,21 @@ public:
 	:	m_allocator(allocator),
 		m_capacity(0), m_length(0)
 	{
-		if (m_data != rhs.c_str()) {
+		if (m_data != rhs.c_str()) 
+		{
 			assign(rhs.c_str(), rhs.length());
 		}
 	}
-	~simple_string_storage()	{
+	~simple_string_storage()	
+	{
 		release_string();
 	}
 
 	// @note: doesnt copy allocator
     simple_string_storage& operator=(const simple_string_storage& rhs)
 	{
-		if (m_data != rhs.c_str()) {
+		if (m_data != rhs.c_str()) 
+		{
 			assign(rhs.c_str(), rhs.length());
 		}
 		return *this;
@@ -65,7 +68,7 @@ public:
 		if (m_capacity <= len + 1)
 		{
 			release_string();
-			m_data = construct_string(len);
+			m_data = construct_string(len, m_capacity);
 		}
 		Sys::MemCpy(m_data, str, len*sizeof(value_type));
 		m_length = len;
@@ -78,14 +81,12 @@ public:
 		const size_type newLen = prevLen + len;
 		if (m_capacity <= newLen + 1)
 		{
-			value_type* newData = construct_string(newLen);
+			size_type newCapacity;
+			value_type* newData = construct_string(newLen, newCapacity);
 			Sys::MemCpy(newData, m_data, prevLen * sizeof(value_type));
-            //fixed: release's assert fails because construct_string changes m_capacity
-            //to reflect newData's capacity and not m_data's actual capacity so we use the 
-            //new function release_string_nocheck which just releases the memory without
-            //paying too much attention to the m_capacity disparity
-			release_string_nocheck(); 			
+			release_string();
             m_data = newData;
+			m_capacity = newCapacity;
 		}
 		Sys::MemCpy(m_data + prevLen, str, len * sizeof(value_type));
 		m_data[newLen] = 0;
@@ -108,7 +109,7 @@ public:
     void clear() 
     {
         release_string();
-        m_data = construct_string(0);
+        m_data = construct_string(0, m_capacity);
         m_length = 0;
     }
     
@@ -127,7 +128,7 @@ protected:
 		return true;
 	}
 private:
-	value_type* construct_string(size_type capacity)
+	value_type* construct_string(size_type capacity, size_type& out_capacity)
 	{  
         value_type* data(0);
         if (capacity != 0)
@@ -145,7 +146,7 @@ private:
             data = &m_end_of_data;
         }
     
-		m_capacity = capacity;
+		out_capacity = capacity;
 		*data = 0;
 		return data;
 	}
@@ -158,13 +159,6 @@ private:
 		}
 	}
     
-    void release_string_nocheck()
-    {
-        //dont free in our empty string situation(s):
-        if( m_capacity && (m_data != &m_end_of_data) )
-            m_allocator.deallocate(m_data, m_capacity);
-    }
-
 	E*			m_data;
 	E			m_end_of_data;
 	size_type	m_capacity;
