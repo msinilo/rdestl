@@ -1,7 +1,7 @@
 #ifndef RDESTL_COW_STRING_STORAGE_H
 #define RDESTL_COW_STRING_STORAGE_H
 
-#include "rdestl_common.h"
+#include "rdestl/rdestl.h"
 
 namespace rde
 {
@@ -184,7 +184,8 @@ protected:
 		{
 			if (capacity_hint > 0)
 			{
-				void* newMem = m_allocator.allocate(capacity_hint);
+				const size_type toAlloc = sizeof(string_rep) + sizeof(value_type)*capacity_hint;
+				void* newMem = m_allocator.allocate(toAlloc);
 				string_rep* newRep = reinterpret_cast<string_rep*>(newMem);
 				newRep->init(short(capacity_hint));
 				value_type* newData = reinterpret_cast<value_type*>(newRep + 1);
