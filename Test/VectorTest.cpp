@@ -264,7 +264,15 @@ namespace
 		CHECK_EQUAL(2, v[1]);
 		CHECK_EQUAL(3, v[2]);
 	}
-    
+
+	TEST(CopyEmpty)
+	{
+		tTestVector v;
+		v.push_back(1); v.push_back(2); v.push_back(3);
+		tTestVector v2;
+		v = v2;
+		CHECK(v.empty());
+	}
 
     //-----------------------------------------------------------------
     //Vector tests by Danushka Abeysuriya silvermace@gmail.com
