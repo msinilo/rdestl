@@ -140,7 +140,7 @@ public:
 	vector(const vector& rhs, const allocator_type& allocator = allocator_type())
 	:	TStorage(allocator)
 	{
-        if( rhs.size() == 0 ) // nothing to do
+        if(rhs.size() == 0) // nothing to do
             return;
 		reallocate_discard_old(rhs.capacity());
 		rde::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
@@ -169,10 +169,9 @@ public:
     
     void copy(const vector& rhs)
     {
-        if( rhs.size() == 0 ) // nothing to do
-            return;
 		const size_type newSize = rhs.size();
-		if (newSize > m_capacity) {
+		if (newSize > m_capacity) 
+		{
 			reallocate_discard_old(rhs.capacity());
 		}
 		rde::copy_construct_n(rhs.m_begin, newSize, m_begin);
