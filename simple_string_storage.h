@@ -14,8 +14,8 @@ public:
 	static const unsigned long	kGranularity = 32;	
 
 	explicit simple_string_storage(const allocator_type& allocator)
-	:	m_allocator(allocator),
-		m_length(0)
+	:	m_length(0),
+		m_allocator(allocator)
 	{
 		m_data = construct_string(0, m_capacity);
 	}
@@ -38,13 +38,12 @@ public:
 		m_data[len] = 0;
 	}
 	simple_string_storage(const simple_string_storage& rhs, const allocator_type& allocator)
-	:	m_allocator(allocator),
-		m_capacity(0), m_length(0)
+	:	m_data(0),
+		m_capacity(0), 
+		m_length(0),
+		m_allocator(allocator)
 	{
-		if (m_data != rhs.c_str()) 
-		{
-			assign(rhs.c_str(), rhs.length());
-		}
+		assign(rhs.c_str(), rhs.length());
 	}
 	~simple_string_storage()	
 	{
