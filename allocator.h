@@ -17,6 +17,7 @@ public:
 	//allocator& operator=(const allocator&)
 
 	void* allocate(unsigned int bytes, int flags = 0);
+	// Not supported for standard allocator for the time being.
 	void* allocate_aligned(unsigned int bytes, unsigned int alignment, int flags = 0);
 	void deallocate(void* ptr, unsigned int bytes);
 
@@ -34,6 +35,16 @@ inline bool operator==(const allocator& /*lhs*/, const allocator& /*rhs*/)
 inline bool operator!=(const allocator& lhs, const allocator& rhs)
 {
 	return !(lhs == rhs);
+}
+
+inline void* allocator::allocate(unsigned int bytes, int)
+{
+	return operator new(bytes);
+}
+
+inline void allocator::deallocate(void* ptr, unsigned int)
+{
+	operator delete(ptr);
 }
 
 } // namespace rde
