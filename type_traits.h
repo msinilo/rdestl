@@ -80,6 +80,14 @@ template<typename T> struct has_trivial_destructor
 	};
 };
 
+template<typename T> struct has_cheap_compare
+{
+	enum
+	{
+		value = has_trivial_copy<T>::value && sizeof(T) <= 4
+	};
+};
+
 } // namespace rde
 
 //-----------------------------------------------------------------------------
