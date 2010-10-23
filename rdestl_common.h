@@ -2,25 +2,28 @@
 #define RDESTL_COMMON_H
 
 #ifndef RDESTL_STANDALONE
-#	define RDESTL_STANDALONE	1
+#	define RDESTL_STANDALONE	0
 #endif
 
 #if RDESTL_STANDALONE
 #  ifdef _MSC_VER
 #	include <cassert>
 #	include <cstring>
+#	define RDE_FORCEINLINE	__forceinline
 #  else
 #   include <assert.h>
 #   include <cstdlib>
 #   include <cstring>
-#  endif
-#	define RDE_ASSERT		assert
-// @note; __forceinline for MSVC!
 #	define RDE_FORCEINLINE	inline
+#  endif
+
 #	ifdef _DEBUG
 #		undef RDE_DEBUG
 #		define RDE_DEBUG	1
 #	endif
+
+#	define RDE_ASSERT	assert
+
 	namespace rde 
 	{ 
 		// # Meh. MSVC doesnt seem to have <stdint.h>
