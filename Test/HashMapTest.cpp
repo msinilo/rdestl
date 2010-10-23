@@ -117,5 +117,5 @@ template rde::hash_map<std::string, int, hasher, 6>;
 		m.erase(m.begin(), m.end());
 		CHECK(m.empty());
 	}
+}	
 
-}
