@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="stltest"
 	ProjectGUID="{047B2954-859C-11DC-8314-0800200C9A66}"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -62,11 +61,11 @@
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="PreCompiled.h"
 				WarningLevel="4"
-				WarnAsError="true"
+				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 				CompileAs="0"
-				DisableSpecificWarnings="4267;4511;4512;4127;4996"
+				DisableSpecificWarnings="4511;4512;4127;4996"
 				UseFullPaths="false"
 			/>
 			<Tool
@@ -121,7 +120,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -183,7 +186,7 @@
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 				CompileAs="0"
-				DisableSpecificWarnings="4512;4127;4996;4291"
+				DisableSpecificWarnings="4511;4512;4127;4996"
 				UseFullPaths="false"
 			/>
 			<Tool
@@ -218,7 +221,7 @@
 				TargetMachine="1"
 				AllowIsolation="true"
 				Profile="false"
-			/>
+			/>			
 			<Tool
 				Name="VCALinkTool"
 			/>
@@ -238,7 +241,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -301,7 +308,7 @@
 				DebugInformationFormat="3"
 				CallingConvention="1"
 				CompileAs="0"
-				DisableSpecificWarnings="4512;4127;4996;4291;4530"
+				DisableSpecificWarnings="4511;4512;4127;4996"
 				UseFullPaths="false"
 			/>
 			<Tool
@@ -336,7 +343,7 @@
 				TargetMachine="1"
 				AllowIsolation="true"
 				Profile="false"
-			/>
+			/>			
 			<Tool
 				Name="VCALinkTool"
 			/>
@@ -356,7 +363,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -419,7 +430,7 @@
 				DebugInformationFormat="3"
 				CallingConvention="1"
 				CompileAs="0"
-				DisableSpecificWarnings="4512;4127;4996;4291;4530"
+				DisableSpecificWarnings="4511;4512;4127;4996"
 				UseFullPaths="false"
 			/>
 			<Tool
@@ -454,7 +465,7 @@
 				TargetMachine="1"
 				AllowIsolation="true"
 				Profile="false"
-			/>
+			/>			
 			<Tool
 				Name="VCALinkTool"
 			/>
@@ -474,7 +485,11 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
+				Description=""
 				CommandLine=""
 				ExcludedFromBuild="false"
 			/>
@@ -483,6 +498,14 @@
 	<References>
 	</References>
 	<Files>
+		<File
+			RelativePath="..\..\HashMapTestInc.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\StringTestInc.h"
+			>
+		</File>
 		<File
 			RelativePath="..\..\AlgoTest.cpp"
 			>
@@ -506,18 +529,6 @@
 		<File
 			RelativePath="..\..\HashMapTest.cpp"
 			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					AssemblerOutput="4"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\HashMapTestInc.h"
-			>
 		</File>
 		<File
 			RelativePath="..\..\IntrusiveListTest.cpp"
@@ -529,6 +540,18 @@
 		</File>
 		<File
 			RelativePath="..\..\ListTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\MapSpeedTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\MapTest.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\RBTreeTest.cpp"
 			>
 		</File>
 		<File
@@ -552,11 +575,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\StringTestInc.h"
+			RelativePath="..\..\TestMain.cpp"
 			>
 		</File>
 		<File
-			RelativePath="..\..\TestMain.cpp"
+			RelativePath="..\..\TreapTest.cpp"
 			>
 		</File>
 		<File
