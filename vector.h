@@ -37,17 +37,15 @@ struct standard_vector_storage
 	{
 	}
 
-	void reallocate(base_vector::size_type newCapacity)
+	void reallocate(base_vector::size_type newCapacity, base_vector::size_type oldSize)
 	{
 		T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-		const size_t s(m_end - m_begin);
-		const base_vector::size_type currSize(s);
-		const base_vector::size_type newSize = currSize < newCapacity ? currSize : newCapacity;
+		const base_vector::size_type newSize = oldSize < newCapacity ? oldSize : newCapacity;
 		// Copy old data if needed.
 		if (m_begin)
 		{
 			rde::copy_construct_n(m_begin, newSize, newBegin);
-			destroy(m_begin, currSize);
+			destroy(m_begin, oldSize);
 		}
 		m_begin = newBegin;
 		m_end = m_begin + newSize;
@@ -236,11 +234,15 @@ public:
     
 	void push_back(const T& v)
 	{
-		if (m_end == m_capacityEnd)
+		if (m_end < m_capacityEnd)
+		{
+			rde::copy_construct(m_end++, v);
+		}
+		else
+		{
 			grow();
-
-		rde::copy_construct(m_end, v);
-		++m_end;
+			rde::copy_construct(m_end++, v);
+		}
 		TStorage::record_high_watermark();
 	}
 	// @note: extension. Use instead of push_back(T()) or resize(size() + 1).
@@ -269,7 +271,8 @@ public:
 		RDE_ASSERT(count > 0);
 		clear();
 		if (m_begin + count > m_capacityEnd)
-			grow_discard_old(count);
+			reallocate_discard_old(compute_new_capacity(count));
+
 		rde::copy_n(first, count, m_begin);
 		m_end = m_begin + count;
 		TStorage::record_high_watermark();
@@ -282,7 +285,9 @@ public:
 		const size_type indexEnd = index + n;
 		const size_type prevSize = size();
 		if (m_end + n > m_capacityEnd)
-			grow(prevSize + n);
+		{
+			reallocate(compute_new_capacity(prevSize + n), prevSize);
+		}
 
 		// Past 'end', needs to copy construct.
 		if (indexEnd > prevSize)
@@ -403,7 +408,7 @@ public:
 	void reserve(size_type n)
 	{
 		if (n > capacity())			
-			reallocate(n);
+			reallocate(n, size());
 	}
 
 	// Removes all elements from this vector (calls their destructors).
@@ -425,7 +430,7 @@ public:
 	// Extension: allows to limit amount of allocated memory.
 	void set_capacity(size_type newCapacity)
 	{
-		reallocate(newCapacity);
+		reallocate(newCapacity, size());
 	}
 
 	size_type index_of(const T& item, size_type index = 0) const
@@ -468,15 +473,9 @@ private:
 	}
 	inline void grow()
 	{
-		reallocate((m_capacityEnd == 0 ? kInitialCapacity : capacity() * 2));
-	}
-	void grow(size_type newMinCapacity)
-	{
-		reallocate(compute_new_capacity(newMinCapacity));
-	}
-	void grow_discard_old(size_type newMinCapacity = 0)
-	{
-		reallocate_discard_old(compute_new_capacity(newMinCapacity));
+		RDE_ASSERT(m_end == m_capacityEnd);	// size == capacity!
+		const size_type c = capacity();
+		reallocate((m_capacityEnd == 0 ? kInitialCapacity : c * 2), c);
 	}
 	RDE_FORCEINLINE void shrink(size_type newSize)
 	{

@@ -33,7 +33,7 @@ struct fixed_vector_storage
 	}
 
 	// @note	Cant shrink
-	void reallocate(base_vector::size_type newCapacity)
+	void reallocate(base_vector::size_type newCapacity, base_vector::size_type oldSize)
 	{
 		if (!TGrowOnOverflow)
 		{
@@ -41,13 +41,12 @@ struct fixed_vector_storage
 			// @TODO: do something more spectacular here... do NOT throw exception, tho :)
 		}
 		T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-		const base_vector::size_type currSize((size_t)(m_end - m_begin));
-		const base_vector::size_type newSize = currSize < newCapacity ? currSize : newCapacity;
+		const base_vector::size_type newSize = oldSize < newCapacity ? oldSize : newCapacity;
 		// Copy old data if needed.
 		if (m_begin)
 		{
 			rde::copy_construct_n(m_begin, newSize, newBegin);
-			destroy(m_begin, currSize);
+			destroy(m_begin, oldSize);
 		}
 		m_begin = newBegin;
 		m_end = m_begin + newSize;
