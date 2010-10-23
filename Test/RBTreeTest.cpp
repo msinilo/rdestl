@@ -9,8 +9,6 @@ namespace
 
 	bool hasKeyType = sizeof(HasKeyType<std::map<int, int> >(0)) != sizeof(char);
 
-
-
 	TEST(DefaultCtorEmptyTree)
 	{
 		rde::rb_tree<int> t;
@@ -43,7 +41,6 @@ namespace
 		t.insert(5);
 		t.insert(8);
 		CHECK_EQUAL(8, t.size());
-		//RDE_ASSERT_MSG(t.size() == 8, ("Size == %d", t.size()));
 		t.traverse(PrintNode);
 	}
 
