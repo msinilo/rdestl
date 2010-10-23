@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="rdestl"
 	ProjectGUID="{2E3C8BF2-8595-11DC-8314-0800200C9A66}"
 	Keyword="Win32Proj"
@@ -441,6 +441,10 @@
 		</File>
 		<File
 			RelativePath="..\..\functional.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\hash.h"
 			>
 		</File>
 		<File
