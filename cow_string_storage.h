@@ -150,7 +150,7 @@ public:
 	{
 		string_rep* rep = get_rep();
 		make_unique(size);
-		rep->size = size;
+		rep->size = (short)size;
 		m_data[size] = 0;
 	}
 
