@@ -68,7 +68,7 @@ struct standard_vector_storage
 		m_capacityEnd = m_begin + newCapacity;
 		RDE_ASSERT(invariant());
 	}
-	RDE_FORCEINLINE void destroy(T* ptr, base_vector::size_type n)
+	void destroy(T* ptr, base_vector::size_type n)
 	{
 		rde::destruct_n(ptr, n);
 		m_allocator.deallocate(ptr, n * sizeof(T));
