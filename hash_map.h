@@ -4,56 +4,12 @@
 #include "algorithm.h"
 #include "allocator.h"
 #include "functional.h"
+#include "hash.h"
 #include "pair.h"
-#include "rde_string.h"
 
 namespace rde
 {
-typedef unsigned long	hash_value_t;
-    
-// Default implementations, just casts to hash_value.
-template<typename T>
-hash_value_t extract_int_key_value(const T& t)
-{
-	return (hash_value_t)t;
-}
  
-// Default implementation of hasher.
-// Works for keys that can be converted to 32-bit integer
-// with extract_int_key_value.
-// Algorithm by Robert Jenkins.
-// (see http://www.cris.com/~Ttwang/tech/inthash.htm for example).
-template<typename T>
-struct hash
-{
-	hash_value_t operator()(const T& t) const
-	{
-		hash_value_t a = extract_int_key_value(t);
-        a = (a+0x7ed55d16) + (a<<12);
-        a = (a^0xc761c23c) ^ (a>>19);
-        a = (a+0x165667b1) + (a<<5);
-        a = (a+0xd3a2646c) ^ (a<<9);
-        a = (a+0xfd7046c5) + (a<<3);
-        a = (a^0xb55a4f09) ^ (a>>16);
-        return a;
-	}
-};
- 
-//Added specialisation for rde::string so you can have MyHashMap["MyLiteralKey"] type operations
-template< > 
-struct hash< rde::string >
-{
-    hash_value_t operator()( const rde::string& x ) const 
-    {
-        //derived from: http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/142054
-        hash_value_t h = 0;
-        for(size_t p=0; p<(size_t)x.length(); ++p) {
-            h = x[p] + (h<<6) + (h<<16) - h;
-        }
-        return h & 0x7FFFFFFF;
-    }
-};
-
 template<typename TKey, typename TValue, 
 		class THashFunc = rde::hash<TKey>,
 		int TLoadFactor4 = 6,
@@ -76,8 +32,8 @@ private:
         RDE_FORCEINLINE bool is_deleted() const     { return hash == kDeletedHash; }
         RDE_FORCEINLINE bool is_occupied() const	{ return hash < kDeletedHash; }
 
+		hash_value_t    hash;
         value_type      data;
-        hash_value_t    hash;
 	};
 	template<typename TNodePtr, typename TPtr, typename TRef>
     class node_iterator
@@ -105,7 +61,7 @@ private:
         {
 			return &m_node->data;
 		}
-        TNodePtr node() const
+        RDE_FORCEINLINE TNodePtr node() const
         {
 			return m_node;
 		}
@@ -124,9 +80,9 @@ private:
             return copy;
 		}
 
-        bool operator==(const node_iterator& rhs) const
+        RDE_FORCEINLINE bool operator==(const node_iterator& rhs) const
         {
-			return rhs.m_node == m_node && m_map == rhs.get_map();
+			return rhs.m_node == m_node;
 		}
         bool operator!=(const node_iterator& rhs) const
         {
@@ -160,16 +116,18 @@ public:
 	static const size_type														kInitialCapacity = 64;
 
 	hash_map()
-	:	m_nodes(0),
+	:	m_nodes(&ms_emptyNode),
 		m_size(0),
 		m_capacity(0),
+		m_capacityMask(0),
 		m_numUsed(0)
 	{
 	}
 	explicit hash_map(const allocator_type& allocator)
-    :	m_nodes(0),
+    :	m_nodes(&ms_emptyNode),
         m_size(0),
         m_capacity(0),
+		m_capacityMask(0),
         m_numUsed(0),
         m_allocator(allocator)
 	{
@@ -177,9 +135,10 @@ public:
 	}
 	explicit hash_map(size_type initial_bucket_count,
 		const allocator_type& allocator = allocator_type())
-    :	m_nodes(0),
+    :	m_nodes(&ms_emptyNode),
         m_size(0),
         m_capacity(0),
+		m_capacityMask(0),
         m_numUsed(0),
         m_allocator(allocator)
 	{
@@ -188,9 +147,10 @@ public:
 	hash_map(size_type initial_bucket_count,
 		const THashFunc& hashFunc, 
 		const allocator_type& allocator = allocator_type())
-    :	m_nodes(0),
+    :	m_nodes(&ms_emptyNode),
         m_size(0),
         m_capacity(0),
+		m_capacityMask(0),
         m_numUsed(0),
 		m_hashFunc(hashFunc),
         m_allocator(allocator)
@@ -198,9 +158,10 @@ public:
 		reserve(initial_bucket_count);
 	}
 	hash_map(const hash_map& rhs, const allocator_type& allocator = allocator_type())
-    :	m_nodes(0),
+    :	m_nodes(&ms_emptyNode),
         m_size(0),
         m_capacity(0),
+		m_capacityMask(0),
         m_numUsed(0),
         m_allocator(allocator)
 	{
@@ -243,7 +204,7 @@ public:
 		}
 		return n->data.second;
 	}
-	// @mote:	Doesnt copy allocator.
+	// @note:	Doesn't copy allocator.
 	hash_map& operator=(const hash_map& rhs)
 	{
 		RDE_ASSERT(invariant());
@@ -255,8 +216,9 @@ public:
 				delete_nodes();
 				m_nodes = allocate_nodes(rhs.bucket_count());
 				m_capacity = rhs.bucket_count();
+				m_capacityMask = m_capacity - 1;
 			}
-			rehash(m_capacity, m_nodes, m_capacity, rhs.m_nodes, false);
+			rehash(m_capacity, m_nodes, rhs.m_capacity, rhs.m_nodes, false);
 			m_size = rhs.size();
 			m_numUsed = rhs.m_numUsed;
 		}
@@ -272,6 +234,7 @@ public:
 			rde::swap(m_nodes, rhs.m_nodes);
 			rde::swap(m_size, rhs.m_size);
 			rde::swap(m_capacity, rhs.m_capacity);
+			rde::swap(m_capacityMask, rhs.m_capacityMask);
 			rde::swap(m_numUsed, rhs.m_numUsed);
 			rde::swap(m_hashFunc, rhs.m_hashFunc);
 			rde::swap(m_keyEqualFunc, rhs.m_keyEqualFunc);
@@ -305,7 +268,7 @@ public:
 	size_type erase(const key_type& key)
     {
 		node* n = lookup(key);
-        if (n != 0 && n->is_occupied())
+        if (n != (m_nodes + m_capacity) && n->is_occupied())
         {
 			erase_node(n);
             return 1;
@@ -334,12 +297,12 @@ public:
 	iterator find(const key_type& key)
     {
 		node* n = lookup(key);
-        return n == 0 ? end() : iterator(n, this);
+        return iterator(n, this);
 	}
 	const_iterator find(const key_type& key) const
 	{
 		const node* n = lookup(key);
-		return n == 0 ? end() : const_iterator(n, this);
+		return const_iterator(n, this);
 	}
 
 	void clear()
@@ -399,8 +362,10 @@ private:
 		RDE_ASSERT((new_capacity & (new_capacity - 1)) == 0);	// Must be power-of-two
 		node* newNodes = allocate_nodes(new_capacity);
 		rehash(new_capacity, newNodes, m_capacity, m_nodes, true);
-		m_allocator.deallocate(m_nodes, sizeof(node) * m_capacity);
+		if (m_nodes != &ms_emptyNode)
+			m_allocator.deallocate(m_nodes, sizeof(node) * m_capacity);
 		m_capacity = new_capacity;
+		m_capacityMask = new_capacity - 1;
 		m_nodes = newNodes;
 		m_numUsed = m_size;
 		RDE_ASSERT(m_numUsed < m_capacity);
@@ -428,8 +393,7 @@ private:
 
 		const hash_value_t hash = hash_func(key);
         *out_hash = hash;
-        const uint32 mask = m_capacity - 1;
-        uint32 i = hash & mask;
+        uint32 i = hash & m_capacityMask;
 
         node* n = m_nodes + i;
 		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
@@ -444,9 +408,9 @@ private:
         while (!n->is_unused())
         {
 			++numProbes;
-            i = (i + numProbes) & mask;
+            i = (i + numProbes) & m_capacityMask;
             n = m_nodes + i;
-			if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
+			if (compare_key(n, key, hash))
 				return n;
             if (n->is_deleted() && freeNode == 0)
 				freeNode = n;
@@ -455,33 +419,38 @@ private:
 	}
 	node* lookup(const key_type& key) const
 	{
-		if (empty())
-			return 0;
-
 		const hash_value_t hash = hash_func(key);
-        const uint32 mask = m_capacity - 1;
-        uint32 i = hash & mask;
+        uint32 i = hash & m_capacityMask;
         node* n = m_nodes + i;
+		// In theory, we could try to use compare_key here, it would
+		// be a little bit faster for keys with cheap_compare. However, if keys are
+		// not totally destroyed on removal (erase_node), this could result in returning
+		// unused nodes. By testing hashes - we make sure it does not happen.
+		// This could also be solved by doing what Google does -- set_empty_key/set_deleted_key,
+		// but for the time being it doesn't look to me like it's worth it.
+		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
+			return n;
+
 		uint32 numProbes(0);
         // Guarantees loop termination.
-        RDE_ASSERT(m_numUsed < m_capacity);
+        RDE_ASSERT(m_capacity == 0 || m_numUsed < m_capacity);
         while (!n->is_unused())
         {
-			if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
-				return n;
-
 			++numProbes;
-            i = (i + numProbes) & mask;
+            i = (i + numProbes) & m_capacityMask;
             n = m_nodes + i;
+
+			if (compare_key(n, key, hash))
+				return n;
 		}
-        return 0;
+		return m_nodes + m_capacity;
 	}
 
 	static void rehash(int new_capacity, node* new_nodes,
 		int capacity, const node* nodes, bool destruct_original)
 	{
-        if( !nodes || !new_nodes ) //incomplete initialization, nothing to do
-            return;
+        //if (nodes == &ms_emptyNode || new_nodes == &ms_emptyNode)
+          //  return;
         
 		const node* it = nodes;
 		const node* itEnd = nodes + capacity;
@@ -530,8 +499,11 @@ private:
 				rde::destruct(&it->data);
 			++it;
 		}
-		m_allocator.deallocate(m_nodes, sizeof(node) * m_capacity);
+		if (m_nodes != &ms_emptyNode)
+			m_allocator.deallocate(m_nodes, sizeof(node) * m_capacity);
+
         m_capacity = 0;
+		m_capacityMask = 0;
         m_size = 0;
 	}
 	void erase_node(node* n)
@@ -549,21 +521,49 @@ private:
 		//RDE_ASSERT(h < node::kDeletedHash);
         return h;
 	}
-	bool invariant()
+	bool invariant() const
 	{
 		RDE_ASSERT((m_capacity & (m_capacity - 1)) == 0);
 		RDE_ASSERT(m_numUsed >= m_size);
 		return true;
 	}
 
+	RDE_FORCEINLINE bool compare_key(const node* n, const key_type& key, hash_value_t hash,
+		int_to_type<false>) const
+	{
+		return (n->hash == hash && m_keyEqualFunc(key, n->data.first));
+	}
+	RDE_FORCEINLINE bool compare_key(const node* n, const key_type& key, hash_value_t,
+		int_to_type<true>) const
+	{
+		return m_keyEqualFunc(key, n->data.first);
+	}
+	RDE_FORCEINLINE bool compare_key(const node* n, const key_type& key, hash_value_t hash) const
+	{
+		return compare_key(n, key, hash, int_to_type<has_cheap_compare<TKey>::value>());
+	}
+
 	node*			m_nodes;
 	int				m_size;
 	int				m_capacity;
+	uint32			m_capacityMask;
 	int				m_numUsed;
 	THashFunc       m_hashFunc;
 	TKeyEqualFunc	m_keyEqualFunc;
 	TAllocator      m_allocator;
+
+	static node		ms_emptyNode;
 };
+
+
+// Holy ...
+template<typename TKey, typename TValue, 
+		class THashFunc,
+		int TLoadFactor4,
+		class TKeyEqualFunc,
+		class TAllocator>
+typename hash_map<TKey, TValue, THashFunc, TLoadFactor4, TKeyEqualFunc, TAllocator>::node hash_map<TKey, TValue, THashFunc, TLoadFactor4, TKeyEqualFunc, TAllocator>::ms_emptyNode;
+
 }
 
 #endif
