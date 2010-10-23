@@ -20,7 +20,7 @@ struct fixed_vector_storage
 	explicit fixed_vector_storage(const TAllocator& allocator)
 	:	m_begin((T*)&m_data[0]),
 		m_end(m_begin),
-		m_capacity(TCapacity),
+		m_capacityEnd(m_begin + TCapacity),
 		m_allocator(allocator)
 #if RDESTL_RECORD_WATERMARKS
 		, m_max_size(0)
@@ -33,38 +33,33 @@ struct fixed_vector_storage
 	}
 
 	// @note	Cant shrink
-	void reallocate(base_vector::size_type newCapacity, bool /*canShrink*/ = false)
+	void reallocate(base_vector::size_type newCapacity)
 	{
-		if (newCapacity > m_capacity)
+		if (!TGrowOnOverflow)
 		{
-			if (!TGrowOnOverflow)
-			{
-				RDE_ASSERT(!"fixed_vector cannot grow");
-				// @TODO: do something more spectacular here... do NOT throw exception, tho :)
-			}
-
-			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-			const base_vector::size_type currSize((size_t)(m_end - m_begin));
-			const base_vector::size_type newSize = currSize < newCapacity ? 
-				currSize : newCapacity;
-			// Copy old data if needed.
-			if (m_begin)
-			{
-				rde::copy_construct_n(m_begin, newSize, newBegin);
-				destroy(m_begin, currSize);
-			}
-			m_begin = newBegin;
-			m_end = m_begin + newSize;
-			m_capacity = newCapacity;
-			record_high_watermark();
-			RDE_ASSERT(invariant());
+			RDE_ASSERT(!"fixed_vector cannot grow");
+			// @TODO: do something more spectacular here... do NOT throw exception, tho :)
 		}
+		T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
+		const base_vector::size_type currSize((size_t)(m_end - m_begin));
+		const base_vector::size_type newSize = currSize < newCapacity ? currSize : newCapacity;
+		// Copy old data if needed.
+		if (m_begin)
+		{
+			rde::copy_construct_n(m_begin, newSize, newBegin);
+			destroy(m_begin, currSize);
+		}
+		m_begin = newBegin;
+		m_end = m_begin + newSize;
+		m_capacityEnd = m_begin + newCapacity;
+		record_high_watermark();
+		RDE_ASSERT(invariant());
 	}
 
 	// Reallocates memory, doesnt copy contents of old buffer.
 	void reallocate_discard_old(base_vector::size_type newCapacity)
 	{
-		if (newCapacity > m_capacity)
+		if (newCapacity > base_vector::size_type(m_capacityEnd - m_begin))
 		{
 			if (!TGrowOnOverflow)
 			{
@@ -77,7 +72,7 @@ struct fixed_vector_storage
 			m_begin = newBegin;
 			m_end = m_begin + currSize;
 			record_high_watermark();
-			m_capacity = newCapacity;
+			m_capacityEnd = m_begin + newCapacity;
 		}
 		RDE_ASSERT(invariant());
 	}
@@ -104,7 +99,7 @@ struct fixed_vector_storage
 #if RDESTL_RECORD_WATERMARKS
 		return m_max_size;
 #else
-		return m_capacity;	// ???
+		return TCapacity;	// ???
 #endif
 	}
 
@@ -114,9 +109,7 @@ struct fixed_vector_storage
 	T*						m_end;
 	// Not T[], because we need uninitialized memory.
 	etype_t					m_data[(TCapacity * sizeof(T)) / sizeof(etype_t)];
-	// @todo: m_capacity is not really needed for containers that
-	// cant overflow.
-	base_vector::size_type	m_capacity;
+	T*						m_capacityEnd;
 	TAllocator				m_allocator;
 #if RDESTL_RECORD_WATERMARKS
 	base_vector::size_type	m_max_size;
@@ -165,7 +158,8 @@ public:
 
 	fixed_vector& operator=(const fixed_vector& rhs)
 	{
-		if (&rhs != this){
+		if (&rhs != this)
+		{
             base_vector::copy(rhs);
 		}
 		return *this;

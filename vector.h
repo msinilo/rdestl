@@ -28,7 +28,7 @@ struct standard_vector_storage
 	explicit standard_vector_storage(const TAllocator& allocator)
 	:	m_begin(0),
 		m_end(0),
-		m_capacity(0),
+		m_capacityEnd(0),
 		m_allocator(allocator)
 	{
 		/**/
@@ -37,38 +37,35 @@ struct standard_vector_storage
 	{
 	}
 
-	void reallocate(base_vector::size_type newCapacity, bool canShrink = false)
+	void reallocate(base_vector::size_type newCapacity)
 	{
-		if (canShrink || newCapacity > m_capacity)
+		T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
+		const size_t s(m_end - m_begin);
+		const base_vector::size_type currSize(s);
+		const base_vector::size_type newSize = currSize < newCapacity ? currSize : newCapacity;
+		// Copy old data if needed.
+		if (m_begin)
 		{
-			T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-			const size_t s(m_end - m_begin);
-			const base_vector::size_type currSize(s);
-			const base_vector::size_type newSize = currSize < newCapacity ? currSize : newCapacity;
-			// Copy old data if needed.
-			if (m_begin)
-			{
-				rde::copy_construct_n(m_begin, newSize, newBegin);
-				destroy(m_begin, currSize);
-			}
-			m_begin = newBegin;
-			m_end = m_begin + newSize;
-			m_capacity = newCapacity;
-			RDE_ASSERT(invariant());
+			rde::copy_construct_n(m_begin, newSize, newBegin);
+			destroy(m_begin, currSize);
 		}
+		m_begin = newBegin;
+		m_end = m_begin + newSize;
+		m_capacityEnd = m_begin + newCapacity;
+		RDE_ASSERT(invariant());
 	}
 
 	// Reallocates memory, doesnt copy contents of old buffer.
 	void reallocate_discard_old(base_vector::size_type newCapacity)
 	{
-		RDE_ASSERT(newCapacity > m_capacity);
+		RDE_ASSERT(newCapacity > base_vector::size_type(m_capacityEnd - m_begin));
 		T* newBegin = static_cast<T*>(m_allocator.allocate(newCapacity * sizeof(T)));
-		const base_vector::size_type currSize((size_t)(m_end - m_begin));
+		const base_vector::size_type currSize((base_vector::size_type)(m_end - m_begin));
 		if (m_begin)
 			destroy(m_begin, currSize);
 		m_begin = newBegin;
 		m_end = m_begin + currSize;
-		m_capacity = newCapacity;
+		m_capacityEnd = m_begin + newCapacity;
 		RDE_ASSERT(invariant());
 	}
 	RDE_FORCEINLINE void destroy(T* ptr, base_vector::size_type n)
@@ -82,7 +79,7 @@ struct standard_vector_storage
 			m_allocator.deallocate(m_begin, (m_end - m_begin) * sizeof(T));
 
 		m_begin = m_end = 0;
-		m_capacity = 0;
+		m_capacityEnd = 0;
 	}
 	bool invariant() const
 	{
@@ -93,10 +90,10 @@ struct standard_vector_storage
 		// empty
 	}
 
-	T*						m_begin;
-	T*						m_end;
-	base_vector::size_type	m_capacity;
-	TAllocator				m_allocator;
+	T*			m_begin;
+	T*			m_end;
+	T*			m_capacityEnd;
+	TAllocator	m_allocator;
 };
 
 //=============================================================================
@@ -109,16 +106,17 @@ class vector : public base_vector, private TStorage
 private:
     using TStorage::m_begin;
     using TStorage::m_end;
-    using TStorage::m_capacity;
+    using TStorage::m_capacityEnd;
     using TStorage::m_allocator;
     using TStorage::invariant;
     using TStorage::reallocate;
     
 public:
-	typedef T			value_type;
-	typedef T*			iterator;
-	typedef const T*	const_iterator;
-	typedef TAllocator	allocator_type;
+	typedef T				value_type;
+	typedef T*				iterator;
+	typedef const T*		const_iterator;
+	typedef TAllocator		allocator_type;
+	static const size_type	kInitialCapacity = 16;
    
 	explicit vector(const allocator_type& allocator = allocator_type())
 	:	TStorage(allocator)
@@ -170,7 +168,7 @@ public:
     void copy(const vector& rhs)
     {
 		const size_type newSize = rhs.size();
-		if (newSize > m_capacity) 
+		if (newSize > capacity())
 		{
 			reallocate_discard_old(rhs.capacity());
 		}
@@ -188,7 +186,7 @@ public:
 	const_iterator end() const		{ return m_end; }
 	size_type size() const			{ return size_type(m_end - m_begin); }
 	bool empty() const				{ return m_begin == m_end; }
-	size_type capacity() const		{ return m_capacity; }
+	size_type capacity() const		{ return size_type(m_capacityEnd - m_begin); }
 
 	T* data()				{ return empty() ? 0 : m_begin; }
 	const T* data() const	{ return empty() ? 0 : m_begin; }
@@ -238,8 +236,9 @@ public:
     
 	void push_back(const T& v)
 	{
-		if (size() == m_capacity)
+		if (m_end == m_capacityEnd)
 			grow();
+
 		rde::copy_construct(m_end, v);
 		++m_end;
 		TStorage::record_high_watermark();
@@ -247,7 +246,7 @@ public:
 	// @note: extension. Use instead of push_back(T()) or resize(size() + 1).
 	void push_back()
 	{
-		if (size() == m_capacity)
+		if (m_end == m_capacityEnd)
 			grow();
 		rde::construct(m_end);
 		++m_end;
@@ -269,7 +268,7 @@ public:
 		const size_type count = size_type(last - first);
 		RDE_ASSERT(count > 0);
 		clear();
-		if (count > m_capacity)
+		if (m_begin + count > m_capacityEnd)
 			grow_discard_old(count);
 		rde::copy_n(first, count, m_begin);
 		m_end = m_begin + count;
@@ -282,7 +281,7 @@ public:
 		RDE_ASSERT(invariant());
 		const size_type indexEnd = index + n;
 		const size_type prevSize = size();
-		if (prevSize + n > m_capacity)
+		if (m_end + n > m_capacityEnd)
 			grow(prevSize + n);
 
 		// Past 'end', needs to copy construct.
@@ -322,12 +321,12 @@ public:
 	{
 		RDE_ASSERT(validate_iterator(it));
 		RDE_ASSERT(invariant());
-		const size_type index = (size_t)(it - m_begin);
+		const size_type index = (size_type)(it - m_begin);
 		const size_type prevSize = size();
 		RDE_ASSERT(index <= prevSize);
 		const size_type toMove = prevSize - index;
 		// @todo: optimize for toMove==0 --> push_back here?
-		if (prevSize == m_capacity)
+		if (m_end == m_capacityEnd)
 		{
 			grow();
 			it = m_begin + index;
@@ -403,11 +402,12 @@ public:
 	}
 	void reserve(size_type n)
 	{
-		reallocate(n);
+		if (n > capacity())			
+			reallocate(n);
 	}
 
 	// Removes all elements from this vector (calls their destructors).
-	// Doesnt release memory.
+	// Doesn't release memory.
 	void clear()
 	{
 		shrink(0);
@@ -422,9 +422,10 @@ public:
 		RDE_ASSERT(invariant());
 	}
 
+	// Extension: allows to limit amount of allocated memory.
 	void set_capacity(size_type newCapacity)
 	{
-		reallocate(newCapacity, true);
+		reallocate(newCapacity);
 	}
 
 	size_type index_of(const T& item, size_type index = 0) const
@@ -460,15 +461,20 @@ public:
 	}
 
 private:
-	RDE_FORCEINLINE size_type compute_new_capacity(size_type newMinCapacity) const
+	size_type compute_new_capacity(size_type newMinCapacity) const
 	{
-		return (newMinCapacity > m_capacity * 2 ? newMinCapacity : (m_capacity == 0 ? 16 : m_capacity * 2));
+		const size_type c = capacity();
+		return (newMinCapacity > c * 2 ? newMinCapacity : (c == 0 ? kInitialCapacity : c * 2));
 	}
-	RDE_FORCEINLINE void grow(size_type newMinCapacity = 0)
+	inline void grow()
+	{
+		reallocate((m_capacityEnd == 0 ? kInitialCapacity : capacity() * 2));
+	}
+	void grow(size_type newMinCapacity)
 	{
 		reallocate(compute_new_capacity(newMinCapacity));
 	}
-	RDE_FORCEINLINE void grow_discard_old(size_type newMinCapacity = 0)
+	void grow_discard_old(size_type newMinCapacity = 0)
 	{
 		reallocate_discard_old(compute_new_capacity(newMinCapacity));
 	}
