@@ -1,10 +1,10 @@
 #ifndef RDESTL_MAP_H
 #define RDESTL_MAP_H
 
-#include "rdestl/algorithm.h"
-#include "rdestl/iterator.h"
-#include "rdestl/pair.h"
-#include "rdestl/rb_tree.h"
+#include "algorithm.h"
+#include "iterator.h"
+#include "pair.h"
+#include "rb_tree.h"
 
 namespace rde
 {
