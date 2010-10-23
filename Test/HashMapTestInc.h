@@ -171,6 +171,15 @@
 		CHECK_EQUAL(7, b.find("brave")->second);
 		CHECK_EQUAL(10, b["world"]);
 		CHECK(b.find("something else") == b.end());
+
+		// Make sure swap didn't mess with internal state.
+		b.insert(rde::make_pair(std::string("hello2"), 15));
+		CHECK_EQUAL(15, b["hello2"]);
+		a.insert(rde::make_pair(std::string("hello"), 25));
+		tMap::iterator it = a.find("hello");
+		CHECK(it != a.end());
+		CHECK_EQUAL(25, it->second);
+
 	}
 	TESTC(SwapEmpty)
 	{
