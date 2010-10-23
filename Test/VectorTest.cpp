@@ -212,6 +212,18 @@ namespace
 		CHECK_EQUAL(7, v.size());
 		CHECK_EQUAL(49, v[6]);
 	}
+
+	TEST(InsertEndRealloc)
+	{
+		tTestVector v;
+		for (tTestVector::size_type i = 0; i < v.capacity(); ++i)
+		{
+			v.push_back((int)i);
+		}
+		v.insert(v.end(), 666);
+		CHECK_EQUAL(666, v.back());
+	}
+
 	TEST(InsertToEmpty)
 	{
 		tTestVector v;
@@ -272,6 +284,21 @@ namespace
 		tTestVector v2;
 		v = v2;
 		CHECK(v.empty());
+	}
+
+	// Force few grows
+	TEST(MultipleGrow)
+	{
+		tTestVector v;
+		for (int i = 0; i < 5000; ++i)
+		{
+			v.push_back(i);
+		}
+		CHECK_EQUAL(5000, v.size());
+		for (int i = 0; i < 5000; ++i)
+		{
+			CHECK_EQUAL(i, v[i]);
+		}
 	}
 
     //-----------------------------------------------------------------
