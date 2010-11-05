@@ -1,6 +1,6 @@
 #include <UnitTest++/src/UnitTest++.h>
 #include "rdestl/rde_string.h"
-#include "rdestl/simple_string_storage.h"
+#include "rdestl/cow_string_storage.h"
 #include <cstdio>
 
 namespace
