@@ -2,13 +2,12 @@
 #define RDESTL_BASIC_STRING_H
 
 #include "allocator.h"
-#include "cow_string_storage.h"
-#include "simple_string_storage.h"
 #include "rdestl_common.h"
+#include "simple_string_storage.h"
 #include "string_utils.h"
 
-#include <istream>
-#include <ostream>
+//#include <istream>
+//#include <ostream>
 
 namespace rde
 {

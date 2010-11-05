@@ -8,8 +8,8 @@
 #define RDESTL_STRINGSTREAM_H
 
 #include "rdestl_common.h"
-#include "vector.h"
 #include "rde_string.h"
+#include "vector.h"
 
 namespace rde 
 {
@@ -24,14 +24,14 @@ namespace rde
     template< typename E, typename TAlloc = rde::allocator >
     struct basic_stringstream
     {
-        typedef E                                     value_type;
-        typedef rde::vector<value_type, TAlloc>       buffer_type;
-        typedef typename buffer_type::size_type       size_type;
-        typedef rde::basic_string<value_type, TAlloc> string_type;
+        typedef E                                   value_type;
+        typedef rde::vector<value_type, TAlloc>     buffer_type;
+        typedef typename buffer_type::size_type		size_type;
+		typedef basic_string<value_type, TAlloc>	string_type;
         
         explicit basic_stringstream(const value_type* inp) { init(inp); }
         explicit basic_stringstream(const string_type& inp) { init(inp.c_str()); }
-        basic_stringstream() {}  
+        basic_stringstream() {}
  
         bool good() const { return buffer.size() ? cursor != buffer.end() : false; }
         bool eof() const { return !good(); }
