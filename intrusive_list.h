@@ -108,6 +108,7 @@ public:
 
 protected:
 	intrusive_list_base();
+	~intrusive_list_base() {}
 
 	// links 'node' before 'nextNode'
 	static void link(intrusive_list_node* node, intrusive_list_node* nextNode);
