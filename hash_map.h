@@ -9,7 +9,11 @@
 
 namespace rde
 {
- 
+
+// TLoadFactor4 - controls hash map load. 4 means 100% load, ie. hashmap will grow
+// when number of items == capacity. Default value of 6 means it grows when
+// number of items == capacity * 3/2 (6/4). Higher load == tighter maps, but bigger
+// risk of collisions.
 template<typename TKey, typename TValue, 
 		class THashFunc = rde::hash<TKey>,
 		int TLoadFactor4 = 6,
@@ -122,6 +126,7 @@ public:
 		m_capacityMask(0),
 		m_numUsed(0)
 	{
+		RDE_ASSERT((kInitialCapacity & (kInitialCapacity - 1)) == 0);	// Must be power-of-two
 	}
 	explicit hash_map(const allocator_type& allocator)
     :	m_nodes(&ms_emptyNode),
@@ -374,7 +379,7 @@ private:
 		hash_value_t hash)
 	{
 		RDE_ASSERT(invariant());
-		if (n == 0 || m_numUsed * 3 >= m_capacity * 2)
+		if (n == 0 || m_numUsed * TLoadFactor4 >= m_capacity * 4)
 			return insert(v);
 
 		RDE_ASSERT(!n->is_occupied());
