@@ -62,7 +62,7 @@ public:
 		m_allocator(allocator)
 	{
 		ms_sentinel.color	= black;
-		ms_sentinel.left		= &ms_sentinel;
+		ms_sentinel.left	= &ms_sentinel;
 		ms_sentinel.right	= &ms_sentinel;
 		ms_sentinel.parent	= &ms_sentinel;
 		m_root				= &ms_sentinel;
