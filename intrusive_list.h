@@ -92,8 +92,6 @@ class intrusive_list_base
 public:
 	typedef size_t	size_type;
 
-	intrusive_list_base();
-
 	void pop_back()
 	{
 		unlink(m_root.prev);
@@ -109,6 +107,8 @@ public:
 	bool empty() const	{ return !m_root.in_list(); }
 
 protected:
+	intrusive_list_base();
+
 	// links 'node' before 'nextNode'
 	static void link(intrusive_list_node* node, intrusive_list_node* nextNode);
 	static void unlink(intrusive_list_node* node);
@@ -131,6 +131,13 @@ public:
 	typedef T											value_type;
 	typedef intrusive_list_iterator<T*, T&>				iterator;
 	typedef intrusive_list_iterator<const T*, const T&>	const_iterator;
+
+	intrusive_list() : intrusive_list_base()
+	{
+		// Compile error if T not derived from intrusive_list_node
+		intrusive_list_node* testNode((T*)0);
+		static_cast<void>(sizeof(testNode));
+	}
 
 	void push_back(value_type* v)
 	{		
