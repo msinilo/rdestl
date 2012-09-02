@@ -87,4 +87,12 @@ namespace
 	{
 		CHECK_EQUAL(2.f, rde::min(2.f, 3.f));
 	}
+	// http://code.google.com/p/rdestl/issues/detail?id=7
+	TEST(UnsignedIntsHaveTrivialCopy)
+	{
+		CHECK_EQUAL(1, rde::has_trivial_copy<unsigned char>::value);
+		CHECK_EQUAL(1, rde::has_trivial_copy<unsigned short>::value);
+		CHECK_EQUAL(1, rde::has_trivial_copy<unsigned int>::value);
+		CHECK_EQUAL(1, rde::has_trivial_copy<unsigned long>::value);
+	}
 }
