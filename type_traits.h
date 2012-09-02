@@ -17,10 +17,14 @@ template<typename T> struct is_floating_point
 #define RDE_INTEGRAL(TYPE)	template<> struct is_integral<TYPE> { enum { value = true }; }
 
 RDE_INTEGRAL(char);
+RDE_INTEGRAL(unsigned char);
 RDE_INTEGRAL(bool);
 RDE_INTEGRAL(short);
+RDE_INTEGRAL(unsigned short);
 RDE_INTEGRAL(int);
+RDE_INTEGRAL(unsigned int);
 RDE_INTEGRAL(long);
+RDE_INTEGRAL(unsigned long);
 RDE_INTEGRAL(wchar_t);
 
 template<> struct is_floating_point<float> { enum { value = true }; };
