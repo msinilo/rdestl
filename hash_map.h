@@ -533,19 +533,9 @@ private:
 		return true;
 	}
 
-	RDE_FORCEINLINE bool compare_key(const node* n, const key_type& key, hash_value_t hash,
-		int_to_type<false>) const
-	{
-		return (n->hash == hash && m_keyEqualFunc(key, n->data.first));
-	}
-	RDE_FORCEINLINE bool compare_key(const node* n, const key_type& key, hash_value_t,
-		int_to_type<true>) const
-	{
-		return m_keyEqualFunc(key, n->data.first);
-	}
 	RDE_FORCEINLINE bool compare_key(const node* n, const key_type& key, hash_value_t hash) const
 	{
-		return compare_key(n, key, hash, int_to_type<has_cheap_compare<TKey>::value>());
+		return (n->hash == hash && m_keyEqualFunc(key, n->data.first));
 	}
 
 	node*			m_nodes;
