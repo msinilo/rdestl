@@ -359,7 +359,7 @@ public:
 		RDE_ASSERT(it != end());
 		RDE_ASSERT(invariant());
 		// Move everything down, overwriting *it
-		rde::copy(it + 1, m_end, it);
+		rde::move(it + 1, m_end, it);
 		--m_end;
 		rde::destruct(m_end);
 		return it;
