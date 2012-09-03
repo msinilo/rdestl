@@ -69,7 +69,7 @@ namespace internal
 	{
 		// Meh, MSVC does pretty stupid things here.
 		//memmove(result, first, (last - first) * sizeof(T));
-		const size_t n = reinterpret_cast<const char*>(last) - reinterpret_cast<const char*>(first);
+		const size_t n = reinterpret_cast<uintptr_t>(last) - reinterpret_cast<uintptr_t>(first);
 		//const size_t n = (last - first) * sizeof(T);
 		Sys::MemMove(result, first, n);
 	}

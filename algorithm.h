@@ -58,7 +58,7 @@ void move_n(const T* from, size_t n, T* result)
 {
 	RDE_ASSERT(from != result || n == 0);
 	// Overlap? 
-	if (result > from && result < from + n)
+	if (result + n >= from && result < from + n)
 	{
 		internal::move_n(from, n, result, int_to_type<has_trivial_copy<T>::value>());
 	}
@@ -73,7 +73,9 @@ template<typename T>
 void move(const T* first, const T* last, T* result)
 {
 	RDE_ASSERT(first != result || first == last);
-	if (result > first && result < last)
+	const size_t n = reinterpret_cast<uintptr_t>(last) - reinterpret_cast<uintptr_t>(first);
+	const unsigned char* resultEnd = reinterpret_cast<const unsigned char*>(result) + n;
+	if (resultEnd >= reinterpret_cast<const unsigned char*>(first) && result < last)
 	{
 		internal::move(first, last, result, int_to_type<has_trivial_copy<T>::value>());
 	}
