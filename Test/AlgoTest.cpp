@@ -95,4 +95,29 @@ namespace
 		CHECK_EQUAL(1, rde::has_trivial_copy<unsigned int>::value);
 		CHECK_EQUAL(1, rde::has_trivial_copy<unsigned long>::value);
 	}
+	// http://code.google.com/p/rdestl/issues/detail?id=8
+	TEST(MoveNOverlap)
+	{
+		int tab[] = { 0, 1, 2, 3, 4, 5, 6 };
+		const int* src = &tab[1];
+		int* dst = &tab[0];
+
+		rde::move_n(src, 3, dst);
+
+		CHECK_EQUAL(1, tab[0]);
+		CHECK_EQUAL(2, tab[1]);
+		CHECK_EQUAL(3, tab[2]);
+	}
+	TEST(MoveOverlap)
+	{
+		int tab[] = { 0, 1, 2, 3, 4, 5, 6 };
+		const int* src = &tab[1];
+		int* dst = &tab[0];
+
+		rde::move(src, src + 3, dst);
+
+		CHECK_EQUAL(1, tab[0]);
+		CHECK_EQUAL(2, tab[1]);
+		CHECK_EQUAL(3, tab[2]);
+	}
 }
