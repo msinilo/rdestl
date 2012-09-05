@@ -5,11 +5,6 @@
 #include "algorithm.h"
 #include "allocator.h"
 
-// @TODO Wont work on 64-bit!
-// 4267 -- conversion from size_t to int.
-#pragma warning(push)
-#pragma warning(disable: 4267)
-
 namespace rde
 {
 //=============================================================================
@@ -359,7 +354,8 @@ public:
 		RDE_ASSERT(it != end());
 		RDE_ASSERT(invariant());
 		// Move everything down, overwriting *it
-		rde::move(it + 1, m_end, it);
+		internal::move(it + 1, m_end, it, int_to_type<has_trivial_copy<T>::value>());
+
 		--m_end;
 		rde::destruct(m_end);
 		return it;
@@ -485,8 +481,6 @@ private:
 		m_end = m_begin + newSize;
 	}
 };
-
-#pragma warning(pop)
 
 } // namespace rde
 
