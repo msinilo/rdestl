@@ -330,8 +330,6 @@ public:
         m_numUsed = 0;
 	}
 
-	// More like reserve.
-	// resize() name chosen for compatibility sake.
 	void reserve(size_type min_size)
 	{
 		size_type newCapacity = (m_capacity == 0 ? kInitialCapacity : m_capacity);
@@ -427,12 +425,6 @@ private:
 		const hash_value_t hash = hash_func(key);
         uint32 i = hash & m_capacityMask;
         node* n = m_nodes + i;
-		// In theory, we could try to use compare_key here, it would
-		// be a little bit faster for keys with cheap_compare. However, if keys are
-		// not totally destroyed on removal (erase_node), this could result in returning
-		// unused nodes. By testing hashes - we make sure it does not happen.
-		// This could also be solved by doing what Google does -- set_empty_key/set_deleted_key,
-		// but for the time being it doesn't look to me like it's worth it.
 		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
 			return n;
 
