@@ -77,22 +77,22 @@ class map
 		TNodePtr	m_node;
 		const map*	m_map;
 	};
-	template<typename Tk, typename Tv>
-	struct map_pair : public rde::pair<Tk, Tv>
+	template<typename Tkm, typename Tvm>
+	struct map_pair : public rde::pair<Tkm, Tvm>
 	{
 		map_pair() {}
-		map_pair(const Tk& k, const Tv& v): pair(k, v) {}
+		map_pair(const Tkm& k, const Tvm& v): pair<Tkm, Tvm>(k, v) {}
 		bool operator<(const map_pair& rhs) const
 		{
 			return first < rhs.first;
 		}
-		RDE_FORCEINLINE const Tk& get_key() const	{ return first; }
+		RDE_FORCEINLINE const Tkm& get_key() const	{ return first; }
 	};
-	template<typename Tk, typename Tv>
+	template<typename Tkm, typename Tvm>
 	struct map_traits
 	{
-		typedef	Tk					key_type;
-		typedef map_pair<Tk, Tv>	value_type;
+		typedef	Tkm					key_type;
+		typedef map_pair<Tkm, Tvm>	value_type;
 	};
 
 public:
@@ -129,7 +129,7 @@ public:
 	//			explicit operations.
 	data_type& operator[](const key_type& key)
 	{
-		tree_type::node* n = m_tree.find_node(key);
+		typename tree_type::node* n = m_tree.find_node(key);
 		if (n == 0)
 			n = m_tree.insert(value_type(key, Tv()));
 		return n->value.second;
@@ -138,7 +138,7 @@ public:
 	// (should result pair<iterator, bool>)
 	RDE_FORCEINLINE iterator insert(const value_type& v)
 	{
-		tree_type::node* n = m_tree.insert(v);
+		typename tree_type::node* n = m_tree.insert(v);
 		return iterator(n, this);
 	}
 	RDE_FORCEINLINE iterator find(const key_type& key)
