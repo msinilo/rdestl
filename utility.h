@@ -36,8 +36,10 @@ namespace internal
 	template<typename T>
 	void copy(const T* first, const T* last, T* result, int_to_type<false>)
 	{
+		// Local variable helps MSVC keep stuff in registers
+		T* localResult = result;
 		while (first != last)
-			*result++ = *first++;
+			*localResult++ = *first++;
 	}
 	template<typename T>
 	void copy(const T* first, const T* last, T* result, int_to_type<true>)
