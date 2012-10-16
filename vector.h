@@ -354,7 +354,7 @@ public:
 		RDE_ASSERT(it != end());
 		RDE_ASSERT(invariant());
 		// Move everything down, overwriting *it
-		internal::move(it + 1, m_end, it, int_to_type<has_trivial_copy<T>::value>());
+		move_down_1(it, int_to_type<has_trivial_copy<T>::value>());
 
 		--m_end;
 		rde::destruct(m_end);
@@ -479,6 +479,19 @@ private:
 		const size_type toShrink = size() - newSize;
 		rde::destruct_n(m_begin + newSize, toShrink);
 		m_end = m_begin + newSize;
+	}
+
+	// The following two methods are only to get better cache behavior.
+	// We do not really need 'move' here if copying one-by-one, only for memcpy/memmove (on some platforms, see
+	// http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.kui0002a/c51_memcpy.htm for example).
+
+	RDE_FORCEINLINE void move_down_1(iterator it, int_to_type<true> itt)
+	{
+		internal::move(it + 1, m_end, it, itt);
+	}
+	RDE_FORCEINLINE void move_down_1(iterator it, int_to_type<false> itt)
+	{
+		internal::copy(it + 1, m_end, it, itt);
 	}
 };
 
