@@ -63,8 +63,9 @@ namespace internal
 	template<typename T> RDE_FORCEINLINE
 	void move(const T* first, const T* last, T* result, int_to_type<false>)
 	{
+		result += (last - first);
 		while (--last >= first)
-			*result++ = *last;
+			*(--result) = *last;
 	}
 	template<typename T> RDE_FORCEINLINE 
 	void move(const T* first, const T* last, T* result, int_to_type<true>)
