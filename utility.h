@@ -2,7 +2,7 @@
 #define RDESTL_UTILITY_H
 
 #include "rdestl_common.h"
-#include <new.h>
+#include <new>
 
 namespace rde
 {
