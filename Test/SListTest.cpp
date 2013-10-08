@@ -8,17 +8,17 @@ namespace
 	{
 		rde::slist<int> lst;
 		CHECK(lst.empty());
-		CHECK_EQUAL(0ul, lst.size());
+		CHECK_EQUAL(0, lst.size());
 	}
 	TEST(PushFront)
 	{
 		rde::slist<int> lst;
 		lst.push_front(5);
 		CHECK(!lst.empty());
-		CHECK_EQUAL(1ul, lst.size());
+		CHECK_EQUAL(1, lst.size());
 		CHECK_EQUAL(5, lst.front());
 		lst.push_front(3);
-		CHECK_EQUAL(2ul, lst.size());
+		CHECK_EQUAL(2, lst.size());
 		CHECK_EQUAL(3, lst.front());
 	}
 	TEST(PopFront)
@@ -57,16 +57,16 @@ namespace
 		lst.push_front(2);
 		lst.push_front(1);
 		CHECK(!lst.empty());
-		CHECK_EQUAL(5ul, lst.size());
+		CHECK_EQUAL(5, lst.size());
 		lst.clear();
 		CHECK(lst.empty());
-		CHECK_EQUAL(0ul, lst.size());
+		CHECK_EQUAL(0, lst.size());
 	}
 
 	TEST(AssignCtor)
 	{
 		rde::slist<int> lst(&array[0], &array[6]);
-		CHECK_EQUAL(6ul, lst.size());
+		CHECK_EQUAL(6, lst.size());
 		CHECK_EQUAL(1, lst.front());
 		rde::slist<int>::iterator it = lst.begin();
 		int i(1);
@@ -81,7 +81,7 @@ namespace
 		rde::slist<int> lst(&array[0], &array[6]);
 		rde::slist<int> lst2;
 		lst2 = lst;
-		CHECK_EQUAL(6ul, lst2.size());
+		CHECK_EQUAL(6, lst2.size());
 		CHECK_EQUAL(1, lst2.front());
 		rde::slist<int>::iterator it = lst.begin();
 		int i(1);

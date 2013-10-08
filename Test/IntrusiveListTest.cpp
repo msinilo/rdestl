@@ -13,7 +13,7 @@ namespace
 	{
 		rde::intrusive_list<MyNode> l;
 		CHECK(l.empty());
-		CHECK_EQUAL(0ul, l.size());
+		CHECK_EQUAL(0, l.size());
 	}
 	TEST(PushBack)
 	{
@@ -21,11 +21,11 @@ namespace
 		MyNode node;
 		node.data = 5;
 		l.push_back(&node);
-		CHECK_EQUAL(1ul, l.size());
+		CHECK_EQUAL(1, l.size());
 		MyNode node2;
 		node2.data = 10;
 		l.push_back(&node2);
-		CHECK_EQUAL(2ul, l.size());
+		CHECK_EQUAL(2, l.size());
 		CHECK_EQUAL(10, l.back()->data);
 	}
 	TEST(PushBackPtr)
@@ -33,7 +33,7 @@ namespace
 		rde::intrusive_list<MyNode> l;
 		MyNode* n(new MyNode());
 		l.push_back(n);
-		CHECK_EQUAL(1ul, l.size());
+		CHECK_EQUAL(1, l.size());
 		delete n;
 	}
 
@@ -43,11 +43,11 @@ namespace
 		MyNode node;
 		node.data = 5;
 		l.push_front(&node);
-		CHECK_EQUAL(1ul, l.size());
+		CHECK_EQUAL(1, l.size());
 		MyNode node2;
 		node2.data = 10;
 		l.push_front(&node2);
-		CHECK_EQUAL(2ul, l.size());
+		CHECK_EQUAL(2, l.size());
 		CHECK_EQUAL(10, l.front()->data);
 		CHECK_EQUAL(5, l.back()->data);
 	}
@@ -58,13 +58,13 @@ namespace
 		MyNode node;
 		node.data = 5;
 		l.push_back(&node);
-		CHECK_EQUAL(1ul, l.size());
+		CHECK_EQUAL(1, l.size());
 		MyNode node2;
 		node2.data = 10;
 		l.push_back(&node2);
-		CHECK_EQUAL(2ul, l.size());
+		CHECK_EQUAL(2, l.size());
 		l.pop_back();
-		CHECK_EQUAL(1ul, l.size());
+		CHECK_EQUAL(1, l.size());
 		CHECK_EQUAL(5, l.front()->data);
 	}
 
@@ -99,7 +99,7 @@ namespace
 
 		MyNode* n = new MyNode(15);
 		l.insert(it, n);
-		CHECK_EQUAL(3ul, l.size());
+		CHECK_EQUAL(3, l.size());
 		it = l.begin();
 		++it;
 		CHECK_EQUAL(15, it->data);
