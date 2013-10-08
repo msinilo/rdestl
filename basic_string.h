@@ -92,10 +92,14 @@ public:
 		return assign(str, strlen(str));
 	}
 
-	basic_string substr(size_type begin, size_type end = length()) const
+	basic_string substr(size_type begin, size_type end) const
 	{
 		RDE_ASSERT(end >= begin && end <= length() && begin >= 0);
 		return basic_string(c_str() + begin, end - begin);
+	}
+	basic_string substr(size_type begin) const
+	{
+		return substr(begin, length());
 	}
 
 	void append(const value_type* str, size_type len)
