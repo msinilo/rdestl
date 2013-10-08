@@ -120,4 +120,18 @@ namespace
 		CHECK_EQUAL(2, tab[1]);
 		CHECK_EQUAL(3, tab[2]);
 	}
+
+	// http://msinilo.pl/blog/?p=956&cpage=1#comment-48615
+	TEST(Regression_MovePreservesOrder)
+	{
+		int tab[] = { 0, 1, 2, 3, 4, 5, 6 };
+		const int* src = &tab[0];
+		int* dst = &tab[3];
+
+		rde::internal::move(src, src + 3, dst, rde::int_to_type<false>());
+
+		CHECK_EQUAL(0, tab[3]);
+		CHECK_EQUAL(1, tab[4]);
+		CHECK_EQUAL(2, tab[5]);
+	}
 }
