@@ -1,0 +1,1 @@
+RDESTL is library providing small subset of STL functionality, aimed at games development.
