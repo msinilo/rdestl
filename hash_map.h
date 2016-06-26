@@ -53,7 +53,7 @@ private:
         template<typename UNodePtr, typename UPtr, typename URef>
         node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
         :	m_node(rhs.node()),
-	  		m_map(rhs.get_map())
+	  		m_map(const_cast<rde::hash_map<>>>::node*>(rhs.get_map()))
 		{/**/}
 
 		TRef operator*() const
