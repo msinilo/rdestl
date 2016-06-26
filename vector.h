@@ -133,7 +133,7 @@ public:
 	{
         if(rhs.size() == 0) // nothing to do
             return;
-		reallocate_discard_old(rhs.capacity());
+		this->reallocate_discard_old(rhs.capacity());
 		rde::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
 		m_end = m_begin + rhs.size();
 		TStorage::record_high_watermark();
