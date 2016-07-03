@@ -163,7 +163,7 @@ public:
 		const size_type newSize = rhs.size();
 		if (newSize > capacity())
 		{
-			reallocate_discard_old(rhs.capacity());
+			this->reallocate_discard_old(rhs.capacity());
 		}
 		rde::copy_construct_n(rhs.m_begin, newSize, m_begin);
 		m_end = m_begin + newSize;
