@@ -24,6 +24,9 @@
 
 #	define RDE_ASSERT	assert
 
+// NOOB
+#include <cstdint>
+
 	namespace rde 
 	{ 
 		// # Meh. MSVC doesnt seem to have <stdint.h>
