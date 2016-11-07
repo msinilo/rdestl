@@ -46,4 +46,13 @@ namespace
 		tVector::iterator it = v.find(7);
 		CHECK(it == v.end());
 	}
+	// Regression test, insert would fail on the 3rd element.
+	TEST(RegressionInsert)
+	{
+		tVector v;
+		CHECK_EQUAL(true, v.insert(268, 5).second);
+		CHECK_EQUAL(true, v.insert(502, 11).second);
+		CHECK_EQUAL(true, v.insert(123, 20).second);
+		CHECK_EQUAL(3, v.size());
+	}
 }
