@@ -2,7 +2,7 @@
 #define RDESTL_STRING_H
 
 #include "basic_string.h"
-#include "hash.h"
+#include "rhash.h"
 
 namespace rde
 {

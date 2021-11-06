@@ -4,7 +4,7 @@
 #include "algorithm.h"
 #include "allocator.h"
 #include "functional.h"
-#include "hash.h"
+#include "rhash.h"
 #include "pair.h"
 
 namespace rde

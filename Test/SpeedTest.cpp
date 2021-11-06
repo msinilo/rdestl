@@ -34,13 +34,13 @@ namespace
 		
 		void Sample()
 		{
-			LARGE_INTEGER tick;
-			QueryPerformanceCounter(&tick);
+			LARGE_INTEGER stick;
+			QueryPerformanceCounter(&stick);
 			
-			this->deltaTicks = (tick.QuadPart - this->tick);
+			this->deltaTicks = (stick.QuadPart - this->tick);
 			if( this->deltaTicks < 0 )
 				this->deltaTicks = 0;
-			this->tick = tick.QuadPart;
+			this->tick = stick.QuadPart;
 		}
 		
 		float DeltaTime() const
