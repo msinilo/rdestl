@@ -7,6 +7,7 @@
 
 #if RDESTL_STANDALONE
 #  ifdef _MSC_VER
+#   define _ALLOW_RTCc_IN_STL
 #	include <cassert>
 #	include <cstring>
 #	define RDE_FORCEINLINE	__forceinline
