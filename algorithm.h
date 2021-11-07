@@ -8,6 +8,13 @@
 
 namespace rde
 {
+//-----------------------------------------------------------------------------
+// Modern C++ version that does constructor/copy constructor/move constructor in 1
+template <typename T, typename... Args> RDE_FORCEINLINE
+void construct_args(T* p, Args&&... args)
+{
+    ::new (static_cast<void*>(p)) T(std::forward<Args>(args)...);
+}
 
 //-----------------------------------------------------------------------------
 template<typename T> RDE_FORCEINLINE
