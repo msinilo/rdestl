@@ -25,7 +25,7 @@ namespace
 	void PrintNode(rde::rb_tree<int>::node* n, int left, int depth)
 	{
 		static const char* s_left[] = { "[root]", "right", "left" };
-		printf("%*s %d: Node %d, [%s, %s]\n", (depth*2), "", depth, n->value, 
+		printf("%*s %d: Node %d, [%s, %s]\n", (depth*2), "", depth, n->value.key, 
 			s_left[left + 1], n->color == 0 ? "red" : "black");
 	}
 

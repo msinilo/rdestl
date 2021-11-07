@@ -196,7 +196,7 @@ protected:
 			else
 			{
 				release_string();
-				string_rep* rep = reinterpret_cast<string_rep*>(m_buffer);
+				rep = reinterpret_cast<string_rep*>(m_buffer);
 				rep->init();
 				m_data = reinterpret_cast<value_type*>(rep + 1);
 				*m_data = 0;
