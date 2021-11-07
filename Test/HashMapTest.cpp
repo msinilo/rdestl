@@ -36,12 +36,12 @@ namespace
 #undef tPoorlyHashedMap
 #undef POSTFIX
 #define POSTFIX				Closed
-#define tMap				rde::hash_map<std::string, int, hasher, 6>
-#define tPoorlyHashedMap	rde::hash_map<std::string, int, poor_hasher, 6>
+#define tMap				rde::hash_map<std::string, int, hasher>
+#define tPoorlyHashedMap	rde::hash_map<std::string, int, poor_hasher>
 #include "HashMapTestInc.h"
 
 // Instantiate to check all methods.
-template rde::hash_map<std::string, int, hasher, 6>;
+template rde::hash_map<std::string, int, hasher>;
 
     // Partially ripped from Google's hash tests.
 	TEST(GoogleIntHash)
@@ -82,7 +82,7 @@ template rde::hash_map<std::string, int, hasher, 6>;
 	}
 	TEST(GoogleIntHashFixed)
     {
-		typedef rde::hash_map<int, int, rde::hash<int>, 6, rde::equal_to<int>, rde::stack_allocator<1000> > TestMap;
+		typedef rde::hash_map<int, int, rde::hash<int>, rde::equal_to<int>, rde::stack_allocator<1000> > TestMap;
 		TestMap m;
 		CHECK(m.empty());
 		m.insert(rde::make_pair(1, 0));
@@ -160,9 +160,9 @@ template rde::hash_map<std::string, int, hasher, 6>;
 		for (int i = 0; i < MAX_KEYS; i++)
 		{
 			m_mHashMap.erase(aKeys[i]);
-			HashMapIterator itr = m_mHashMap.find(aKeys[i]);
-			RDE_ASSERT(itr == m_mHashMap.end());
-			CHECK(itr == m_mHashMap.end());
+			HashMapIterator itr2 = m_mHashMap.find(aKeys[i]);
+			RDE_ASSERT(itr2 == m_mHashMap.end());
+			CHECK(itr2 == m_mHashMap.end());
 		}
 	}
 }	
