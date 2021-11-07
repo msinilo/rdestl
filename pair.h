@@ -17,11 +17,18 @@ struct pair
 	explicit pair(const T1& a):	first(a) {/**/}
 
     pair(const pair<T1,T2>& rhs) : first(rhs.first), second(rhs.second) {/**/}
+    pair(pair<T1, T2>&& rhs) : first(std::move(rhs.first)), second(std::move(rhs.second)) {/**/ }
     
     pair& operator=(const pair<T1,T2>& rhs) 
     {
         first = rhs.first;
         second = rhs.second;
+        return *this;
+    }
+    pair& operator=(pair<T1, T2>&& rhs)
+    {
+        first = std::move(rhs.first);
+        second = std::move(rhs.second);
         return *this;
     }
     
