@@ -39,7 +39,7 @@ struct standard_vector_storage
 		// Copy old data if needed.
 		if (m_begin)
 		{
-			rde::copy_construct_n(m_begin, newSize, newBegin);
+			rde::move_construct_n(m_begin, newSize, newBegin);
 			destroy(m_begin, oldSize);
 		}
 		m_begin = newBegin;

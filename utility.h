@@ -91,6 +91,20 @@ namespace internal
 		Sys::MemCpy(result, first, n * sizeof(T));
 	}
 
+    template<typename T>
+    void move_construct_n(T* first, size_t n, T* result, int_to_type<false>)
+    {
+        for (size_t i = 0; i < n; ++i)
+            new (result + i) T(std::move(first[i]));
+    }
+
+    template<typename T>
+    void move_construct_n(T* first, size_t n, T* result, int_to_type<true>)
+    {
+        RDE_ASSERT(result >= first + n || result < first);
+        Sys::MemCpy(result, first, n * sizeof(T));
+    }
+
 	template<typename T>
 	void destruct_n(T* first, size_t n, int_to_type<false>)
 	{

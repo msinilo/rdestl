@@ -58,6 +58,14 @@ void copy_construct_n(T* first, size_t n, T* result)
 {
 	internal::copy_construct_n(first, n, result, int_to_type<has_trivial_copy<T>::value>());
 }
+
+//-----------------------------------------------------------------------------
+// Modern C++ version that does constructor / copy constructor / move constructor in 1
+template <typename T>
+void move_construct_n(T* first, size_t n, T* result)
+{
+    internal::move_construct_n(first, n, result, int_to_type<has_trivial_copy<T>::value>());
+}
  
 //-----------------------------------------------------------------------------
 template<typename T>
