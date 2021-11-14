@@ -41,7 +41,7 @@ namespace
 		CHECK(v.empty());
 		CHECK_EQUAL(0, v.size());
 		CHECK_EQUAL(v.begin(), v.end());
-		printf("Sizeof(v) = %d\n", sizeof(v));
+		printf("Sizeof(v) = %zd\n", sizeof(v));
 	}
 	TEST(PushBack)
 	{
@@ -382,6 +382,34 @@ namespace
         CHECK(myFoosFoos[1].size() == 20);
     }
 
+    TEST(MoveConstructorExplicit)
+    {
+        rde::vector<int> v;
+        v.push_back(1);
+        v.push_back(2);
+        CHECK_EQUAL(2, v.size());
+
+        rde::vector<int> v2(std::move(v));
+        CHECK_EQUAL(0, v.size());
+        CHECK_EQUAL(2, v2.size());
+        CHECK_EQUAL(1, v2[0]);
+        CHECK_EQUAL(2, v2[1]);
+    }
+    TEST(MoveAssignment)
+    {
+        rde::vector<int> v;
+        v.push_back(1);
+        v.push_back(2);
+        CHECK_EQUAL(2, v.size());
+
+        rde::vector<int> v2;
+        v2 = std::move(v);
+        CHECK_EQUAL(0, v.size());
+        CHECK_EQUAL(2, v2.size());
+        CHECK_EQUAL(1, v2[0]);
+        CHECK_EQUAL(2, v2[1]);
+    }
+    
     //typedef rde::fixed_vector<int, 3, false> fvector;
 
     //TEST(fixedvec_copy)

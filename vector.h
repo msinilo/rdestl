@@ -27,10 +27,26 @@ struct standard_vector_storage
 		m_allocator(allocator)
 	{
 		/**/
-	}	
+	}
+    standard_vector_storage(standard_vector_storage&& rhs)
+    :   m_begin(std::exchange(rhs.m_begin, nullptr)),
+        m_end(std::exchange(rhs.m_end, nullptr)),
+        m_capacityEnd(std::exchange(rhs.m_capacityEnd, nullptr)),
+        m_allocator(std::move(rhs.m_allocator))
+    {
+    }
 	explicit standard_vector_storage(e_noinitialize) 
 	{
 	}
+
+    standard_vector_storage& operator=(standard_vector_storage&& rhs)
+    {
+        m_begin = std::exchange(rhs.m_begin, nullptr);
+        m_end = std::exchange(rhs.m_end, nullptr);
+        m_capacityEnd = std::exchange(rhs.m_capacityEnd, nullptr);
+        m_allocator = std::move(rhs.m_allocator);
+        return *this;
+    }
 
 	void reallocate(base_vector::size_type newCapacity, base_vector::size_type oldSize)
 	{
@@ -143,6 +159,10 @@ public:
 	:	TStorage(n)
 	{
 	}
+    vector(vector&& rhs)
+    :   TStorage(std::forward<TStorage&&>(rhs))
+    {
+    }
 	~vector()
 	{
 		if (TStorage::m_begin != 0)
@@ -157,6 +177,15 @@ public:
         copy(rhs);		
 		return *this;
 	}
+    vector& operator=(vector&& rhs)
+    {
+        if (&rhs == this)
+        {
+            return *this;
+        }
+        TStorage::operator=(std::forward<TStorage&&>(rhs));
+        return *this;
+    }
     
     void copy(const vector& rhs)
     {
