@@ -402,18 +402,18 @@ class hash_map
             node* freeNode(0);
             if (n->is_deleted())
                 freeNode = n;
-            uint32 numProbes(0);
+            uint32 numProbes(1);
             // Guarantees loop termination.
             RDE_ASSERT(m_numUsed < m_capacity);
             while (!n->is_unused())
             {
-                ++numProbes;
                 i = (i + numProbes) & m_capacityMask;
                 n = m_nodes + i;
                 if (compare_key(n, key, hash))
                     return n;
                 if (n->is_deleted() && freeNode == 0)
                     freeNode = n;
+                ++numProbes;
             }
             return freeNode ? freeNode : n;
         }
@@ -425,17 +425,18 @@ class hash_map
             if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
                 return n;
 
-            uint32 numProbes(0);
+            uint32 numProbes(1);
             // Guarantees loop termination.
             RDE_ASSERT(m_capacity == 0 || m_numUsed < m_capacity);
             while (!n->is_unused())
             {
-                ++numProbes;
                 i = (i + numProbes) & m_capacityMask;
                 n = m_nodes + i;
 
                 if (compare_key(n, key, hash))
                     return n;
+
+                ++numProbes;
             }
             return m_nodes + m_capacity;
         }
