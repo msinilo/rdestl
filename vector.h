@@ -292,7 +292,7 @@ public:
         {
             grow();
         }
-        rde::construct_args(m_end, args...);
+        rde::construct_args(m_end, std::forward<Args>(args)...);
         ++m_end;
         TStorage::record_high_watermark();
     }
