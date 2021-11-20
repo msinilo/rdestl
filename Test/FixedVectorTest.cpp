@@ -1,5 +1,6 @@
 #include <UnitTest++/src/UnitTest++.h>
 #include "rdestl/fixed_vector.h"
+#include "rdestl/pair.h"
 #include <xmmintrin.h>
 
 
@@ -254,6 +255,20 @@ namespace
 		CHECK_EQUAL(2, v[1]);
 		CHECK_EQUAL(3, v[2]);
 	}
+
+    TEST(EmplaceBack)
+    {
+        rde::fixed_vector<rde::pair<int, int>, 8, false> v;
+
+        v.emplace_back(1, 2);
+        v.emplace_back(3, 4);
+        v.emplace_back(5, 6);
+
+        CHECK_EQUAL(3, v.size());
+        CHECK(v[0].first == 1 && v[0].second == 2);
+        CHECK(v[1].first == 3 && v[1].second == 4);
+        CHECK(v[2].first == 5 && v[2].second == 6);
+    }
 #if RDESTL_RECORD_WATERMARKS
 	TEST(Watermarks)
 	{

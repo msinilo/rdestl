@@ -285,6 +285,18 @@ public:
 		rde::destruct(m_end);
 	}
 
+    template<class... Args>
+    void emplace_back(Args&&... args)
+    {
+        if (m_end == m_capacityEnd)
+        {
+            grow();
+        }
+        rde::construct_args(m_end, args...);
+        ++m_end;
+        TStorage::record_high_watermark();
+    }
+
 	void assign(const T* first, const T* last)
 	{
 		// Iterators cant be in range!
