@@ -7,6 +7,8 @@
 #include "rhash.h"
 #include "pair.h"
 
+#include <tuple> // TODO use own tuple?
+
 namespace rde
 {
 
@@ -246,25 +248,19 @@ class hash_map
 
         rde::pair<iterator, bool> insert(const value_type& v)
         {
-            typedef rde::pair<iterator, bool> ret_type_t;
+            return emplace(v.first, v.second);
+        }
+        template<class K = key_type, class... Args>
+        rde::pair<iterator, bool> emplace(K&& key, Args&&... args)
+        {
             RDE_ASSERT(invariant());
             if (m_numUsed * 8 >= m_capacity * 7)
                 grow();
 
             hash_value_t hash;
-            node* n = find_for_insert(v.first, &hash);
-            if (n->is_occupied())
-            {
-                RDE_ASSERT(hash == n->hash && m_keyEqualFunc(v.first, n->data.first));
-                return ret_type_t(iterator(n, this), false);
-            }
-            if (n->is_unused())
-                ++m_numUsed;
-            rde::copy_construct(&n->data, v);
-            n->hash = hash;
-            ++m_size;
-            RDE_ASSERT(invariant());
-            return ret_type_t(iterator(n, this), true);
+            node* n = find_for_insert(key, &hash);
+ 
+            return emplace_at(n, hash, std::forward<K>(key), std::forward<Args>(args)...);
         }
 
         size_type erase(const key_type& key)
@@ -370,6 +366,28 @@ class hash_map
             m_numUsed = m_size;
             RDE_ASSERT(m_numUsed < m_capacity);
         }
+        template<class K = key_type, class... Args>
+        RDE_FORCEINLINE rde::pair<iterator, bool> emplace_at(node* n, hash_value_t hash, K&& key, Args&&... args)
+        {
+            typedef rde::pair<iterator, bool> ret_type_t;
+            if (n->is_occupied())
+            {
+                RDE_ASSERT(hash == n->hash && m_keyEqualFunc(key, n->data.first));
+                return ret_type_t(iterator(n, this), false);
+            }
+            if (n->is_unused())
+            {
+                ++m_numUsed;
+            }
+            rde::construct_args(&n->data,
+                std::forward<K>(key),
+                std::forward<Args>(args)...);
+            n->hash = hash;
+            ++m_size;
+            RDE_ASSERT(invariant());
+            return ret_type_t(iterator(n, this), true);
+        }
+ 
         rde::pair<iterator, bool> insert_at(const value_type& v, node* n, 
                 hash_value_t hash)
         {
@@ -378,13 +396,7 @@ class hash_map
                 return insert(v);
 
             RDE_ASSERT(!n->is_occupied());
-            if (n->is_unused())
-                ++m_numUsed;
-            rde::copy_construct(&n->data, v);
-            n->hash = hash;
-            ++m_size;
-            RDE_ASSERT(invariant());
-            return rde::pair<iterator, bool>(iterator(n, this), true);
+            return emplace_at(n, hash, v.first, v.second);
         }
         node* find_for_insert(const key_type& key, hash_value_t* out_hash)
         {

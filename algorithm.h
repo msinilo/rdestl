@@ -164,7 +164,7 @@ TIter lower_bound(TIter first, TIter last, const T& val, const TPred& pred)
 	{
 		const int halfDist = dist >> 1;
 		TIter mid = first;
-		advance(mid, halfDist);
+		rde::advance(mid, halfDist);
 		if (internal::debug_pred(pred, *mid, val))
 			first = ++mid, dist -= halfDist + 1;
 		else

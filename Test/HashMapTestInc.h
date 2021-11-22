@@ -23,6 +23,17 @@
 		CHECK(!h.empty());
 		CHECK(h.bucket_count() > 0);
 	}
+
+    TESTC(Emplace)
+    {
+        tMap h;
+        h.emplace(std::string("hello"), 5);
+        h.emplace(std::string("world"), 10);
+        CHECK_EQUAL(2, h.size());
+        CHECK(!h.empty());
+        CHECK(h.bucket_count() > 0);
+    }
+
 	TESTC(Clear)
 	{
 		tMap h;
@@ -221,6 +232,20 @@
 		CHECK_EQUAL(7, it->second);
 	}
 
+    TEST(SubscriptionOp)
+    {
+        tMap h;
+        const std::string strHello("hello");
+        h[strHello] = 2;
+        h[std::string("world")] = 5;
+        h[std::string("test")] = h[strHello] + 10;
+        CHECK(!h.empty());
+        CHECK_EQUAL(3, h.size());
+        CHECK(h.find(strHello) != h.end());
+        CHECK_EQUAL(2, h.find(strHello)->second);
+        CHECK_EQUAL(5, h.find("world")->second);
+        CHECK_EQUAL(12, h.find("test")->second);
+    }
 
 	//-----------------------------------------------------------------
 	//Regression test:
