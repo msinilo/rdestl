@@ -10,7 +10,7 @@ namespace rde
 // Cannot grow.
 // Never allocates memory.
 template<typename E, size_t N>
-class fixed_substring : private fixed_array<E, N + 1>
+class fixed_substring: private fixed_array<E, N + 1>
 {
 	typedef fixed_array<E, N + 1>	Base;
 public:
@@ -142,6 +142,7 @@ public:
 	}
 };
 
-} // rde
+} // namespace rde
 
+//-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_FIXED_SUBSTRING_H

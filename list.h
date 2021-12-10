@@ -8,36 +8,36 @@ namespace rde
 {
 namespace internal
 {
-	struct list_base_node
+struct list_base_node
+{
+	list_base_node()
 	{
-		list_base_node()
-		{
 #if RDE_DEBUG
-			reset();
+		reset();
 #endif
-		}
-		void reset()
-		{
-			next = prev = this;
-		}
-		bool in_list() const { return this != next; }
+	}
+	void reset()
+	{
+		next = prev = this;
+	}
+	bool in_list() const { return this != next; }
 
-		void link_before(list_base_node* nextNode);
-		void unlink();
+	void link_before(list_base_node* nextNode);
+	void unlink();
 
-		list_base_node* prev;
-		list_base_node*	next;
-	};
-}
+	list_base_node* prev;
+	list_base_node*	next;
+};
+} // namespace internal
 
 //=============================================================================
 template<typename T, class TAllocator = rde::allocator>
 class list
 {
 private:
-	struct node : public internal::list_base_node
+	struct node: public internal::list_base_node
 	{
-		node():	list_base_node() {}
+		node(): list_base_node() {}
 		explicit node(const T& v): list_base_node(), value(v) {}
 
 		T		value;
@@ -53,13 +53,13 @@ private:
 	public:
 		typedef bidirectional_iterator_tag	iterator_category;
 
-        explicit node_iterator(): m_node(NULL) {/**/}
-		
-        explicit node_iterator(TNodePtr node):	m_node(node) {/**/}
-        
+		explicit node_iterator(): m_node(NULL) { /**/ }
+
+		explicit node_iterator(TNodePtr node): m_node(node) { /**/ }
+
 		template<typename UNodePtr, typename UPtr, typename URef>
 		node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
-		:	m_node(rhs.node())
+			: m_node(rhs.node())
 		{
 			/**/
 		}
@@ -115,28 +115,28 @@ private:
 	};
 
 public:
-	typedef T													value_type;
-	typedef TAllocator											allocator_type;
-	typedef int 												size_type;
-	typedef node_iterator<node*, T*, T&>						iterator;
+	typedef T												value_type;
+	typedef TAllocator										allocator_type;
+	typedef int 											size_type;
+	typedef node_iterator<node*, T*, T&>					iterator;
 	typedef node_iterator<const node*, const T*, const T&>	const_iterator;
-	static const std::size_t									kNodeSize = sizeof(node);
+	static const std::size_t								kNodeSize = sizeof(node);
 
 	explicit list(const allocator_type& allocator = allocator_type())
-	:	m_allocator(allocator)
+		: m_allocator(allocator)
 	{
 		m_root.reset();
 	}
 	template<class InputIterator>
-	list(InputIterator first, InputIterator last, 
+	list(InputIterator first, InputIterator last,
 		const allocator_type& allocator = allocator_type())
-	:	m_allocator(allocator)
+		: m_allocator(allocator)
 	{
 		m_root.reset();
 		assign(first, last);
 	}
 	list(const list& rhs, const allocator_type& allocator = allocator_type())
-	:	m_allocator(allocator)
+		: m_allocator(allocator)
 	{
 		m_root.reset();
 		assign(rhs.begin(), rhs.end());
@@ -160,10 +160,10 @@ public:
 	iterator end()					{ return iterator(&m_root); }
 	const_iterator end() const		{ return const_iterator(&m_root); }
 
-	const T& front() const	{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
-	T& front()				{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
-	const T& back() const	{ RDE_ASSERT(!empty()); return upcast(m_root.prev)->value; }
-	T& back()				{ RDE_ASSERT(!empty()); return upcast(m_root.prev)->value; }
+	T& front()						{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
+	const T& front() const			{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
+	T& back()						{ RDE_ASSERT(!empty()); return upcast(m_root.prev)->value; }
+	const T& back() const			{ RDE_ASSERT(!empty()); return upcast(m_root.prev)->value; }
 
 	void push_front(const T& value)
 	{
@@ -216,7 +216,7 @@ public:
 	}
 
 	template<class InputIterator>
-	void assign(InputIterator first, InputIterator last) 
+	void assign(InputIterator first, InputIterator last)
 	{
 		clear();
 		while (first != last)

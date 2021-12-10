@@ -8,34 +8,34 @@ namespace rde
 {
 namespace internal
 {
-	struct slist_base_node
+struct slist_base_node
+{
+	slist_base_node()
 	{
-		slist_base_node()
-		{
-			reset();
-		}
-		void reset()
-		{
-			next = this;
-		}
-		bool in_list() const { return this != next; }
+		reset();
+	}
+	void reset()
+	{
+		next = this;
+	}
+	bool in_list() const { return this != next; }
 
-		void link_after(slist_base_node* prevNode);
-		void unlink(slist_base_node* prevNode);
+	void link_after(slist_base_node* prevNode);
+	void unlink(slist_base_node* prevNode);
 
-		slist_base_node*	next;
-	};
-}
+	slist_base_node*	next;
+};
+} // namespace internal
 
 //=============================================================================
 template<typename T, class TAllocator = rde::allocator>
 class slist
 {
-	private:
-	struct node : public internal::slist_base_node
+private:
+	struct node: public internal::slist_base_node
 	{
-		node():	internal::slist_base_node() {}
-		explicit node(const T& v): internal::slist_base_node(),	value(v) {}
+		node(): internal::slist_base_node() {}
+		explicit node(const T& v): internal::slist_base_node(), value(v) {}
 		T		value;
 	};
 	static RDE_FORCEINLINE node* upcast(internal::slist_base_node* n)
@@ -48,10 +48,10 @@ class slist
 	public:
 		typedef forward_iterator_tag	iterator_category;
 
-		explicit node_iterator(TNodePtr node):	m_node(node) {/**/}
+		explicit node_iterator(TNodePtr node): m_node(node) { /**/ }
 		template<typename UNodePtr, typename UPtr, typename URef>
 		node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
-		:	m_node(rhs.node())
+			: m_node(rhs.node())
 		{
 			/**/
 		}
@@ -73,7 +73,7 @@ class slist
 		{
 			return upcast(m_node->next);
 		}
-		
+
 		node_iterator& operator++()
 		{
 			m_node = upcast(m_node->next);
@@ -108,20 +108,20 @@ public:
 	static const std::size_t									kNodeSize = sizeof(node);
 
 	explicit slist(const allocator_type& allocator = allocator_type())
-	:	m_allocator(allocator)
+		: m_allocator(allocator)
 	{
 		m_root.reset();
 	}
 	template<class InputIterator>
-	slist(InputIterator first, InputIterator last, 
+	slist(InputIterator first, InputIterator last,
 		const allocator_type& allocator = allocator_type())
-	:	m_allocator(allocator)
+		: m_allocator(allocator)
 	{
 		m_root.reset();
 		assign(first, last);
 	}
 	slist(const slist& rhs, const allocator_type& allocator = allocator_type())
-	:	m_allocator(allocator)
+		: m_allocator(allocator)
 	{
 		m_root.reset();
 		assign(rhs.begin(), rhs.end());
@@ -167,7 +167,7 @@ public:
 	}
 
 	template<class InputIterator>
-	void assign(InputIterator first, InputIterator last) 
+	void assign(InputIterator first, InputIterator last)
 	{
 		clear();
 		iterator it(&m_root);
@@ -190,7 +190,7 @@ public:
 			it = nextIt;
 		}
 		m_root.reset();
-	}	
+	}
 	bool empty() const	{ return !m_root.in_list(); }
 	// @todo: consider keeping size member, would make this O(1)
 	// as a policy? via preprocessor macro? TBD
@@ -224,7 +224,6 @@ public:
 			++prevIt;
 		return prevIt;
 	}
-
 
 private:
 	node* construct_node(const T& value)

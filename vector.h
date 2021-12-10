@@ -18,35 +18,35 @@ struct base_vector
 // Standard vector storage.
 // Dynamic allocation, can grow, can shrink.
 template<typename T, class TAllocator>
-struct standard_vector_storage 
+struct standard_vector_storage
 {
 	explicit standard_vector_storage(const TAllocator& allocator)
-	:	m_begin(0),
+		: m_begin(0),
 		m_end(0),
 		m_capacityEnd(0),
 		m_allocator(allocator)
 	{
 		/**/
 	}
-    standard_vector_storage(standard_vector_storage&& rhs)
-    :   m_begin(std::exchange(rhs.m_begin, nullptr)),
-        m_end(std::exchange(rhs.m_end, nullptr)),
-        m_capacityEnd(std::exchange(rhs.m_capacityEnd, nullptr)),
-        m_allocator(std::move(rhs.m_allocator))
-    {
-    }
-	explicit standard_vector_storage(e_noinitialize) 
+	standard_vector_storage(standard_vector_storage&& rhs)
+		: m_begin(std::exchange(rhs.m_begin, nullptr)),
+		m_end(std::exchange(rhs.m_end, nullptr)),
+		m_capacityEnd(std::exchange(rhs.m_capacityEnd, nullptr)),
+		m_allocator(std::move(rhs.m_allocator))
+	{
+	}
+	explicit standard_vector_storage(e_noinitialize)
 	{
 	}
 
-    standard_vector_storage& operator=(standard_vector_storage&& rhs)
-    {
-        m_begin = std::exchange(rhs.m_begin, nullptr);
-        m_end = std::exchange(rhs.m_end, nullptr);
-        m_capacityEnd = std::exchange(rhs.m_capacityEnd, nullptr);
-        m_allocator = std::move(rhs.m_allocator);
-        return *this;
-    }
+	standard_vector_storage& operator=(standard_vector_storage&& rhs)
+	{
+		m_begin = std::exchange(rhs.m_begin, nullptr);
+		m_end = std::exchange(rhs.m_end, nullptr);
+		m_capacityEnd = std::exchange(rhs.m_capacityEnd, nullptr);
+		m_allocator = std::move(rhs.m_allocator);
+		return *this;
+	}
 
 	void reallocate(base_vector::size_type newCapacity, base_vector::size_type oldSize)
 	{
@@ -108,47 +108,50 @@ struct standard_vector_storage
 //=============================================================================
 // Simplified vector class.
 // Mimics std::vector.
-template<typename T, class TAllocator = rde::allocator,
-	class TStorage = standard_vector_storage<T, TAllocator> >
-class vector : public base_vector, private TStorage
+template<
+	typename T,
+	class TAllocator = rde::allocator,
+	class TStorage = standard_vector_storage<T, TAllocator>
+>
+class vector: public base_vector, private TStorage
 {
 private:
-    using TStorage::m_begin;
-    using TStorage::m_end;
-    using TStorage::m_capacityEnd;
-    using TStorage::m_allocator;
-    using TStorage::invariant;
-    using TStorage::reallocate;
-    
+	using TStorage::m_begin;
+	using TStorage::m_end;
+	using TStorage::m_capacityEnd;
+	using TStorage::m_allocator;
+	using TStorage::invariant;
+	using TStorage::reallocate;
+
 public:
 	typedef T				value_type;
 	typedef T*				iterator;
 	typedef const T*		const_iterator;
 	typedef TAllocator		allocator_type;
 	static const size_type	kInitialCapacity = 16;
-   
+
 	explicit vector(const allocator_type& allocator = allocator_type())
-	:	TStorage(allocator)
+		: TStorage(allocator)
 	{
 		/**/
 	}
 	explicit vector(size_type initialSize, const allocator_type& allocator = allocator_type())
-	:	TStorage(allocator)
+		: TStorage(allocator)
 	{
 		resize(initialSize);
 	}
 	vector(const T* first, const T* last, const allocator_type& allocator = allocator_type())
-	:	TStorage(allocator)
+		: TStorage(allocator)
 	{
 		assign(first, last);
 	}
 	// @note: allocator is not copied from rhs.
 	// @note: will not perform default constructor for newly created objects.
 	vector(const vector& rhs, const allocator_type& allocator = allocator_type())
-	:	TStorage(allocator)
+		: TStorage(allocator)
 	{
-        if(rhs.size() == 0) // nothing to do
-            return;
+		if (rhs.size() == 0) // nothing to do
+			return;
 		this->reallocate_discard_old(rhs.capacity());
 		rde::copy_construct_n(rhs.m_begin, rhs.size(), m_begin);
 		m_end = m_begin + rhs.size();
@@ -156,13 +159,13 @@ public:
 		RDE_ASSERT(invariant());
 	}
 	explicit vector(e_noinitialize n)
-	:	TStorage(n)
+		: TStorage(n)
 	{
 	}
-    vector(vector&& rhs)
-    :   TStorage(std::forward<TStorage&&>(rhs))
-    {
-    }
+	vector(vector&& rhs)
+		: TStorage(std::forward<TStorage&&>(rhs))
+	{
+	}
 	~vector()
 	{
 		if (TStorage::m_begin != 0)
@@ -174,21 +177,21 @@ public:
 	//			just initialize with copy ctor of elements of rhs.
 	vector& operator=(const vector& rhs)
 	{
-        copy(rhs);		
+		copy(rhs);
 		return *this;
 	}
-    vector& operator=(vector&& rhs)
-    {
-        if (&rhs == this)
-        {
-            return *this;
-        }
-        TStorage::operator=(std::forward<TStorage&&>(rhs));
-        return *this;
-    }
-    
-    void copy(const vector& rhs)
-    {
+	vector& operator=(vector&& rhs)
+	{
+		if (&rhs == this)
+		{
+			return *this;
+		}
+		TStorage::operator=(std::forward<TStorage&&>(rhs));
+		return *this;
+	}
+
+	void copy(const vector& rhs)
+	{
 		const size_type newSize = rhs.size();
 		if (newSize > capacity())
 		{
@@ -198,7 +201,7 @@ public:
 		m_end = m_begin + newSize;
 		TStorage::record_high_watermark();
 		RDE_ASSERT(invariant());
-    }
+	}
 
 	// @note: swap() not provided for the time being.
 
@@ -234,28 +237,28 @@ public:
 		return *(end() - 1);
 	}
 
-	T& operator[](size_type i) 
-    {
+	T& operator[](size_type i)
+	{
 		return at(i);
 	}
 
-	const T& operator[](size_type i) const 
-    {
-        return at(i);
+	const T& operator[](size_type i) const
+	{
+		return at(i);
 	}
 
-    T& at(size_type i) 
-    {
-        RDE_ASSERT(i < size());
+	T& at(size_type i)
+	{
+		RDE_ASSERT(i < size());
 		return m_begin[i];
-    }
+	}
 
-    const T& at(size_type i) const
-    {
-        RDE_ASSERT(i < size());
+	const T& at(size_type i) const
+	{
+		RDE_ASSERT(i < size());
 		return m_begin[i];
-    }
-    
+	}
+
 	void push_back(const T& v)
 	{
 		if (m_end < m_capacityEnd)
@@ -285,17 +288,17 @@ public:
 		rde::destruct(m_end);
 	}
 
-    template<class... Args>
-    void emplace_back(Args&&... args)
-    {
-        if (m_end == m_capacityEnd)
-        {
-            grow();
-        }
-        rde::construct_args(m_end, std::forward<Args>(args)...);
-        ++m_end;
-        TStorage::record_high_watermark();
-    }
+	template<class... Args>
+	void emplace_back(Args&&... args)
+	{
+		if (m_end == m_capacityEnd)
+		{
+			grow();
+		}
+		rde::construct_args(m_end, std::forward<Args>(args)...);
+		++m_end;
+		TStorage::record_high_watermark();
+	}
 
 	void assign(const T* first, const T* last)
 	{
@@ -347,7 +350,7 @@ public:
 			for (size_type i = 0; i < n; ++i)
 				insertPos[i] = val;
 		}
-		m_end += n; 
+		m_end += n;
 		TStorage::record_high_watermark();
 	}
 	// @pre validate_iterator(it)
@@ -377,7 +380,7 @@ public:
 		// @note: conditional vs empty loop, what's better?
 		if (m_end > it)
 		{
-			if(!has_trivial_copy<T>::value)
+			if (!has_trivial_copy<T>::value)
 			{
 				const size_type prevSize = size();
 				RDE_ASSERT(index <= prevSize);
@@ -423,7 +426,7 @@ public:
 		RDE_ASSERT(invariant());
 		if (last <= first)
 			return end();
-		
+
 		const size_type indexFirst = size_type(first - m_begin);
 		const size_type toRemove = size_type(last - first);
 		if (toRemove > 0)
@@ -458,7 +461,7 @@ public:
 	}
 	void reserve(size_type n)
 	{
-		if (n > capacity())			
+		if (n > capacity())
 			reallocate(n, size());
 	}
 
@@ -487,7 +490,7 @@ public:
 	size_type index_of(const T& item, size_type index = 0) const
 	{
 		RDE_ASSERT(index >= 0 && index < size());
-		for ( ; index < size(); ++index)
+		for (; index < size(); ++index)
 			if (m_begin[index] == item)
 				return index;
 		return npos;

@@ -8,9 +8,12 @@
 
 namespace rde
 {
-template<typename Tk, typename Tv, 
-	class TAllocator = rde::allocator>
-class map 
+template<
+	typename TKey,
+	typename TValue,
+	class TAllocator = rde::allocator
+>
+class map
 {
 	template<typename TNodePtr, typename TPtr, typename TRef>
 	class node_iterator
@@ -19,12 +22,14 @@ class map
 		typedef forward_iterator_tag	iterator_category;
 
 		explicit node_iterator(TNodePtr node, const map* map_)
-		:	m_node(node),
+			: m_node(node),
 			m_map(map_)
-		{/**/}
+		{
+			/**/
+		}
 		template<typename UNodePtr, typename UPtr, typename URef>
 		node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
-		:	m_node(rhs.node()),
+			: m_node(rhs.node()),
 			m_map(rhs.get_map())
 		{
 			/**/
@@ -44,13 +49,13 @@ class map
 			return m_node;
 		}
 
-		node_iterator& operator++() 
+		node_iterator& operator++()
 		{
 			RDE_ASSERT(m_node != 0);
 			TNodePtr next = find_next_node(m_node);
 			m_node = next;
 			return *this;
-		} 
+		}
 		node_iterator operator++(int)
 		{
 			node_iterator copy(*this);
@@ -77,39 +82,41 @@ class map
 		TNodePtr	m_node;
 		const map*	m_map;
 	};
-	template<typename Tkm, typename Tvm>
-	struct map_pair : public rde::pair<Tkm, Tvm>
+
+	template<typename TKeym, typename TValuem>
+	struct map_pair: public rde::pair<TKeym, TValuem>
 	{
 		map_pair() {}
-		map_pair(const Tkm& k, const Tvm& v): pair<Tkm, Tvm>(k, v) {}
+		map_pair(const TKeym& k, const TValuem& v): pair<TKeym, TValuem>(k, v) {}
 		bool operator<(const map_pair& rhs) const
 		{
 			return first < rhs.first;
 		}
-		RDE_FORCEINLINE const Tkm& get_key() const	{ return first; }
+		RDE_FORCEINLINE const TKeym& get_key() const	{ return first; }
 	};
-	template<typename Tkm, typename Tvm>
+
+	template<typename TKeym, typename TValuem>
 	struct map_traits
 	{
-		typedef	Tkm					key_type;
-		typedef map_pair<Tkm, Tvm>	value_type;
+		typedef	TKeym						key_type;
+		typedef map_pair<TKeym, TValuem>	value_type;
 	};
 
 public:
-	typedef Tk															key_type;
-	typedef Tv															data_type;
-	typedef map_pair<Tk, Tv>											value_type;
-	typedef rb_tree_base<map_traits<Tk, Tv> >							tree_type;
-	typedef typename tree_type::size_type								size_type;
-	typedef node_iterator<typename tree_type::node*, value_type*, value_type&>	iterator;
+	typedef TKey																			key_type;
+	typedef TValue																			data_type;
+	typedef map_pair<TKey, TValue>															value_type;
+	typedef rb_tree_base<map_traits<TKey, TValue> >											tree_type;
+	typedef typename tree_type::size_type													size_type;
+	typedef node_iterator<typename tree_type::node*, value_type*, value_type&>				iterator;
 	typedef node_iterator<typename tree_type::node*, const value_type*, const value_type&>	const_iterator;
-	typedef TAllocator													allocator_type;
+	typedef TAllocator																		allocator_type;
 
 	explicit map(const allocator_type& allocator = allocator_type())
-	:	m_tree(allocator) {}
+		: m_tree(allocator) {}
 	template<typename TInputIterator>
 	map(TInputIterator dataBegin, TInputIterator dataEnd, const allocator_type& allocator = allocator_type())
-	:	m_tree(allocator)
+		: m_tree(allocator)
 	{
 		TInputIterator it = dataBegin;
 		while (it != dataEnd)
@@ -131,7 +138,7 @@ public:
 	{
 		typename tree_type::node* n = m_tree.find_node(key);
 		if (n == 0)
-			n = m_tree.insert(value_type(key, Tv()));
+			n = m_tree.insert(value_type(key, TValue()));
 		return n->value.second;
 	}
 
@@ -162,7 +169,7 @@ private:
 	tree_type	m_tree;
 };
 
-}
+} // namespace rde
 
+//-----------------------------------------------------------------------------
 #endif // RDESTL_MAP_H
-

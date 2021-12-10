@@ -16,11 +16,17 @@
 
 namespace rde
 {
-    template<typename T, class TAllocator = rde::allocator,
-                class TStorage = standard_vector_storage<T, TAllocator> >
-    struct deque : public vector<T,TAllocator,TStorage>
-    {
-        // TODO
-    };
+template<
+	typename T,
+	class TAllocator = rde::allocator,
+	class TStorage = standard_vector_storage<T, TAllocator>
+>
+struct deque: public vector<T, TAllocator, TStorage>
+{
+	// TODO
 };
-#endif
+
+} // namespace rde
+
+//-----------------------------------------------------------------------------
+#endif // #ifndef RDESTL_H

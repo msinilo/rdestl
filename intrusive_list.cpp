@@ -3,7 +3,7 @@
 namespace rde
 {
 	intrusive_list_base::intrusive_list_base()
-	:	m_root()
+		: m_root()
 	{
 		/**/
 	}
@@ -16,7 +16,8 @@ namespace rde
 		{
 			iter = iter->next;
 			++numNodes;
-		} while (iter != &m_root);
+		}
+		while (iter != &m_root);
 		return numNodes - 1;
 	}
 
@@ -35,4 +36,5 @@ namespace rde
 		node->next->prev = node->prev;
 		node->next = node->prev = node;
 	}
-}
+
+} // namespace rde

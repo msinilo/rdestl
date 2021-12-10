@@ -11,29 +11,32 @@ namespace rde
 namespace internal
 {
 	//=========================================================================
-	template<class TPair, class TFunctor>
-	struct compare_func
+template<class TPair, class TFunctor>
+struct compare_func
+{
+	bool operator()(const TPair& lhs, const TPair& rhs) const
 	{
-		bool operator()(const TPair& lhs, const TPair& rhs) const
-		{
-			return TFunctor()(lhs.first, rhs.first);
-		}
-		bool operator()(const TPair& lhs, const typename TPair::first_type& rhs) const
-		{
-			return TFunctor()(lhs.first, rhs);
-		}
-		bool operator()(const typename TPair::first_type& lhs, const TPair& rhs) const
-		{
-			return TFunctor()(lhs, rhs.first);
-		}
-	};
-}
+		return TFunctor()(lhs.first, rhs.first);
+	}
+	bool operator()(const TPair& lhs, const typename TPair::first_type& rhs) const
+	{
+		return TFunctor()(lhs.first, rhs);
+	}
+	bool operator()(const typename TPair::first_type& lhs, const TPair& rhs) const
+	{
+		return TFunctor()(lhs, rhs.first);
+	}
+};
+
+} // namespace internal
 
 //=============================================================================
-template<typename TKey, typename TValue, class TCompare = rde::less<TKey>,
-	class TAllocator = rde::allocator, 
-	class TStorage = rde::standard_vector_storage<pair<TKey, TValue>, TAllocator> >
-class sorted_vector : private vector<pair<TKey, TValue>, TAllocator, TStorage >
+template<typename TKey, typename TValue,
+	class TCompare = rde::less<TKey>,
+	class TAllocator = rde::allocator,
+	class TStorage = rde::standard_vector_storage<pair<TKey, TValue>, TAllocator>
+>
+class sorted_vector: private vector<pair<TKey, TValue>, TAllocator, TStorage>
 {
 	typedef vector<pair<TKey, TValue>, TAllocator, TStorage>	Base;
 
@@ -47,14 +50,14 @@ public:
 	typedef typename Base::allocator_type	allocator_type;
 
 	explicit sorted_vector(const allocator_type& allocator = allocator_type())
-	:	Base(allocator)
+		: Base(allocator)
 	{
 		/**/
 	}
 	template <class InputIterator>
-	sorted_vector(InputIterator first, InputIterator last, 
+	sorted_vector(InputIterator first, InputIterator last,
 		const allocator_type& allocator = allocator_type())
-	:	Base(first, last, allocator)
+		: Base(first, last, allocator)
 	{
 		rde::quick_sort(begin(), end(), m_compare);
 		RDE_ASSERT(invariant());
@@ -83,31 +86,30 @@ public:
 		return pair<iterator, bool>(it, !found);
 	}
 	// @extension
-	RDE_FORCEINLINE 
-	pair<iterator, bool> insert(const key_type& k, const mapped_type& v)
+	RDE_FORCEINLINE pair<iterator, bool> insert(const key_type& k, const mapped_type& v)
 	{
 		return insert(value_type(k, v));
 	}
 
 	iterator find(const key_type& k)
-    {
+	{
 		RDE_ASSERT(invariant());
 		iterator i(lower_bound(k));
-        if (i != end() && m_compare(k, *i))
-        {
+		if (i != end() && m_compare(k, *i))
+		{
 			i = end();
 		}
-        return i;
+		return i;
 	}
-    const_iterator find(const key_type& k) const
-    {       
+	const_iterator find(const key_type& k) const
+	{
 		RDE_ASSERT(invariant());
 		const_iterator i(lower_bound(k));
-        if (i != end() && m_compare(k, *i))
-        {
+		if (i != end() && m_compare(k, *i))
+		{
 			i = end();
 		}
-        return i;
+		return i;
 	}
 
 	RDE_FORCEINLINE iterator erase(iterator it)
@@ -116,13 +118,13 @@ public:
 		return Base::erase(it);
 	}
 	size_type erase(const key_type& k)
-    {
+	{
 		iterator i(find(k));
-        if (i == end()) 
+		if (i == end())
 			return 0;
-        erase(i);
+		erase(i);
 		RDE_ASSERT(invariant());
-        return 1;
+		return 1;
 	}
 
 	using Base::clear;

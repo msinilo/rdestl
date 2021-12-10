@@ -69,12 +69,12 @@ void down_heap(T* data, size_t k, size_t n, TPredicate pred)
 	data[k - 1] = temp;
 }
 
-} // internal
+} // namespace internal
 
 template<typename T, class TPredicate>
 void insertion_sort(T* begin, T* end, TPredicate pred)
 {
-	const size_t num = end - begin;	
+	const size_t num = end - begin;
 	for (size_t i = 0; i < num; ++i)
 	{
 		const T t = begin[i];
@@ -117,7 +117,7 @@ void heap_sort(T* begin, T* end, TPredicate pred)
 		const T temp = begin[0];
 		begin[0] = begin[n - 1];
 		begin[n - 1] = temp;
-		
+
 		--n;
 		internal::down_heap(begin, 1, n, pred);
 	}
@@ -152,6 +152,7 @@ bool is_sorted(TIter begin, TIter end, TPredicate pred)
 	return is_sorted;
 }
 
-} // rde
+} // namespace rde
 
-#endif 
+//-----------------------------------------------------------------------------
+#endif // #ifndef RDESTL_SORT_H

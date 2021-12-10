@@ -6,17 +6,18 @@
 #endif
 
 #if RDESTL_STANDALONE
-#  ifdef _MSC_VER
-#   define _ALLOW_RTCc_IN_STL
-#	include <cassert>
-#	include <cstring>
-#	define RDE_FORCEINLINE	__forceinline
-#  else
-#   include <assert.h>
-#   include <cstdlib>
-#   include <cstring>
-#	define RDE_FORCEINLINE	inline
-#  endif
+
+#	ifdef _MSC_VER
+#		define _ALLOW_RTCc_IN_STL
+#		include <cassert>
+#		include <cstring>
+#		define RDE_FORCEINLINE	__forceinline
+#	else
+#		include <assert.h>
+#		include <cstdlib>
+#		include <cstring>
+#		define RDE_FORCEINLINE	inline
+#	endif
 
 #	ifdef _DEBUG
 #		undef RDE_DEBUG
@@ -28,39 +29,41 @@
 // NOOB
 #include <cstdint>
 
-	namespace rde 
-	{ 
-		// # Meh. MSVC doesnt seem to have <stdint.h>
-		// @todo	Fixes to make this portable.
-		typedef unsigned char		uint8;
-		typedef unsigned short		uint16;
-		typedef signed long			int32;
-		typedef unsigned long		uint32;
-        #ifdef _MSC_VER
-		typedef unsigned __int64	uint64;
-        #else
-        typedef unsigned long long	uint64;
-        #endif
-		namespace Sys 
+namespace rde
+{
+	// # Meh. MSVC doesnt seem to have <stdint.h>
+	// @todo	Fixes to make this portable.
+	typedef unsigned char		uint8;
+	typedef unsigned short		uint16;
+	typedef signed long			int32;
+	typedef unsigned long		uint32;
+	#ifdef _MSC_VER
+	typedef unsigned __int64	uint64;
+	#else
+	typedef unsigned long long	uint64;
+	#endif
+
+	namespace Sys
+	{
+		RDE_FORCEINLINE void MemCpy(void* to, const void* from, size_t bytes)
 		{
-			RDE_FORCEINLINE void MemCpy(void* to, const void* from, size_t bytes)
-			{
-				std::memcpy(to, from, bytes);
-			}
-			RDE_FORCEINLINE void MemMove(void* to, const void* from, size_t bytes)
-			{
-				std::memmove(to, from, bytes);
-			}
-			RDE_FORCEINLINE void MemSet(void* buf, unsigned char value, size_t bytes)
-			{
-				std::memset(buf, value, bytes);
-			}
-		} // sys
-	}
-#else
+			std::memcpy(to, from, bytes);
+		}
+		RDE_FORCEINLINE void MemMove(void* to, const void* from, size_t bytes)
+		{
+			std::memmove(to, from, bytes);
+		}
+		RDE_FORCEINLINE void MemSet(void* buf, unsigned char value, size_t bytes)
+		{
+			std::memset(buf, value, bytes);
+		}
+	} // namespace sys
+} // namespace rde
+
+#else // #if RDESTL_STANDALONE
 #	include "core/RdeAssert.h"
 #	include "core/System.h"
-#endif
+#endif // #if RDESTL_STANDALONE
 
 namespace rde
 {
@@ -68,6 +71,8 @@ enum e_noinitialize
 {
 	noinitialize
 };
-}
 
-#endif // #ifndef RDESTL_H
+} // namespace rde
+
+//-----------------------------------------------------------------------------
+#endif // #ifndef RDESTL_COMMON_H

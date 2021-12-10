@@ -28,9 +28,9 @@ public:
 	typedef Reference				reference;
 	typedef forward_iterator_tag	iterator_category;
 
-	intrusive_slist_iterator():	m_node(0) {/**/}
+	intrusive_slist_iterator(): m_node(0) { /**/ }
 	explicit intrusive_slist_iterator(Pointer iterNode)
-	:	m_node(iterNode)
+		: m_node(iterNode)
 	{
 		/**/
 	}
@@ -108,7 +108,7 @@ private:
 //=============================================================================
 // Can store pointers only!
 template<class T>
-class intrusive_slist : public intrusive_slist_base
+class intrusive_slist: public intrusive_slist_base
 {
 public:
 	typedef T												node_type;
@@ -175,7 +175,7 @@ public:
 		return iterator(v);
 	}
 	// O(1)
-	static const_iterator get_iterator(const value_type* v) 
+	static const_iterator get_iterator(const value_type* v)
 	{
 		RDE_ASSERT(v->in_list());
 		return const_iterator(v);

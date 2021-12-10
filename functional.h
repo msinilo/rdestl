@@ -33,7 +33,7 @@ struct equal_to
 	}
 };
 
-}
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_FUNCTIONAL_H

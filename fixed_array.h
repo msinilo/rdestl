@@ -16,7 +16,7 @@ public:
 	typedef const T*	const_iterator;
 	typedef size_t		size_type;
 
-	fixed_array() {/**/}
+	fixed_array() { /**/ }
 	fixed_array(const T array[N])
 	{
 		rde::copy_n(&array[0], N, m_data);
@@ -28,14 +28,14 @@ public:
 	const_iterator begin() const	{ return &m_data[0]; }
 	iterator end()					{ return begin() + N; }
 	const_iterator end() const		{ return begin() + N; }
-	size_type size() const	{ return N; }
-	T* data()				{ return &m_data[0]; }
-	const T* data() const	{ return &m_data[0]; }
+	size_type size() const			{ return N; }
+	T* data()						{ return &m_data[0]; }
+	const T* data() const			{ return &m_data[0]; }
 
-	const T& front() const	{ return *begin(); }
-	T& front()				{ return *begin(); }
-	const T& back() const	{ return *(end() - 1); }
-	T& back()				{ return *(end() - 1); }
+	T& front()						{ return *begin(); }
+	const T& front() const			{ return *begin(); }
+	T& back()						{ return *(end() - 1); }
+	const T& back() const			{ return *(end() - 1); }
 
 	RDE_FORCEINLINE T& operator[](size_type i)
 	{
@@ -52,8 +52,7 @@ private:
 	T	m_data[N];
 };
 
-} // rde
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_FIXED_ARRAY_H
-

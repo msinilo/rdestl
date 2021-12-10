@@ -108,7 +108,7 @@ public:
 		if (num > m_dst.size())
 			resize(num);
 		sort<TDataType, TFunc>(src, num, func, m_dst.begin());
-	}		
+	}
 
 private:
 	void resize(int num)
@@ -117,7 +117,7 @@ private:
 	}
 	void calculate_offsets(uint32* histogram)
 	{
-		uint32 offsets[4] = { 1, 1, 1, 1 };
+		uint32 offsets[4] ={ 1, 1, 1, 1 };
 		for (int i = 0; i < kHistogramSize; ++i)
 		{
 			uint32 temp = histogram[i] + offsets[0];
@@ -139,7 +139,7 @@ private:
 	}
 	void calculate_offsets_signed(uint32* histogram)
 	{
-		uint32 offsets[4] = { 1, 1, 1, 1 };
+		uint32 offsets[4] ={ 1, 1, 1, 1 };
 		int numNeg(0);
 		for (int i = 0; i < kHistogramSize; ++i)
 		{
@@ -176,6 +176,8 @@ private:
 	}
 	vector<T>	m_dst;
 };
-}
 
-#endif
+} // namespace rde
+
+//-----------------------------------------------------------------------------
+#endif // #ifndef RDESTL_RADIX_SORTER_H

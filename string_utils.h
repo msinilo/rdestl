@@ -48,6 +48,7 @@ template<typename T> int strcompare(const T* s1, const T* s2)
 	return 0;
 }
 
-} // rde
+} // namespace rde
 
+//-----------------------------------------------------------------------------
 #endif // RDESTL_STRING_UTILS_H

@@ -13,7 +13,7 @@ namespace rde
 template <typename T, typename... Args> RDE_FORCEINLINE
 void construct_args(T* p, Args&&... args)
 {
-    ::new (static_cast<void*>(p)) T(std::forward<Args>(args)...);
+	::new (static_cast<void*>(p)) T(std::forward<Args>(args)...);
 }
 
 //-----------------------------------------------------------------------------
@@ -64,15 +64,15 @@ void copy_construct_n(T* first, size_t n, T* result)
 template <typename T>
 void move_construct_n(T* first, size_t n, T* result)
 {
-    internal::move_construct_n(first, n, result, int_to_type<has_trivial_copy<T>::value>());
+	internal::move_construct_n(first, n, result, int_to_type<has_trivial_copy<T>::value>());
 }
- 
+
 //-----------------------------------------------------------------------------
 template<typename T>
 void move_n(const T* from, size_t n, T* result)
 {
 	RDE_ASSERT(from != result || n == 0);
-	// Overlap? 
+	// Overlap?
 	if (result + n >= from && result < from + n)
 	{
 		internal::move_n(from, n, result, int_to_type<has_trivial_copy<T>::value>());
@@ -252,7 +252,7 @@ RDE_FORCEINLINE short abs(short x)
 template<typename T> inline
 T max(const T& x, const T& y)
 {
-    return x > y ? x : y;
+	return x > y ? x : y;
 }
 
 //-----------------------------------------------------------------------------
@@ -290,4 +290,3 @@ void swap(TAssignable& a, TAssignable& b)
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_ALGORITHM_H
-

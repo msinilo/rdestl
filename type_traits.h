@@ -3,8 +3,7 @@
 
 namespace rde
 {
-
-template<typename T> struct is_integral 
+template<typename T> struct is_integral
 {
 	enum { value = false };
 };
@@ -46,7 +45,7 @@ template<typename T> struct is_pod
 
 template<typename T> struct is_fundamental
 {
-	enum 
+	enum
 	{
 		value = is_integral<T>::value || is_floating_point<T>::value
 	};
@@ -96,4 +95,3 @@ template<typename T> struct has_cheap_compare
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_TYPETRAITS_H
-

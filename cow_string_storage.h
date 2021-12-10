@@ -36,35 +36,35 @@ public:
 	typedef int					size_type;
 	typedef TAllocator			allocator_type;
 	typedef const value_type*	const_iterator;
-	static const unsigned long	kGranularity = 32;	
+	static const unsigned long	kGranularity = 32;
 
 	explicit cow_string_storage(const allocator_type& allocator)
-	:	m_allocator(allocator)
+		: m_allocator(allocator)
 	{
 		construct_string(0);
 	}
 	cow_string_storage(const value_type* str, const allocator_type& allocator)
-	:	m_allocator(allocator)
+		: m_allocator(allocator)
 	{
 		const int len = strlen(str);
 		construct_string(len);
-		Sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len * sizeof(value_type));
 		RDE_ASSERT(len < string_rep::kMaxCapacity);
 		get_rep()->size = static_cast<short>(len);
 		m_data[len] = 0;
 	}
-	cow_string_storage(const value_type* str, size_type len, 
+	cow_string_storage(const value_type* str, size_type len,
 		const allocator_type& allocator)
-	:	m_allocator(allocator)
+		: m_allocator(allocator)
 	{
 		construct_string(len);
-		Sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len * sizeof(value_type));
 		RDE_ASSERT(len < string_rep::kMaxCapacity);
 		get_rep()->size = static_cast<short>(len);
 		m_data[len] = 0;
 	}
 	cow_string_storage(const cow_string_storage& rhs, const allocator_type& allocator)
-	:	m_data(rhs.m_data),
+		: m_data(rhs.m_data),
 		m_allocator(allocator)
 	{
 		if (rhs.is_dynamic())
@@ -75,7 +75,7 @@ public:
 		{
 			const int len = rhs.length();
 			construct_string(len);
-			Sys::MemCpy(m_data, rhs.c_str(), len*sizeof(value_type));
+			Sys::MemCpy(m_data, rhs.c_str(), len * sizeof(value_type));
 			RDE_ASSERT(len < string_rep::kMaxCapacity);
 			get_rep()->size = static_cast<short>(len);
 			m_data[len] = 0;
@@ -106,7 +106,7 @@ public:
 		RDE_ASSERT(str != m_data);
 		release_string();
 		construct_string(len);
-		Sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len * sizeof(value_type));
 		get_rep()->size = short(len);
 		m_data[len] = 0;
 	}
@@ -171,7 +171,7 @@ protected:
 		if (capacity_hint != 0)
 		{
 			++capacity_hint;
-			capacity_hint = (capacity_hint+kGranularity-1) & ~(kGranularity-1);
+			capacity_hint = (capacity_hint + kGranularity - 1) & ~(kGranularity - 1);
 			if (capacity_hint < kGranularity)
 				capacity_hint = kGranularity;
 		}
@@ -182,12 +182,12 @@ protected:
 		{
 			if (capacity_hint > 0)
 			{
-				const size_type toAlloc = sizeof(string_rep) + sizeof(value_type)*capacity_hint;
+				const size_type toAlloc = sizeof(string_rep) + sizeof(value_type) * capacity_hint;
 				void* newMem = m_allocator.allocate(toAlloc);
 				string_rep* newRep = reinterpret_cast<string_rep*>(newMem);
 				newRep->init(short(capacity_hint));
 				value_type* newData = reinterpret_cast<value_type*>(newRep + 1);
-				Sys::MemCpy(newData, m_data, rep->size*sizeof(value_type));
+				Sys::MemCpy(newData, m_data, rep->size * sizeof(value_type));
 				newRep->size = rep->size;
 				newData[rep->size] = 0;
 				release_string();
@@ -215,12 +215,12 @@ private:
 		if (capacity != 0)
 		{
 			++capacity;
-			capacity = (capacity+kGranularity-1) & ~(kGranularity-1);
+			capacity = (capacity + kGranularity - 1) & ~(kGranularity - 1);
 			if (capacity < kGranularity)
 				capacity = kGranularity;
 			RDE_ASSERT(capacity < string_rep::kMaxCapacity);
 
-			const size_type toAlloc = sizeof(string_rep) + sizeof(value_type)*capacity;
+			const size_type toAlloc = sizeof(string_rep) + sizeof(value_type) * capacity;
 			void* mem = m_allocator.allocate(toAlloc);
 			string_rep* rep = reinterpret_cast<string_rep*>(mem);
 			rep->init(static_cast<short>(capacity));
@@ -252,10 +252,11 @@ private:
 	E*			m_data;
 	// @note: hack-ish. sizeof(string_rep) bytes for string_rep, than place for terminating
 	// character (up to 2-bytes!)
-	char		m_buffer[sizeof(string_rep)+2]; 
+	char		m_buffer[sizeof(string_rep) + 2];
 	TAllocator	m_allocator;
 };
 
-} // rde
+} // namespace rde
 
+//-----------------------------------------------------------------------------
 #endif // RDESTL_COW_STRING_STORAGE_H
