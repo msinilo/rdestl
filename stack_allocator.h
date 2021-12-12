@@ -15,7 +15,7 @@ class stack_allocator
 {
 public:
 	explicit stack_allocator(const char* name = "STACK")
-	:	m_name(name), 
+		: m_name(name),
 		m_bufferTop(0)
 	{
 		/**/
@@ -34,7 +34,7 @@ public:
 		sizeof(ptr);
 	}
 
-	const char* get_name() const	{ return m_name; }
+	const char* get_name() const { return m_name; }
 
 private:
 	stack_allocator(const stack_allocator&);
@@ -46,5 +46,6 @@ private:
 };
 
 } // namespace rde
+
 //-----------------------------------------------------------------------------
-#endif 
+#endif // #ifndef RDESTL_STACK_ALLOCATOR_H

@@ -17,6 +17,7 @@ struct rb_tree_base
 		black
 	};
 };
+
 template<typename TKey>
 struct rb_tree_key_wrapper
 {
@@ -25,6 +26,7 @@ struct rb_tree_key_wrapper
 	rb_tree_key_wrapper(const TKey& key_): key(key_) {}
 	const TKey& get_key() const { return key; }
 };
+
 template<typename TKey>
 struct rb_tree_traits
 {
@@ -32,10 +34,10 @@ struct rb_tree_traits
 	typedef rb_tree_key_wrapper<TKey>	value_type;
 };
 
-} // internal
+} // namespace internal
 
 template<class TTreeTraits, class TAllocator = rde::allocator>
-class rb_tree_base : public internal::rb_tree_base
+class rb_tree_base: public internal::rb_tree_base
 {
 public:
 	typedef typename TTreeTraits::key_type		key_type;
@@ -46,7 +48,7 @@ public:
 	{
 		node() {}
 		node(color_e color_, node* left_, node* right_, node* parent_)
-		:	left(left_), parent(parent_), right(right_), color(color_)
+			: left(left_), parent(parent_), right(right_), color(color_)
 		{
 		}
 
@@ -58,7 +60,7 @@ public:
 	};
 
 	explicit rb_tree_base(const allocator_type& allocator = allocator_type())
-	:	m_size(0),
+		: m_size(0),
 		m_allocator(allocator)
 	{
 		ms_sentinel.color	= black;
@@ -111,7 +113,7 @@ public:
 		return new_node;
 	}
 
-	node* find_node(const key_type& key) 
+	node* find_node(const key_type& key)
 	{
 		node* iter(m_root);
 		while (iter != &ms_sentinel)
@@ -308,7 +310,7 @@ public:
 					grandparent->color = red;
 					iter = grandparent;
 				}
-				else 
+				else
 				{
 					if (iter == iter->parent->right)
 					{
@@ -530,12 +532,13 @@ typename rb_tree_base<TTreeTraits, TAllocator>::node rb_tree_base<TTreeTraits, T
 	internal::rb_tree_base::black, &ms_sentinel, &ms_sentinel, &ms_sentinel);
 
 template<typename TKey, class TAllocator = rde::allocator>
-class rb_tree : public rb_tree_base<internal::rb_tree_traits<TKey>, TAllocator>
+class rb_tree: public rb_tree_base<internal::rb_tree_traits<TKey>, TAllocator>
 {
 public:
 	explicit rb_tree(TAllocator allocator = TAllocator()): rb_tree_base(allocator) {}
 };
 
-} // rde
+} // namespace rde
 
+//-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_RB_TREE_H

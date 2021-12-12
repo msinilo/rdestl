@@ -5,14 +5,13 @@
 
 namespace rde
 {
-
 // CONCEPT!
 class buffer_allocator
 {
 public:
 	explicit buffer_allocator(const char* name, char* mem,
 		size_t bufferSize)
-	:	m_name(name), 
+		: m_name(name),
 		m_buffer(mem),
 		m_bufferTop(0),
 		m_bufferSize(bufferSize)
@@ -43,5 +42,6 @@ private:
 };
 
 } // namespace rde
+
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_BUFFER_ALLOCATOR_H

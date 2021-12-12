@@ -14,41 +14,41 @@ namespace rde
 //=============================================================================
 // @note: this one is totally _not_ std::string compatible for the time being!
 // one way conversion should work, ie rde --> STL.
-template<typename E, 
+template<typename E,
 	class TAllocator = rde::allocator,
 	typename TStorage = rde::simple_string_storage<E, TAllocator> >
-class basic_string : private TStorage
+	class basic_string: private TStorage
 {
 public:
 	typedef typename TStorage::value_type		value_type;
 	typedef typename TStorage::size_type		size_type;
 	typedef typename TStorage::const_iterator	const_iterator;
 	typedef typename TStorage::allocator_type	allocator_type;
-    
-    //For find
-    static const size_type npos = size_type(-1);
-    
+
+	//For find
+	static const size_type npos = size_type(-1);
+
 	explicit basic_string(const allocator_type& allocator = allocator_type())
-	:	TStorage(allocator)
+		: TStorage(allocator)
 	{
 		/**/
 	}
 	// yeah, EXPLICIT.
-	explicit basic_string(const value_type* str, 
+	explicit basic_string(const value_type* str,
 		const allocator_type& allocator = allocator_type())
-	:	TStorage(str, allocator)
+		: TStorage(str, allocator)
 	{
 		/**/
 	}
-	basic_string(const value_type* str, size_type len, 
+	basic_string(const value_type* str, size_type len,
 		const allocator_type& allocator = allocator_type())
-	:	TStorage(str, len, allocator)
+		: TStorage(str, len, allocator)
 	{
 		/**/
 	}
-	basic_string(const basic_string& str, 
+	basic_string(const basic_string& str,
 		const allocator_type& allocator = allocator_type())
-	:	TStorage(str, allocator)
+		: TStorage(str, allocator)
 	{
 		/**/
 	}
@@ -56,8 +56,8 @@ public:
 	{
 		/**/
 	}
-    
-    size_type capacity() const { return TStorage::capacity(); }
+
+	size_type capacity() const { return TStorage::capacity(); }
 
 	// No operator returning ref for the time being. It's dangerous with COW.
 	value_type operator[](size_type i) const
@@ -71,7 +71,7 @@ public:
 	{
 		RDE_ASSERT(rhs.invariant());
 		if (this != &rhs) {
-            TStorage::operator=((TStorage&)rhs);
+			TStorage::operator=((TStorage&)rhs);
 		}
 		RDE_ASSERT(invariant());
 		return *this;
@@ -104,8 +104,8 @@ public:
 
 	void append(const value_type* str, size_type len)
 	{
-        if( !str || len == 0 || *str == 0 )
-            return;
+		if (!str || len == 0 || *str == 0)
+			return;
 		TStorage::append(str, len);
 	}
 	void append(const basic_string& str)
@@ -192,7 +192,7 @@ public:
 		for (size_type i = 0; i < len; ++i)
 		{
 			if (data[i] < 'a')
-				data[i] += chDelta;		
+				data[i] += chDelta;
 		}
 	}
 	void make_upper()
@@ -239,65 +239,65 @@ public:
 		}
 		return retIndex;
 	}
-    
-    size_type find(const value_type* needle) const
-    {       
-        const value_type* s(c_str());    
-        size_type si(0);
-        while(*s)
-        {
-            const value_type* n = needle;
-            if( *s == *n ) //first character matches
-            {
-                //go through the sequence, and make sure while(x) x == n for all of n
-                const value_type* x = s; 
-                size_type match = 0;
-                while(*x && *n) 
-                {
-                    if( *n == *x )
-                        ++match;
-                    ++n;
-                    ++x;
-                }
-                if( match == strlen(needle) )
-                    return si;
-            }
-            ++s;
-            ++si;
-        }
-        return basic_string::npos;
-    }
-    
-    size_type rfind(const value_type* needle) const
-    {   
-		const value_type* s(c_str() + length());
-		size_type si(length()+1); 
 
-		//find the last index of the first char in needle
-		//searching from end->start for obvious reasons
-		while(--si >= 0) 
+	size_type find(const value_type* needle) const
+	{
+		const value_type* s(c_str());
+		size_type si(0);
+		while (*s)
 		{
-			//if the first character matches, run our check
-			if( *s-- == *needle ) {
-
+			const value_type* n = needle;
+			if (*s == *n) //first character matches
+			{
 				//go through the sequence, and make sure while(x) x == n for all of n
-				const value_type* x = c_str() + si; 
-				const value_type* n = needle;
+				const value_type* x = s;
 				size_type match = 0;
-				while(*x && *n) 
+				while (*x && *n)
 				{
-					if( *n == *x )
+					if (*n == *x)
 						++match;
 					++n;
 					++x;
 				}
-				if( match == strlen(needle) )
+				if (match == strlen(needle))
+					return si;
+			}
+			++s;
+			++si;
+		}
+		return basic_string::npos;
+	}
+
+	size_type rfind(const value_type* needle) const
+	{
+		const value_type* s(c_str() + length());
+		size_type si(length()+1);
+
+		//find the last index of the first char in needle
+		//searching from end->start for obvious reasons
+		while (--si >= 0)
+		{
+			//if the first character matches, run our check
+			if (*s-- == *needle) {
+
+				//go through the sequence, and make sure while(x) x == n for all of n
+				const value_type* x = c_str() + si;
+				const value_type* n = needle;
+				size_type match = 0;
+				while (*x && *n)
+				{
+					if (*n == *x)
+						++match;
+					++n;
+					++x;
+				}
+				if (match == strlen(needle))
 					return si;
 			}
 		}
 		return basic_string::npos;
-    }
-    
+	}
+
 private:
 	bool invariant() const
 	{
@@ -307,7 +307,7 @@ private:
 
 //-----------------------------------------------------------------------------
 template<typename E, class TStorage, class TAllocator>
-bool operator==(const basic_string<E, TStorage, TAllocator>& lhs, 
+bool operator==(const basic_string<E, TStorage, TAllocator>& lhs,
 				const basic_string<E, TStorage, TAllocator>& rhs)
 {
 	return lhs.compare(rhs) == 0;
@@ -315,7 +315,7 @@ bool operator==(const basic_string<E, TStorage, TAllocator>& lhs,
 
 //-----------------------------------------------------------------------------
 template<typename E, class TStorage, class TAllocator>
-bool operator!=(const basic_string<E, TStorage, TAllocator>& lhs, 
+bool operator!=(const basic_string<E, TStorage, TAllocator>& lhs,
 				const basic_string<E, TStorage, TAllocator>& rhs)
 {
 	return !(lhs == rhs);
@@ -323,7 +323,7 @@ bool operator!=(const basic_string<E, TStorage, TAllocator>& lhs,
 
 //-----------------------------------------------------------------------------
 template<typename E, class TStorage, class TAllocator>
-bool operator<(const basic_string<E, TStorage, TAllocator>& lhs, 
+bool operator<(const basic_string<E, TStorage, TAllocator>& lhs,
 				const basic_string<E, TStorage, TAllocator>& rhs)
 {
 	return lhs.compare(rhs) < 0;
@@ -331,7 +331,7 @@ bool operator<(const basic_string<E, TStorage, TAllocator>& lhs,
 
 //-----------------------------------------------------------------------------
 template<typename E, class TStorage, class TAllocator>
-bool operator>(const basic_string<E, TStorage, TAllocator>& lhs, 
+bool operator>(const basic_string<E, TStorage, TAllocator>& lhs,
 				const basic_string<E, TStorage, TAllocator>& rhs)
 {
 	return lhs.compare(rhs) > 0;

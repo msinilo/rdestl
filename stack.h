@@ -6,8 +6,11 @@
 namespace rde
 {
 // Stack implemented on top of another container (vector by default).
-template<typename T, class TAllocator = rde::allocator,
-	class TContainer = rde::vector<T, TAllocator> >
+template<
+	typename T,
+	class TAllocator = rde::allocator,
+	class TContainer = rde::vector<T, TAllocator>
+>
 class stack
 {
 public:
@@ -17,15 +20,15 @@ public:
 	typedef TAllocator						allocator_type;
 
 	explicit stack(const allocator_type& allocator = allocator_type())
-	:	m_container(allocator)
+		: m_container(allocator)
 	{
 	}
 	stack(const stack& rhs, const allocator_type& allocator = allocator_type())
-	:	m_container(rhs, allocator)
+		: m_container(rhs, allocator)
 	{
 	}
 	explicit stack(e_noinitialize n)
-	:	m_container(n)
+		: m_container(n)
 	{
 	}
 
@@ -51,14 +54,14 @@ public:
 	const value_type& top() const	{ return m_container.back(); }
 
 	// @extension
-	void clear()			{ m_container.clear(); }
+	void clear()					{ m_container.clear(); }
 
-	bool empty() const		{ return m_container.empty(); }
-	size_type size() const	{ return m_container.size(); }
+	bool empty() const				{ return m_container.empty(); }
+	size_type size() const			{ return m_container.size(); }
 
-	const allocator_type& get_allocator() const	
-	{ 
-		return m_container.get_allocator(); 
+	const allocator_type& get_allocator() const
+	{
+		return m_container.get_allocator();
 	}
 	void set_allocator(const allocator_type& allocator)
 	{
@@ -69,6 +72,7 @@ private:
 	TContainer	m_container;
 };
 
-} // rde
+} // namespace rde
 
-#endif
+//-----------------------------------------------------------------------------
+#endif // #ifndef RDESTL_STACK_H

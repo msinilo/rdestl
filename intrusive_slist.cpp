@@ -15,7 +15,8 @@ namespace rde
 		{
 			iter = iter->next;
 			++numNodes;
-		} while (iter != &m_root);
+		}
+		while (iter != &m_root);
 		return numNodes - 1;
 	}
 
@@ -32,4 +33,5 @@ namespace rde
 		node->next = thisNode->next;
 		thisNode->next = thisNode;
 	}
-}
+
+} // namespace rde

@@ -8,7 +8,6 @@
 
 namespace rde
 {
-
 template<typename T, size_t TCapacity>
 class fixed_list
 {
@@ -30,7 +29,7 @@ class fixed_list
 		typedef unsigned long	index_type;
 	};
 
-	enum { select = TCapacity+1 > 255 ? (TCapacity+1 > 65535 ? 2 : 1) : 0 };
+	enum { select = TCapacity + 1 > 255 ? (TCapacity + 1 > 65535 ? 2 : 1) : 0 };
 	typedef type_selector<select>	index_type_selector;
 
 public:
@@ -60,10 +59,10 @@ private:
 		typedef bidirectional_iterator_tag	iterator_category;
 
 		explicit node_iterator(TNodePtr node, const fixed_list* list)
-		:	m_node(node), m_list(list) {/**/}
+			: m_node(node), m_list(list) { /**/ }
 		template<typename UNodePtr, typename UPtr, typename URef>
 		node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
-		:	m_node(rhs.node()),
+			: m_node(rhs.node()),
 			m_list(rhs.list())
 		{
 			/**/
@@ -131,7 +130,7 @@ public:
 	typedef node_iterator<const node*, const T*, const T&>	const_iterator;
 
 	fixed_list()
-	:	m_num_nodes(0)
+		: m_num_nodes(0)
 	{
 		init_free_indices();
 		get_root()->reset();
@@ -145,7 +144,7 @@ public:
 	fixed_list(const fixed_list& rhs)
 	{
 		get_root()->reset();
-		copy(rhs, 
+		copy(rhs,
 			int_to_type<has_trivial_copy<T>::value>());
 	}
 	explicit fixed_list(e_noinitialize)
@@ -161,7 +160,7 @@ public:
 	{
 		if (this != &rhs)
 		{
-			copy(rhs, 
+			copy(rhs,
 				int_to_type<has_trivial_copy<T>::value>());
 		}
 		return *this;
@@ -172,10 +171,10 @@ public:
 	iterator end()					{ return iterator(get_root(), this); }
 	const_iterator end() const		{ return const_iterator(get_root(), this); }
 
-	const T& front() const	{ RDE_ASSERT(!empty()); return get_next(get_root())->value; }
-	T& front()				{ RDE_ASSERT(!empty()); return get_next(get_root())->value; }
-	const T& back() const	{ RDE_ASSERT(!empty()); return get_prev(get_root())->value; }
-	T& back()				{ RDE_ASSERT(!empty()); return get_prev(get_root())->value; }
+	T& front()						{ RDE_ASSERT(!empty()); return get_next(get_root())->value; }
+	const T& front() const			{ RDE_ASSERT(!empty()); return get_next(get_root())->value; }
+	T& back()						{ RDE_ASSERT(!empty()); return get_prev(get_root())->value; }
+	const T& back() const			{ RDE_ASSERT(!empty()); return get_prev(get_root())->value; }
 
 	void push_front(const T& value)
 	{
@@ -249,7 +248,7 @@ public:
 	}
 
 	template<class InputIterator>
-	void assign(InputIterator first, InputIterator last) 
+	void assign(InputIterator first, InputIterator last)
 	{
 		clear();
 		while (first != last)
@@ -347,6 +346,7 @@ private:
 	size_type		m_num_nodes;	// Excluding root!
 };
 
-}
+} // namespace rde
 
-#endif
+//-----------------------------------------------------------------------------
+#endif // #ifndef RDESTL_FIXED_LIST_H

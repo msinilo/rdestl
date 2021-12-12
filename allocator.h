@@ -3,17 +3,16 @@
 
 namespace rde
 {
-
 // CONCEPT!
 class allocator
 {
 public:
-	explicit allocator(const char* name = "DEFAULT"):	m_name(name) {}
-    allocator(const allocator&) = default;
-    allocator(allocator&&) = default;
+	explicit allocator(const char* name = "DEFAULT"): m_name(name) {}
+	allocator(const allocator&) = default;
+	allocator(allocator&&) = default;
 	~allocator() {}
 
-    allocator& operator=(const allocator&) = default;
+	allocator& operator=(const allocator&) = default;
 
 	void* allocate(unsigned int bytes, int flags = 0);
 	// Not supported for standard allocator for the time being.

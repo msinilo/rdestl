@@ -6,7 +6,6 @@
 
 namespace rde
 {
-
 //=============================================================================
 struct intrusive_list_node
 {
@@ -29,9 +28,9 @@ public:
 	typedef Reference					reference;
 	typedef bidirectional_iterator_tag	iterator_category;
 
-	intrusive_list_iterator():	m_node(0) {/**/}
+	intrusive_list_iterator(): m_node(0) { /**/ }
 	explicit intrusive_list_iterator(Pointer iterNode)
-	:	m_node(iterNode)
+		: m_node(iterNode)
 	{
 		/**/
 	}
@@ -125,7 +124,7 @@ private:
 // Can store pointers only.
 // Type should be derived from intrusive_list_node.
 template<class T>
-class intrusive_list : public intrusive_list_base
+class intrusive_list: public intrusive_list_base
 {
 public:
 	typedef T											node_type;
@@ -133,7 +132,7 @@ public:
 	typedef intrusive_list_iterator<T*, T&>				iterator;
 	typedef intrusive_list_iterator<const T*, const T&>	const_iterator;
 
-	intrusive_list() : intrusive_list_base()
+	intrusive_list(): intrusive_list_base()
 	{
 		// Compile error if T not derived from intrusive_list_node
 		intrusive_list_node* testNode((T*)0);
@@ -141,7 +140,7 @@ public:
 	}
 
 	void push_back(value_type* v)
-	{		
+	{
 		link(v, &m_root);
 	}
 	void push_front(value_type* v)

@@ -6,4 +6,4 @@ const char* allocator::get_name() const
 {
 	return m_name;
 }
-} // rde
+} // namespace rde

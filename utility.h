@@ -67,7 +67,7 @@ namespace internal
 		while (--last >= first)
 			*(--result) = *last;
 	}
-	template<typename T> RDE_FORCEINLINE 
+	template<typename T> RDE_FORCEINLINE
 	void move(const T* first, const T* last, T* result, int_to_type<true>)
 	{
 		// Meh, MSVC does pretty stupid things here.
@@ -91,19 +91,19 @@ namespace internal
 		Sys::MemCpy(result, first, n * sizeof(T));
 	}
 
-    template<typename T>
-    void move_construct_n(T* first, size_t n, T* result, int_to_type<false>)
-    {
-        for (size_t i = 0; i < n; ++i)
-            new (result + i) T(std::move(first[i]));
-    }
+	template<typename T>
+	void move_construct_n(T* first, size_t n, T* result, int_to_type<false>)
+	{
+		for (size_t i = 0; i < n; ++i)
+			new (result + i) T(std::move(first[i]));
+	}
 
-    template<typename T>
-    void move_construct_n(T* first, size_t n, T* result, int_to_type<true>)
-    {
-        RDE_ASSERT(result >= first + n || result < first);
-        Sys::MemCpy(result, first, n * sizeof(T));
-    }
+	template<typename T>
+	void move_construct_n(T* first, size_t n, T* result, int_to_type<true>)
+	{
+		RDE_ASSERT(result >= first + n || result < first);
+		Sys::MemCpy(result, first, n * sizeof(T));
+	}
 
 	template<typename T>
 	void destruct_n(T* first, size_t n, int_to_type<false>)
@@ -170,7 +170,7 @@ namespace internal
 	template<class TIter, class TPred>
 	void test_ordering(TIter first, TIter last, const TPred& pred)
 	{
-#if RDE_DEBUG
+	#if RDE_DEBUG
 		if (first != last)
 		{
 			TIter next = first;
@@ -180,15 +180,15 @@ namespace internal
 				first = next;
 			}
 		}
-#else
+	#else
 		sizeof(first); sizeof(last); sizeof(pred);
-#endif
+	#endif
 	}
 
 	template<typename T1, typename T2, class TPred> inline
-	bool debug_pred(const TPred& pred, const T1& a, const T2& b) 
+	bool debug_pred(const TPred& pred, const T1& a, const T2& b)
 	{
-#if RDE_DEBUG
+	#if RDE_DEBUG
 		if (pred(a, b))
 		{
 			RDE_ASSERT(!pred(b, a));
@@ -198,12 +198,12 @@ namespace internal
 		{
 			return false;
 		}
-#else
+	#else
 		return pred(a, b);
-#endif
+	#endif
 	}
-} // namespace internal
 
+} // namespace internal
 } // namespace rde
 
 //-----------------------------------------------------------------------------
