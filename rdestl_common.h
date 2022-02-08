@@ -60,9 +60,6 @@ namespace rde
 	} // namespace sys
 } // namespace rde
 
-#else // #if RDESTL_STANDALONE
-#	include "core/RdeAssert.h"
-#	include "core/System.h"
 #endif // #if RDESTL_STANDALONE
 
 namespace rde
