@@ -8,6 +8,9 @@
 #if RDESTL_STANDALONE
 
 #	ifdef _MSC_VER
+#		define NOMINMAX
+#		undef min
+#		undef max
 #		define _ALLOW_RTCc_IN_STL
 #		include <cassert>
 #		include <cstring>
@@ -31,8 +34,7 @@
 
 namespace rde
 {
-	// # Meh. MSVC doesnt seem to have <stdint.h>
-	// @todo	Fixes to make this portable.
+
 	typedef unsigned char		uint8;
 	typedef unsigned short		uint16;
 	typedef signed long			int32;
@@ -45,6 +47,7 @@ namespace rde
 
 	namespace Sys
 	{
+
 		RDE_FORCEINLINE void MemCpy(void* to, const void* from, size_t bytes)
 		{
 			std::memcpy(to, from, bytes);
@@ -57,17 +60,16 @@ namespace rde
 		{
 			std::memset(buf, value, bytes);
 		}
-	} // namespace sys
+
+	} // namespace Sys
 } // namespace rde
 
 #endif // #if RDESTL_STANDALONE
 
 namespace rde
 {
-enum e_noinitialize
-{
-	noinitialize
-};
+
+enum e_noinitialize { noinitialize };
 
 } // namespace rde
 
