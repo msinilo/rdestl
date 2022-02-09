@@ -5,6 +5,20 @@
 #	define RDESTL_STANDALONE	1
 #endif
 
+#ifdef _MSC_VER
+#	if _MSC_VER == 1600 // VS2010/VC100
+#		define RDE_COMPILER_MSVC_2010 1
+#	endif
+#endif
+
+#ifdef __cplusplus
+#	if __cplusplus <= 199711L // C++98 and earlier
+#		define RDE_HAS_CPP98 1
+#	elif __cplusplus >= 201103L // C++11 and later
+#		define RDE_HAS_CPP11 1
+#	endif
+#endif
+
 #if RDESTL_STANDALONE
 
 #	ifdef _MSC_VER

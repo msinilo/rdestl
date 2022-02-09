@@ -347,10 +347,7 @@ public:
 	}
 
 	const allocator_type& get_allocator() const	{ return m_allocator; }
-	void set_allocator(const allocator_type& allocator)
-	{
-		m_allocator = allocator;
-	}
+	void set_allocator(const allocator_type& allocator) { m_allocator = allocator; }
 
 private:
 	void grow()
@@ -371,8 +368,9 @@ private:
 		m_numUsed = m_size;
 		RDE_ASSERT(m_numUsed < m_capacity);
 	}
-	template<class K = key_type, class... Args>
-	RDE_FORCEINLINE rde::pair<iterator, bool> emplace_at(node* n, hash_value_t hash, K&& key, Args&&... args)
+
+	template<class K = key_type, class... Args> RDE_FORCEINLINE
+	rde::pair<iterator, bool> emplace_at(node* n, hash_value_t hash, K&& key, Args&&... args)
 	{
 		typedef rde::pair<iterator, bool> ret_type_t;
 		if (n->is_occupied())
@@ -393,8 +391,7 @@ private:
 		return ret_type_t(iterator(n, this), true);
 	}
 
-	rde::pair<iterator, bool> insert_at(const value_type& v, node* n,
-			hash_value_t hash)
+	rde::pair<iterator, bool> insert_at(const value_type& v, node* n, hash_value_t hash)
 	{
 		RDE_ASSERT(invariant());
 		if (n == 0 || m_numUsed * 8 >= m_capacity * 7)
@@ -458,8 +455,7 @@ private:
 		return m_nodes + m_capacity;
 	}
 
-	static void rehash(int new_capacity, node* new_nodes,
-			int capacity, const node* nodes, bool destruct_original)
+	static void rehash(int new_capacity, node* new_nodes, int capacity, const node* nodes, bool destruct_original)
 	{
 		//if (nodes == &ms_emptyNode || new_nodes == &ms_emptyNode)
 		//  return;

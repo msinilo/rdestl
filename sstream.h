@@ -13,6 +13,7 @@
 
 namespace rde
 {
+
 /**
  * this is a super cut down replacement for std::stringstream
  * current limitations:
@@ -21,10 +22,7 @@ namespace rde
  * - no support for unsigned word types
  * - untested unicode support, no support for custom allocator
  */
-template<
-	typename E,
-	typename TAlloc = rde::allocator
->
+template<typename E, typename TAlloc = rde::allocator>
 struct basic_stringstream
 {
 	typedef E									value_type;

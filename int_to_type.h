@@ -19,7 +19,7 @@ struct int_to_type
 	enum { value = TVal };
 };
 
-} // namespaces
+} // namespace rde
 
 //-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_INT_TO_TYPE_H

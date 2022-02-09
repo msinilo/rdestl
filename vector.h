@@ -7,6 +7,7 @@
 
 namespace rde
 {
+
 //=============================================================================
 struct base_vector
 {
@@ -292,9 +293,7 @@ public:
 	void emplace_back(Args&&... args)
 	{
 		if (m_end == m_capacityEnd)
-		{
 			grow();
-		}
 		rde::construct_args(m_end, std::forward<Args>(args)...);
 		++m_end;
 		TStorage::record_high_watermark();
