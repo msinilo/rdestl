@@ -45,7 +45,7 @@ public:
 				alreadySorted = false;
 				break;
 			}
-			const uint8_t* px = (const uint8_t*)&x;
+			const std::uint8_t* px = (const std::uint8_t*)&x;
 
 			++histogram[*px];
 			++h1[px[1]];
@@ -60,7 +60,7 @@ public:
 		for (; k < num; ++k)
 		{
 			const uint32 x = func(src[k]);
-			const uint8_t* px = (const uint8_t*)&x;
+			const std::uint8_t* px = (const std::uint8_t*)&x;
 
 			++histogram[*px];
 			++h1[px[1]];
