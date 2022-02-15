@@ -6,7 +6,9 @@
 #endif
 
 #ifdef _MSC_VER
-#	if _MSC_VER == 1600 // VS2010/VC100
+#	if _MSC_VER < 1600
+#		error platform not supported
+#	elif _MSC_VER < 1700
 #		define RDE_COMPILER_MSVC_2010 1
 #	endif
 #endif
@@ -43,22 +45,10 @@
 
 #	define RDE_ASSERT	assert
 
-// NOOB
 #include <cstdint>
 
 namespace rde
 {
-
-	typedef unsigned char		uint8;
-	typedef unsigned short		uint16;
-	typedef signed long			int32;
-	typedef unsigned long		uint32;
-	#ifdef _MSC_VER
-	typedef unsigned __int64	uint64;
-	#else
-	typedef unsigned long long	uint64;
-	#endif
-
 	namespace Sys
 	{
 

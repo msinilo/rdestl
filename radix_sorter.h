@@ -25,27 +25,27 @@ public:
 		if (num == 0)
 			return;
 
-		uint32 histogram[kHistogramSize * 4];
+		std::uint32_t histogram[kHistogramSize * 4];
 		Sys::MemSet(histogram, 0, sizeof(histogram));
 
-		uint32* h1 = &histogram[0] + kHistogramSize;
-		uint32* h2 = h1 + kHistogramSize;
-		uint32* h3 = h2 + kHistogramSize;
+		std::uint32_t* h1 = &histogram[0] + kHistogramSize;
+		std::uint32_t* h2 = h1 + kHistogramSize;
+		std::uint32_t* h3 = h2 + kHistogramSize;
 
 		bool alreadySorted(true);
-		uint32 prevValue = func(src[0]);
+		std::uint32_t prevValue = func(src[0]);
 
 		int k(0);
 		for (int i = 0; i < num; ++i)
 		{
 			k = i;
-			const uint32 x = func(src[i]);
+			const std::uint32_t x = func(src[i]);
 			if (alreadySorted && x < prevValue)
 			{
 				alreadySorted = false;
 				break;
 			}
-			const uint8* px = (const uint8*)&x;
+			const std::uint8_t* px = (const std::uint8_t*)&x;
 
 			++histogram[*px];
 			++h1[px[1]];
@@ -59,8 +59,8 @@ public:
 
 		for (; k < num; ++k)
 		{
-			const uint32 x = func(src[k]);
-			const uint8* px = (const uint8*)&x;
+			const std::uint32_t x = func(src[k]);
+			const std::uint8_t* px = (const std::uint8_t*)&x;
 
 			++histogram[*px];
 			++h1[px[1]];
@@ -69,7 +69,7 @@ public:
 		}
 
 		// 3rd byte == 0
-		const bool canBreakAfter16Bits = (h2[0] == (uint32)num && h3[0] == (uint32)num);
+		const bool canBreakAfter16Bits = (h2[0] == (std::uint32_t)num && h3[0] == (std::uint32_t)num);
 		(void)canBreakAfter16Bits;
 
 		if (TDataType == data_signed)
@@ -79,24 +79,24 @@ public:
 
 		for (int i = 0; i < num; ++i)
 		{
-			const uint32 pos = func(src[i]) & 0xFF;
+			const std::uint32_t pos = func(src[i]) & 0xFF;
 			help_buffer[histogram[pos]++] = src[i];
 		}
 		for (int i = 0; i < num; ++i)
 		{
-			const uint32 pos = (func(m_dst[i]) >> 8) & 0xFF;
+			const std::uint32_t pos = (func(m_dst[i]) >> 8) & 0xFF;
 			src[h1[pos]++] = help_buffer[i];
 		}
 		if (TDataType == data_unsigned && canBreakAfter16Bits)
 			return;
 		for (int i = 0; i < num; ++i)
 		{
-			const uint32 pos = (func(src[i]) >> 16) & 0xFF;
+			const std::uint32_t pos = (func(src[i]) >> 16) & 0xFF;
 			help_buffer[h2[pos]++] = src[i];
 		}
 		for (int i = 0; i < num; ++i)
 		{
-			const uint32 pos = (func(m_dst[i]) >> 24) & 0xFF;
+			const std::uint32_t pos = (func(m_dst[i]) >> 24) & 0xFF;
 			src[h3[pos]++] = help_buffer[i];
 		}
 	}
@@ -115,12 +115,12 @@ private:
 	{
 		m_dst.resize(num);
 	}
-	void calculate_offsets(uint32* histogram)
+	void calculate_offsets(std::uint32_t* histogram)
 	{
-		uint32 offsets[4] ={ 1, 1, 1, 1 };
+		std::uint32_t offsets[4] ={ 1, 1, 1, 1 };
 		for (int i = 0; i < kHistogramSize; ++i)
 		{
-			uint32 temp = histogram[i] + offsets[0];
+			std::uint32_t temp = histogram[i] + offsets[0];
 			histogram[i] = offsets[0] - 1;
 			offsets[0] = temp;
 
@@ -137,13 +137,13 @@ private:
 			offsets[3] = temp;
 		}
 	}
-	void calculate_offsets_signed(uint32* histogram)
+	void calculate_offsets_signed(std::uint32_t* histogram)
 	{
-		uint32 offsets[4] ={ 1, 1, 1, 1 };
+		std::uint32_t offsets[4] ={ 1, 1, 1, 1 };
 		int numNeg(0);
 		for (int i = 0; i < kHistogramSize; ++i)
 		{
-			uint32 temp = histogram[i] + offsets[0];
+			std::uint32_t temp = histogram[i] + offsets[0];
 			histogram[i] = offsets[0] - 1;
 			offsets[0] = temp;
 
@@ -158,18 +158,18 @@ private:
 			if (i >= kHistogramSize/2)
 				numNeg += histogram[i + kHistogramSize*3];
 		}
-		uint32* h3 = &histogram[kHistogramSize*3];
+		std::uint32_t* h3 = &histogram[kHistogramSize*3];
 		offsets[3] = numNeg + 1;
 		for (int i = 0; i < kHistogramSize / 2; ++i)
 		{
-			uint32 temp = h3[i] + offsets[3];
+			std::uint32_t temp = h3[i] + offsets[3];
 			h3[i] = offsets[3] - 1;
 			offsets[3] = temp;
 		}
 		offsets[3] = 1;
 		for (int i = kHistogramSize / 2; i < kHistogramSize; ++i)
 		{
-			uint32 temp = h3[i] + offsets[3];
+			std::uint32_t temp = h3[i] + offsets[3];
 			h3[i] = offsets[3] - 1;
 			offsets[3] = temp;
 		}
