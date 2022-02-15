@@ -156,7 +156,7 @@ namespace
 
 		rde::Timer t;
 		t.Start();
-		rde::uint64 ticks = __rdtsc();
+		std::uint64_t ticks = __rdtsc();
 		std::sort(data, data + N);
 		ticks = __rdtsc() - ticks;
 		t.Stop();

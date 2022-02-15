@@ -20,9 +20,9 @@ struct alignof_helper
 };
 
 #ifdef _MSC_VER
-__declspec(align(16)) struct aligned16 { uint64 member[2]; };
+__declspec(align(16)) struct aligned16 { std::uint64_t member[2]; };
 #else
-struct __attribute__((aligned(16))) aligned16 { uint64 member[2]; };
+struct __attribute__((aligned(16))) aligned16 { std::uint64_t member[2]; };
 #endif
 
 #pragma warning(pop)
@@ -35,7 +35,7 @@ template<> struct type_with_alignment<0> {};
 template<> struct type_with_alignment<1> { std::uint8_t member; };
 template<> struct type_with_alignment<2> { std::uint16_t member; };
 template<> struct type_with_alignment<4> { std::uint32_t member; };
-template<> struct type_with_alignment<8> { uint64 member; };
+template<> struct type_with_alignment<8> { std::uint64_t member; };
 template<> struct type_with_alignment<16> { aligned16 member; };
 } // namespace internal
 
