@@ -37,13 +37,13 @@ namespace
 	TEST(RadixSortTestSigned)
 	{
 		static const int N = 200 * 1000;
-		rde::int32* data = new rde::int32[N];
+		std::int32_t* data = new std::int32_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
 			data[i] = rand() - (rand() / 2);
 
-		rde::radix_sorter<rde::int32> r;
-		r.sort<r.data_signed>(data, N, as_int<rde::int32>());
+		rde::radix_sorter<std::int32_t> r;
+		r.sort<r.data_signed>(data, N, as_int<std::int32_t>());
 		CHECK(IsSorted(data, N));
 
 		delete[] data;
