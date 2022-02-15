@@ -48,6 +48,11 @@ public:
 		return m_data[i];
 	}
 
+	RDE_FORCEINLINE void fill(const T& value)
+	{
+		fill_n(m_data, N, value);
+	}
+
 private:
 	T	m_data[N];
 };
