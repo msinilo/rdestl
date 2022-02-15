@@ -3,6 +3,7 @@
 
 namespace rde
 {
+
 /**
  * Sample usage:
  *	void fun(int_to_type<true>)  { ... }
@@ -15,10 +16,7 @@ namespace rde
 template<int TVal>
 struct int_to_type
 {
-	enum
-	{
-		value = TVal
-	};
+	enum { value = TVal };
 };
 
 } // namespaces
