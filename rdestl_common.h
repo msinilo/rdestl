@@ -6,7 +6,7 @@
 #endif
 
 #ifdef _MSC_VER
-#	if _MSC_VER < 1700
+#	if _MSC_VER < 1600
 #		error platform not supported
 #	elif _MSC_VER < 1700
 #		define RDE_COMPILER_MSVC_2010 1
