@@ -6,7 +6,9 @@
 #endif
 
 #ifdef _MSC_VER
-#	if _MSC_VER == 1600 // VS2010/VC100
+#	if _MSC_VER < 1700
+#		error platform not supported
+#	elif _MSC_VER < 1700
 #		define RDE_COMPILER_MSVC_2010 1
 #	endif
 #endif
@@ -43,7 +45,6 @@
 
 #	define RDE_ASSERT	assert
 
-// NOOB
 #include <cstdint>
 
 namespace rde
