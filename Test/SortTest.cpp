@@ -16,7 +16,7 @@ namespace
 	template<typename T>
 	struct as_int
 	{
-		rde::uint32 operator()(const T& x) const
+		std::uint32_t operator()(const T& x) const
 		{
 			return x;
 		}
@@ -125,13 +125,13 @@ namespace
 #if !RDESTL_STANDALONE && SORT_SPEED_TEST
 	struct Foo
 	{
-		rde::uint32 x;
+		std::uint32_t x;
 		int y;
 		float z;
 	};
 	struct FooToInt
 	{
-		RDE_FORCEINLINE rde::uint32 operator()(const Foo& f) const
+		RDE_FORCEINLINE std::uint32_t operator()(const Foo& f) const
 		{
 			return f.x;
 		}

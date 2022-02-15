@@ -51,7 +51,6 @@ namespace rde
 {
 
 	typedef signed long			int32;
-	typedef unsigned long		uint32;
 	#ifdef _MSC_VER
 	typedef unsigned __int64	uint64;
 	#else

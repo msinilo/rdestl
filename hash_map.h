@@ -407,7 +407,7 @@ private:
 
 		const hash_value_t hash = hash_func(key);
 		*out_hash = hash;
-		uint32 i = hash & m_capacityMask;
+		std::uint32_t i = hash & m_capacityMask;
 
 		node* n = m_nodes + i;
 		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
@@ -416,7 +416,7 @@ private:
 		node* freeNode(0);
 		if (n->is_deleted())
 			freeNode = n;
-		uint32 numProbes(1);
+		std::uint32_t numProbes(1);
 		// Guarantees loop termination.
 		RDE_ASSERT(m_numUsed < m_capacity);
 		while (!n->is_unused())
@@ -434,12 +434,12 @@ private:
 	node* lookup(const key_type& key) const
 	{
 		const hash_value_t hash = hash_func(key);
-		uint32 i = hash & m_capacityMask;
+		std::uint32_t i = hash & m_capacityMask;
 		node* n = m_nodes + i;
 		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
 			return n;
 
-		uint32 numProbes(1);
+		std::uint32_t numProbes(1);
 		// Guarantees loop termination.
 		RDE_ASSERT(m_capacity == 0 || m_numUsed < m_capacity);
 		while (!n->is_unused())
@@ -462,16 +462,16 @@ private:
 
 		node* it = const_cast<node*>(nodes);
 		const node* itEnd = nodes + capacity;
-		const uint32 mask = new_capacity - 1;
+		const std::uint32_t mask = new_capacity - 1;
 		while (it != itEnd)
 		{
 			if (it->is_occupied())
 			{
 				const hash_value_t hash = it->hash;
-				uint32 i = hash & mask;
+				std::uint32_t i = hash & mask;
 
 				node* n = new_nodes + i;
-				uint32 numProbes(0);
+				std::uint32_t numProbes(0);
 				while (!n->is_unused())
 				{
 					++numProbes;
@@ -555,7 +555,7 @@ private:
 	node*			m_nodes;
 	int				m_size;
 	int				m_capacity;
-	uint32			m_capacityMask;
+	std::uint32_t			m_capacityMask;
 	int				m_numUsed;
 	THashFunc       m_hashFunc;
 	TKeyEqualFunc	m_keyEqualFunc;
