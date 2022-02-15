@@ -50,7 +50,6 @@
 namespace rde
 {
 
-	typedef unsigned char		uint8;
 	typedef unsigned short		uint16;
 	typedef signed long			int32;
 	typedef unsigned long		uint32;
