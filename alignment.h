@@ -33,7 +33,7 @@ template<size_t N> struct type_with_alignment
 };
 template<> struct type_with_alignment<0> {};
 template<> struct type_with_alignment<1> { std::uint8_t member; };
-template<> struct type_with_alignment<2> { uint16 member; };
+template<> struct type_with_alignment<2> { std::uint16_t member; };
 template<> struct type_with_alignment<4> { uint32 member; };
 template<> struct type_with_alignment<8> { uint64 member; };
 template<> struct type_with_alignment<16> { aligned16 member; };

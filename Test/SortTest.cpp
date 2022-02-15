@@ -51,13 +51,13 @@ namespace
 	TEST(RadixSort16Bit)
 	{
 		static const int N = 200 * 1000;
-		rde::uint16* data = new rde::uint16[N];
+		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
-			data[i] = (rde::uint16)(rand());
+			data[i] = (std::uint16_t)(rand());
 
-		rde::radix_sorter<rde::uint16> r;
-		r.sort<r.data_unsigned>(data, N, as_int<rde::uint16>());
+		rde::radix_sorter<std::uint16_t> r;
+		r.sort<r.data_unsigned>(data, N, as_int<std::uint16_t>());
 		CHECK(IsSorted(data, N));
 
 		delete[] data;
@@ -65,10 +65,10 @@ namespace
 	TEST(InsertionSort)
 	{
 		static const int N = 200;
-		rde::uint16* data = new rde::uint16[N];
+		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
-			data[i] = (rde::uint16)(rand());
+			data[i] = (std::uint16_t)(rand());
 
 		rde::insertion_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
@@ -77,10 +77,10 @@ namespace
 	TEST(QuickSort)
 	{
 		static const int N = 200 * 1000;
-		rde::uint16* data = new rde::uint16[N];
+		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
-			data[i] = (rde::uint16)(rand());
+			data[i] = (std::uint16_t)(rand());
 
 		rde::quick_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
@@ -89,10 +89,10 @@ namespace
 	TEST(HeapSort)
 	{
 		static const int N = 200 * 1000;
-		rde::uint16* data = new rde::uint16[N];
+		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
-			data[i] = (rde::uint16)(rand());
+			data[i] = (std::uint16_t)(rand());
 
 		rde::heap_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
@@ -200,4 +200,3 @@ namespace
 	}
 #endif
 }
-
