@@ -16,7 +16,7 @@ namespace
 	template<typename T>
 	struct as_int
 	{
-		rde::uint32 operator()(const T& x) const
+		std::uint32_t operator()(const T& x) const
 		{
 			return x;
 		}
@@ -37,13 +37,13 @@ namespace
 	TEST(RadixSortTestSigned)
 	{
 		static const int N = 200 * 1000;
-		rde::int32* data = new rde::int32[N];
+		std::int32_t* data = new std::int32_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
 			data[i] = rand() - (rand() / 2);
 
-		rde::radix_sorter<rde::int32> r;
-		r.sort<r.data_signed>(data, N, as_int<rde::int32>());
+		rde::radix_sorter<std::int32_t> r;
+		r.sort<r.data_signed>(data, N, as_int<std::int32_t>());
 		CHECK(IsSorted(data, N));
 
 		delete[] data;
@@ -51,13 +51,13 @@ namespace
 	TEST(RadixSort16Bit)
 	{
 		static const int N = 200 * 1000;
-		rde::uint16* data = new rde::uint16[N];
+		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
-			data[i] = (rde::uint16)(rand());
+			data[i] = (std::uint16_t)(rand());
 
-		rde::radix_sorter<rde::uint16> r;
-		r.sort<r.data_unsigned>(data, N, as_int<rde::uint16>());
+		rde::radix_sorter<std::uint16_t> r;
+		r.sort<r.data_unsigned>(data, N, as_int<std::uint16_t>());
 		CHECK(IsSorted(data, N));
 
 		delete[] data;
@@ -65,10 +65,10 @@ namespace
 	TEST(InsertionSort)
 	{
 		static const int N = 200;
-		rde::uint16* data = new rde::uint16[N];
+		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
-			data[i] = (rde::uint16)(rand());
+			data[i] = (std::uint16_t)(rand());
 
 		rde::insertion_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
@@ -77,10 +77,10 @@ namespace
 	TEST(QuickSort)
 	{
 		static const int N = 200 * 1000;
-		rde::uint16* data = new rde::uint16[N];
+		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
-			data[i] = (rde::uint16)(rand());
+			data[i] = (std::uint16_t)(rand());
 
 		rde::quick_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
@@ -89,10 +89,10 @@ namespace
 	TEST(HeapSort)
 	{
 		static const int N = 200 * 1000;
-		rde::uint16* data = new rde::uint16[N];
+		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
 		for (int i = 0; i < N; ++i)
-			data[i] = (rde::uint16)(rand());
+			data[i] = (std::uint16_t)(rand());
 
 		rde::heap_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
@@ -125,13 +125,13 @@ namespace
 #if !RDESTL_STANDALONE && SORT_SPEED_TEST
 	struct Foo
 	{
-		rde::uint32 x;
+		std::uint32_t x;
 		int y;
 		float z;
 	};
 	struct FooToInt
 	{
-		RDE_FORCEINLINE rde::uint32 operator()(const Foo& f) const
+		RDE_FORCEINLINE std::uint32_t operator()(const Foo& f) const
 		{
 			return f.x;
 		}
@@ -156,7 +156,7 @@ namespace
 
 		rde::Timer t;
 		t.Start();
-		rde::uint64 ticks = __rdtsc();
+		std::uint64_t ticks = __rdtsc();
 		std::sort(data, data + N);
 		ticks = __rdtsc() - ticks;
 		t.Stop();
@@ -200,4 +200,3 @@ namespace
 	}
 #endif
 }
-

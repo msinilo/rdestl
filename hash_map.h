@@ -347,10 +347,7 @@ public:
 	}
 
 	const allocator_type& get_allocator() const	{ return m_allocator; }
-	void set_allocator(const allocator_type& allocator)
-	{
-		m_allocator = allocator;
-	}
+	void set_allocator(const allocator_type& allocator) { m_allocator = allocator; }
 
 private:
 	void grow()
@@ -371,8 +368,9 @@ private:
 		m_numUsed = m_size;
 		RDE_ASSERT(m_numUsed < m_capacity);
 	}
-	template<class K = key_type, class... Args>
-	RDE_FORCEINLINE rde::pair<iterator, bool> emplace_at(node* n, hash_value_t hash, K&& key, Args&&... args)
+
+	template<class K = key_type, class... Args> RDE_FORCEINLINE
+	rde::pair<iterator, bool> emplace_at(node* n, hash_value_t hash, K&& key, Args&&... args)
 	{
 		typedef rde::pair<iterator, bool> ret_type_t;
 		if (n->is_occupied())
@@ -393,8 +391,7 @@ private:
 		return ret_type_t(iterator(n, this), true);
 	}
 
-	rde::pair<iterator, bool> insert_at(const value_type& v, node* n,
-			hash_value_t hash)
+	rde::pair<iterator, bool> insert_at(const value_type& v, node* n, hash_value_t hash)
 	{
 		RDE_ASSERT(invariant());
 		if (n == 0 || m_numUsed * 8 >= m_capacity * 7)
@@ -410,7 +407,7 @@ private:
 
 		const hash_value_t hash = hash_func(key);
 		*out_hash = hash;
-		uint32 i = hash & m_capacityMask;
+		std::uint32_t i = hash & m_capacityMask;
 
 		node* n = m_nodes + i;
 		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
@@ -419,7 +416,7 @@ private:
 		node* freeNode(0);
 		if (n->is_deleted())
 			freeNode = n;
-		uint32 numProbes(1);
+		std::uint32_t numProbes(1);
 		// Guarantees loop termination.
 		RDE_ASSERT(m_numUsed < m_capacity);
 		while (!n->is_unused())
@@ -437,12 +434,12 @@ private:
 	node* lookup(const key_type& key) const
 	{
 		const hash_value_t hash = hash_func(key);
-		uint32 i = hash & m_capacityMask;
+		std::uint32_t i = hash & m_capacityMask;
 		node* n = m_nodes + i;
 		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
 			return n;
 
-		uint32 numProbes(1);
+		std::uint32_t numProbes(1);
 		// Guarantees loop termination.
 		RDE_ASSERT(m_capacity == 0 || m_numUsed < m_capacity);
 		while (!n->is_unused())
@@ -458,24 +455,23 @@ private:
 		return m_nodes + m_capacity;
 	}
 
-	static void rehash(int new_capacity, node* new_nodes,
-			int capacity, const node* nodes, bool destruct_original)
+	static void rehash(int new_capacity, node* new_nodes, int capacity, const node* nodes, bool destruct_original)
 	{
 		//if (nodes == &ms_emptyNode || new_nodes == &ms_emptyNode)
 		//  return;
 
 		node* it = const_cast<node*>(nodes);
 		const node* itEnd = nodes + capacity;
-		const uint32 mask = new_capacity - 1;
+		const std::uint32_t mask = new_capacity - 1;
 		while (it != itEnd)
 		{
 			if (it->is_occupied())
 			{
 				const hash_value_t hash = it->hash;
-				uint32 i = hash & mask;
+				std::uint32_t i = hash & mask;
 
 				node* n = new_nodes + i;
-				uint32 numProbes(0);
+				std::uint32_t numProbes(0);
 				while (!n->is_unused())
 				{
 					++numProbes;
@@ -559,7 +555,7 @@ private:
 	node*			m_nodes;
 	int				m_size;
 	int				m_capacity;
-	uint32			m_capacityMask;
+	std::uint32_t			m_capacityMask;
 	int				m_numUsed;
 	THashFunc       m_hashFunc;
 	TKeyEqualFunc	m_keyEqualFunc;
