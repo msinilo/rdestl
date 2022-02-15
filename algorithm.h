@@ -115,6 +115,7 @@ void destruct_n(T* first, size_t n)
 }
 
 //-----------------------------------------------------------------------------
+// TODO Add `fill` wrapper to container classes (array, list, vector, etc)
 template<typename T> RDE_FORCEINLINE
 void fill_n(T* first, size_t n, const T& val)
 {
