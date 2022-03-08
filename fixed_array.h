@@ -5,6 +5,7 @@
 
 namespace rde
 {
+
 //=============================================================================
 template<typename T, size_t N>
 class fixed_array
@@ -46,6 +47,12 @@ public:
 		return m_data[i];
 	}
 };
+
+#if RDE_HAS_CPP11
+// A condensed alias using standard container nomenclature
+template<typename T, size_t N>
+using array = fixed_array<T, N>;
+#endif
 
 } // namespace rde
 
