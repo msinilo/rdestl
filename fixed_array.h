@@ -49,7 +49,7 @@ public:
 
 	RDE_FORCEINLINE void fill(const T& value)
 	{
-		fill_n(m_data, N, value);
+		rde::fill_n(m_data, N, value);
 	}
 };
 
