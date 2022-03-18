@@ -11,7 +11,7 @@ namespace rde
 //=============================================================================
 struct base_vector
 {
-	typedef std::size_t		size_type;
+	typedef size_t			size_type;
 	static const size_type	npos = size_type(-1);
 };
 
