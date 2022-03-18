@@ -11,7 +11,7 @@ namespace rde
 //=============================================================================
 struct base_vector
 {
-	typedef int				size_type;
+	typedef std::size_t		size_type;
 	static const size_type	npos = size_type(-1);
 };
 
@@ -112,7 +112,7 @@ struct standard_vector_storage
 template<
 	typename T,
 	class TAllocator = rde::allocator,
-	class TStorage = standard_vector_storage<T, TAllocator>
+	class TStorage   = standard_vector_storage<T, TAllocator>
 >
 class vector: public base_vector, private TStorage
 {
