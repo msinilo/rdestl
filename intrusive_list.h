@@ -71,7 +71,7 @@ private:
 class intrusive_list_base
 {
 public:
-	typedef int	size_type;
+	typedef size_t	size_type;
 
 	void pop_back()		{ unlink(m_root.prev); }
 	void pop_front()	{ unlink(m_root.next); }

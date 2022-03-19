@@ -60,7 +60,7 @@ private:
 class intrusive_slist_base
 {
 public:
-	typedef int	size_type;
+	typedef size_t	size_type;
 
 	intrusive_slist_base();
 	void pop_front()	{ unlink_after(&m_root); }

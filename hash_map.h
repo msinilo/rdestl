@@ -106,7 +106,8 @@ public:
 	typedef TAllocator															allocator_type;
 	typedef node_iterator<node*, value_type*, value_type&>						iterator;
 	typedef node_iterator<const node*, const value_type*, const value_type&>	const_iterator;
-	typedef int																	size_type;
+	typedef size_t																size_type;
+
 	static const size_type														kNodeSize = sizeof(node);
 	static const size_type														kInitialCapacity = 64;
 
@@ -332,10 +333,10 @@ public:
 private:
 	void grow()
 	{
-		const int newCapacity = (m_capacity == 0 ? kInitialCapacity : m_capacity * 2);
+		const size_type newCapacity = (m_capacity == 0 ? kInitialCapacity : m_capacity * 2);
 		grow(newCapacity);
 	}
-	void grow(int new_capacity)
+	void grow(size_t new_capacity)
 	{
 		RDE_ASSERT((new_capacity & (new_capacity - 1)) == 0);	// Must be power-of-two
 		node* newNodes = allocate_nodes(new_capacity);
@@ -435,7 +436,7 @@ private:
 		return m_nodes + m_capacity;
 	}
 
-	static void rehash(int new_capacity, node* new_nodes, int capacity, const node* nodes, bool destruct_original)
+	static void rehash(size_t new_capacity, node* new_nodes, size_t capacity, const node* nodes, bool destruct_original)
 	{
 		//if (nodes == &ms_emptyNode || new_nodes == &ms_emptyNode)
 		//  return;
@@ -478,14 +479,13 @@ private:
 		}
 	}
 
-	node* allocate_nodes(int n)
+	node* allocate_nodes(size_t n)
 	{
 		node* buckets = static_cast<node*>(m_allocator.allocate(n * sizeof(node)));
 		node* iterBuckets(buckets);
 		node* end = iterBuckets + n;
 		for (; iterBuckets != end; ++iterBuckets)
 			iterBuckets->hash = node::kUnusedHash;
-
 		return buckets;
 	}
 	void delete_nodes()
@@ -533,10 +533,10 @@ private:
 	}
 
 	node*			m_nodes;
-	int				m_size;
-	int				m_capacity;
-	std::uint32_t			m_capacityMask;
-	int				m_numUsed;
+	size_type		m_size;
+	size_type		m_capacity;
+	std::uint32_t	m_capacityMask;
+	size_type		m_numUsed;
 	THashFunc       m_hashFunc;
 	TKeyEqualFunc	m_keyEqualFunc;
 	TAllocator      m_allocator;
