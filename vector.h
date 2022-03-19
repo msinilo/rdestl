@@ -109,8 +109,7 @@ struct standard_vector_storage
 //=============================================================================
 // Simplified vector class.
 // Mimics std::vector.
-template<
-	typename T,
+template<typename T,
 	class TAllocator = rde::allocator,
 	class TStorage   = standard_vector_storage<T, TAllocator>
 >
