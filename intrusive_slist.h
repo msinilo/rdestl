@@ -62,14 +62,18 @@ class intrusive_slist_base
 public:
 	typedef size_t	size_type;
 
-	intrusive_slist_base();
 	void pop_front()	{ unlink_after(&m_root); }
+
+	// NOTE: commenting `intrusive_list_base::size()` method declaration; missing definition ~SK
 	// @note: allow for constant complexity way of checking this
 	// (at a cost of additional variable)?
-	size_type size() const;
+	//size_type size() const;
+
 	bool empty() const	{ return !m_root.in_list(); }
 
 protected:
+	intrusive_slist_base();
+
 	static void link_after(intrusive_slist_node* node, intrusive_slist_node* prevNode);
 	static void unlink_after(intrusive_slist_node* node);
 
