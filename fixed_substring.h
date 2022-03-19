@@ -6,6 +6,7 @@
 
 namespace rde
 {
+
 // "Substring" of fixed size.
 // Cannot grow.
 // Never allocates memory.
@@ -14,8 +15,8 @@ class fixed_substring: private fixed_array<E, N + 1>
 {
 	typedef fixed_array<E, N + 1>	Base;
 public:
-	typedef E	value_type;
-	typedef int	size_type;
+	typedef E		value_type;
+	typedef size_t	size_type;
 
 	fixed_substring()
 	{
