@@ -46,6 +46,11 @@ public:
 		RDE_ASSERT(i < size());
 		return m_data[i];
 	}
+
+	RDE_FORCEINLINE void fill(const T& value)
+	{
+		rde::fill_n(m_data, N, value);
+	}
 };
 
 #if RDE_HAS_CPP11
