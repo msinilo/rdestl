@@ -76,11 +76,9 @@ public:
 	void pop_back()		{ unlink(m_root.prev); }
 	void pop_front()	{ unlink(m_root.next); }
 
-	// NOTE: commenting `intrusive_list_base::size()` method declaration; missing definition ~SK
 	// @note: allow for constant complexity way of checking this
 	// (at a cost of additional variable)?
-	//size_type size() const;
-
+	size_type size() const;
 	bool empty() const	{ return !m_root.in_list(); }
 
 protected:
