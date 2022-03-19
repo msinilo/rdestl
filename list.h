@@ -16,11 +16,8 @@ struct list_base_node
 		reset();
 #endif
 	}
-	void reset()
-	{
-		next = prev = this;
-	}
-	bool in_list() const { return this != next; }
+	void reset()			{ next = prev = this; }
+	bool in_list() const	{ return this != next; }
 
 	void link_before(list_base_node* nextNode);
 	void unlink();
@@ -42,6 +39,7 @@ private:
 
 		T		value;
 	};
+
 	static RDE_FORCEINLINE node* upcast(internal::list_base_node* n)
 	{
 		return (node*)n;
@@ -53,30 +51,17 @@ private:
 	public:
 		typedef bidirectional_iterator_tag	iterator_category;
 
-		explicit node_iterator(): m_node(NULL) { /**/ }
+		explicit node_iterator(): m_node(NULL) { }
 
-		explicit node_iterator(TNodePtr node): m_node(node) { /**/ }
+		explicit node_iterator(TNodePtr node): m_node(node) { }
 
 		template<typename UNodePtr, typename UPtr, typename URef>
 		node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
-			: m_node(rhs.node())
-		{
-			/**/
-		}
+			: m_node(rhs.node()) { }
 
-		TRef operator*() const
-		{
-			RDE_ASSERT(m_node != 0);
-			return m_node->value;
-		}
-		TPtr operator->() const
-		{
-			return &m_node->value;
-		}
-		TNodePtr node() const
-		{
-			return m_node;
-		}
+		TRef operator*() const	{ RDE_ASSERT(m_node != 0); return m_node->value; }
+		TPtr operator->() const	{ return &m_node->value; }
+		TNodePtr node() const	{ return m_node; }
 
 		node_iterator& operator++()
 		{
@@ -101,14 +86,8 @@ private:
 			return copy;
 		}
 
-		bool operator==(const node_iterator& rhs) const
-		{
-			return rhs.m_node == m_node;
-		}
-		bool operator!=(const node_iterator& rhs) const
-		{
-			return !(rhs == *this);
-		}
+		bool operator==(const node_iterator& rhs) const { return rhs.m_node == m_node; }
+		bool operator!=(const node_iterator& rhs) const { return !(rhs == *this); }
 
 	private:
 		TNodePtr	m_node;
@@ -120,6 +99,7 @@ public:
 	typedef int 											size_type;
 	typedef node_iterator<node*, T*, T&>					iterator;
 	typedef node_iterator<const node*, const T*, const T&>	const_iterator;
+
 	static const std::size_t								kNodeSize = sizeof(node);
 
 	explicit list(const allocator_type& allocator = allocator_type())
@@ -149,9 +129,7 @@ public:
 	list& operator=(const list& rhs)
 	{
 		if (this != &rhs)
-		{
 			assign(rhs.begin(), rhs.end());
-		}
 		return *this;
 	}
 

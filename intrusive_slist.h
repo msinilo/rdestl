@@ -14,6 +14,7 @@ struct intrusive_slist_node
 	{
 		next = this;
 	}
+
 	bool in_list() const	{ return this != next; }
 
 	intrusive_slist_node*	next;
@@ -28,30 +29,13 @@ public:
 	typedef Reference				reference;
 	typedef forward_iterator_tag	iterator_category;
 
-	intrusive_slist_iterator(): m_node(0) { /**/ }
-	explicit intrusive_slist_iterator(Pointer iterNode)
-		: m_node(iterNode)
-	{
-		/**/
-	}
+	intrusive_slist_iterator(): m_node(0) { }
+	explicit intrusive_slist_iterator(Pointer iterNode): m_node(iterNode) { }
 
-	Reference operator*() const
-	{
-		RDE_ASSERT(m_node);
-		return *m_node;
-	}
-	Pointer operator->() const
-	{
-		return m_node;
-	}
-	Pointer node() const
-	{
-		return m_node;
-	}
-	intrusive_slist_node* next() const
-	{
-		return m_node->next;
-	}
+	Reference operator*() const			{ RDE_ASSERT(m_node); return *m_node; }
+	Pointer operator->() const			{ return m_node; }
+	Pointer node() const				{ return m_node; }
+	intrusive_slist_node* next() const	{ return m_node->next; }
 
 	intrusive_slist_iterator& operator++()
 	{
@@ -65,14 +49,8 @@ public:
 		return copy;
 	}
 
-	bool operator==(const intrusive_slist_iterator& rhs) const
-	{
-		return rhs.m_node == m_node;
-	}
-	bool operator!=(const intrusive_slist_iterator& rhs) const
-	{
-		return !(rhs == *this);
-	}
+	bool operator==(const intrusive_slist_iterator& rhs) const { return rhs.m_node == m_node; }
+	bool operator!=(const intrusive_slist_iterator& rhs) const { return !(rhs == *this); }
 
 private:
 	Pointer	m_node;
@@ -85,10 +63,7 @@ public:
 	typedef int	size_type;
 
 	intrusive_slist_base();
-	void pop_front()
-	{
-		unlink_after(&m_root);
-	}
+	void pop_front()	{ unlink_after(&m_root); }
 	// @note: allow for constant complexity way of checking this
 	// (at a cost of additional variable)?
 	size_type size() const;
@@ -101,6 +76,7 @@ protected:
 	intrusive_slist_node	m_root;
 
 private:
+	// prevent copying
 	intrusive_slist_base(const intrusive_slist_base&);
 	intrusive_slist_base& operator=(const intrusive_slist_base&);
 };

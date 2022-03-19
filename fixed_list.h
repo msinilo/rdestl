@@ -8,6 +8,7 @@
 
 namespace rde
 {
+
 template<typename T, size_t TCapacity>
 class fixed_list
 {

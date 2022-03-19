@@ -48,31 +48,21 @@ private:
 	public:
 		typedef forward_iterator_tag	iterator_category;
 
-		explicit node_iterator(TNodePtr node): m_node(node) { /**/ }
+		explicit node_iterator(TNodePtr node)
+			: m_node(node)
+		{
+		}
 		template<typename UNodePtr, typename UPtr, typename URef>
 		node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
 			: m_node(rhs.node())
 		{
-			/**/
 		}
 
-		TRef operator*() const
-		{
-			RDE_ASSERT(m_node != 0);
-			return m_node->value;
-		}
-		TPtr operator->() const
-		{
-			return &m_node->value;
-		}
-		TNodePtr node() const
-		{
-			return m_node;
-		}
-		TNodePtr next() const
-		{
-			return upcast(m_node->next);
-		}
+		TRef operator*() const	{ RDE_ASSERT(m_node != 0); return m_node->value; }
+		TPtr operator->() const	{ return &m_node->value; }
+
+		TNodePtr node() const	{ return m_node; }
+		TNodePtr next() const	{ return upcast(m_node->next); }
 
 		node_iterator& operator++()
 		{
@@ -86,14 +76,8 @@ private:
 			return copy;
 		}
 
-		bool operator==(const node_iterator& rhs) const
-		{
-			return rhs.m_node == m_node;
-		}
-		bool operator!=(const node_iterator& rhs) const
-		{
-			return !(rhs == *this);
-		}
+		bool operator==(const node_iterator& rhs) const { return rhs.m_node == m_node; }
+		bool operator!=(const node_iterator& rhs) const { return !(rhs == *this); }
 
 	private:
 		TNodePtr	m_node;
@@ -134,9 +118,7 @@ public:
 	slist& operator=(const slist& rhs)
 	{
 		if (this != &rhs)
-		{
 			assign(rhs.begin(), rhs.end());
-		}
 		return *this;
 	}
 
@@ -145,8 +127,8 @@ public:
 	iterator end()					{ return iterator(&m_root); }
 	const_iterator end() const		{ return const_iterator(&m_root); }
 
-	const T& front() const	{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
-	T& front()				{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
+	const T& front() const			{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
+	T& front()						{ RDE_ASSERT(!empty()); return upcast(m_root.next)->value; }
 
 	void push_front(const T& value)
 	{
@@ -191,6 +173,7 @@ public:
 		}
 		m_root.reset();
 	}
+
 	bool empty() const	{ return !m_root.in_list(); }
 	// @todo: consider keeping size member, would make this O(1)
 	// as a policy? via preprocessor macro? TBD

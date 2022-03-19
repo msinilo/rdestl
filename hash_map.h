@@ -11,11 +11,12 @@
 
 namespace rde
 {
+
 // Load factor is 7/8th.
 template<typename TKey, typename TValue,
-	class THashFunc = rde::hash<TKey>,
-	class TKeyEqualFunc = rde::equal_to<TKey>,
-	class TAllocator = rde::allocator
+	class THashFunc		= rde::hash<TKey>,
+	class TKeyEqualFunc	= rde::equal_to<TKey>,
+	class TAllocator	= rde::allocator
 >
 class hash_map
 {
@@ -31,7 +32,7 @@ public:
 		node(): hash(kUnusedHash) {}
 
 		RDE_FORCEINLINE bool is_unused() const		{ return hash == kUnusedHash; }
-		RDE_FORCEINLINE bool is_deleted() const     { return hash == kDeletedHash; }
+		RDE_FORCEINLINE bool is_deleted() const		{ return hash == kDeletedHash; }
 		RDE_FORCEINLINE bool is_occupied() const	{ return hash < kDeletedHash; }
 
 		hash_value_t    hash;
@@ -60,19 +61,9 @@ public:
 		{
 			 /**/
 		}
-		TRef operator*() const
-		{
-			RDE_ASSERT(m_node != 0);
-			return m_node->data;
-		}
-		TPtr operator->() const
-		{
-			return &m_node->data;
-		}
-		RDE_FORCEINLINE TNodePtr node() const
-		{
-			return m_node;
-		}
+		TRef operator*() const					{ RDE_ASSERT(m_node != 0); return m_node->data; }
+		TPtr operator->() const					{ return &m_node->data; }
+		RDE_FORCEINLINE TNodePtr node() const	{ return m_node; }
 
 		node_iterator& operator++()
 		{
@@ -88,27 +79,23 @@ public:
 			return copy;
 		}
 
-		RDE_FORCEINLINE bool operator==(const node_iterator& rhs) const
-		{
-			return rhs.m_node == m_node;
-		}
-		bool operator!=(const node_iterator& rhs) const
-		{
-			return !(rhs == *this);
-		}
+		RDE_FORCEINLINE bool operator==(const node_iterator& rhs) const { return rhs.m_node == m_node; }
+		RDE_FORCEINLINE bool operator!=(const node_iterator& rhs) const { return !(rhs == *this); }
 
 		const hash_map* get_map() const { return m_map; }
+
 	private:
 		void move_to_next_occupied_node()
 		{
 			// @todo: save nodeEnd in constructor?
 			TNodePtr nodeEnd = m_map->m_nodes + m_map->bucket_count();
-			for (/**/; m_node < nodeEnd; ++m_node)
+			for (; m_node < nodeEnd; ++m_node)
 			{
 				if (m_node->is_occupied())
 					break;
 			}
 		}
+
 		TNodePtr		m_node;
 		const hash_map*	m_map;
 	};
@@ -142,8 +129,7 @@ public:
 	{
 		/**/
 	}
-	explicit hash_map(size_type initial_bucket_count,
-			const allocator_type& allocator = allocator_type())
+	explicit hash_map(size_type initial_bucket_count, const allocator_type& allocator = allocator_type())
 		: m_nodes(&ms_emptyNode),
 		m_size(0),
 		m_capacity(0),
@@ -153,9 +139,7 @@ public:
 	{
 		reserve(initial_bucket_count);
 	}
-	hash_map(size_type initial_bucket_count,
-			const THashFunc& hashFunc,
-			const allocator_type& allocator = allocator_type())
+	hash_map(size_type initial_bucket_count, const THashFunc& hashFunc, const allocator_type& allocator = allocator_type())
 		: m_nodes(&ms_emptyNode),
 		m_size(0),
 		m_capacity(0),
@@ -178,7 +162,6 @@ public:
 	}
 	explicit hash_map(e_noinitialize)
 	{
-		/**/
 	}
 	~hash_map()
 	{
@@ -289,7 +272,7 @@ public:
 	}
 	void erase(iterator from, iterator to)
 	{
-		for (/**/; from != to; ++from)
+		for (; from != to; ++from)
 		{
 			node* n = from.node();
 			if (n->is_occupied())
@@ -341,10 +324,7 @@ public:
 	size_type size() const					{ return m_size; }
 	size_type empty() const					{ return size() == 0; }
 	size_type nonempty_bucket_count() const	{ return m_numUsed; }
-	size_type used_memory() const
-	{
-		return bucket_count() * kNodeSize;
-	}
+	size_type used_memory() const			{ return bucket_count() * kNodeSize; }
 
 	const allocator_type& get_allocator() const	{ return m_allocator; }
 	void set_allocator(const allocator_type& allocator) { m_allocator = allocator; }
@@ -503,7 +483,7 @@ private:
 		node* buckets = static_cast<node*>(m_allocator.allocate(n * sizeof(node)));
 		node* iterBuckets(buckets);
 		node* end = iterBuckets + n;
-		for (/**/; iterBuckets != end; ++iterBuckets)
+		for (; iterBuckets != end; ++iterBuckets)
 			iterBuckets->hash = node::kUnusedHash;
 
 		return buckets;
