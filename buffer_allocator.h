@@ -5,6 +5,7 @@
 
 namespace rde
 {
+
 // CONCEPT!
 class buffer_allocator
 {
@@ -32,7 +33,7 @@ public:
 		sizeof(ptr);
 	}
 
-	const char* get_name() const	{ return m_name; }
+	const char* get_name() const { return m_name; }
 
 private:
 	const char*	m_name;
