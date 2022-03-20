@@ -38,10 +38,10 @@ TEST_CASE("sort", "[algorithm]")
 {
 	SECTION("RadixSortTestSigned")
 	{
-		static const int N = 200 * 1000;
+		static const size_t N = 200 * 1000;
 		std::int32_t* data = new std::int32_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = rand() - (rand() / 2);
 
 		rde::radix_sorter<std::int32_t> r;
@@ -52,10 +52,10 @@ TEST_CASE("sort", "[algorithm]")
 	}
 	SECTION("RadixSort16Bit")
 	{
-		static const int N = 200 * 1000;
+		static const size_t N = 200 * 1000;
 		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = (std::uint16_t)(rand());
 
 		rde::radix_sorter<std::uint16_t> r;
@@ -66,10 +66,10 @@ TEST_CASE("sort", "[algorithm]")
 	}
 	SECTION("InsertionSort")
 	{
-		static const int N = 200;
+		static const size_t N = 200;
 		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = (std::uint16_t)(rand());
 
 		rde::insertion_sort(&data[0], &data[N]);
@@ -78,10 +78,10 @@ TEST_CASE("sort", "[algorithm]")
 	}
 	SECTION("QuickSort")
 	{
-		static const int N = 200 * 1000;
+		static const size_t N = 200 * 1000;
 		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = (std::uint16_t)(rand());
 
 		rde::quick_sort(&data[0], &data[N]);
@@ -90,10 +90,10 @@ TEST_CASE("sort", "[algorithm]")
 	}
 	SECTION("HeapSort")
 	{
-		static const int N = 200 * 1000;
+		static const size_t N = 200 * 1000;
 		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = (std::uint16_t)(rand());
 
 		rde::heap_sort(&data[0], &data[N]);
@@ -149,11 +149,11 @@ TEST_CASE("sort", "[algorithm]")
 
 	SECTION("RadixSpeedTest")
 	{
-		static const int N = 300 * 1000;
+		static const size_t N = 300 * 1000;
 
 		Foo* data = new Foo[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i].x = rand();
 
 		rde::Timer t;
@@ -167,7 +167,7 @@ TEST_CASE("sort", "[algorithm]")
 		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 
 		rde::radix_sorter<Foo> r;
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i].x = rand();
 		t.Start();
 		ticks = __rdtsc();
@@ -178,7 +178,7 @@ TEST_CASE("sort", "[algorithm]")
 			double(ticks) / N);
 		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i].x = rand();
 		t.Start();
 		ticks = __rdtsc();
@@ -189,7 +189,7 @@ TEST_CASE("sort", "[algorithm]")
 			double(ticks) / N);
 		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i].x = rand();
 		t.Start();
 		ticks = __rdtsc();
