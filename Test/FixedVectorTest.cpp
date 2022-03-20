@@ -6,8 +6,6 @@
 
 namespace
 {
-TEST_CASE("fixed_vector", "[vector]")
-{
 	typedef rde::fixed_vector<int, 64, true>			tTestVector;
 	typedef rde::fixed_vector<std::string, 64, true>	tStringVector;
 
@@ -20,6 +18,8 @@ TEST_CASE("fixed_vector", "[vector]")
 		printf("\n");
 	}
 
+TEST_CASE("fixed_vector", "[vector]")
+{
 	SECTION("NonStandardAlign")
 	{
 		rde::fixed_vector<__m128, 1, false> v;

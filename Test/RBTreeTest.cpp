@@ -9,6 +9,13 @@ namespace
 
 	bool hasKeyType = sizeof(HasKeyType<std::map<int, int> >(0)) != sizeof(char);
 
+	void PrintNode(rde::rb_tree<int>::node* n, int left, int depth)
+	{
+		static const char* s_left[] ={ "[root]", "right", "left" };
+		printf("%*s %d: Node %d, [%s, %s]\n", (depth*2), "", depth, n->value.key,
+			s_left[left + 1], n->color == 0 ? "red" : "black");
+	}
+
 TEST_CASE("rb_tree", "[map][algorithm]")
 {
 	SECTION("DefaultCtorEmptyTree")
@@ -22,13 +29,6 @@ TEST_CASE("rb_tree", "[map][algorithm]")
 		rde::rb_tree<int> t;
 		t.insert(5);
 		CHECK(1 == t.size());
-	}
-
-	void PrintNode(rde::rb_tree<int>::node* n, int left, int depth)
-	{
-		static const char* s_left[] = { "[root]", "right", "left" };
-		printf("%*s %d: Node %d, [%s, %s]\n", (depth*2), "", depth, n->value.key,
-			s_left[left + 1], n->color == 0 ? "red" : "black");
 	}
 
 	SECTION("InsertMore")
@@ -81,7 +81,8 @@ TEST_CASE("rb_tree", "[map][algorithm]")
 
 
 	// Make find_next_node public to test it.
-	SECTIONTEST_CASE("IterationFromSmallest")
+	/*
+	SECTION("IterationFromSmallest")
 	{
 		rde::rb_tree<int> t;
 		t.insert(10); t.insert(14);	t.insert(2);
@@ -98,6 +99,7 @@ TEST_CASE("rb_tree", "[map][algorithm]")
 		n = t.find_next_node(n); CHECK(15 == n->key);
 		n = t.find_next_node(n);
 		CHECK(n == 0);
-	}*/
+	}
+	*/
 }
 }
