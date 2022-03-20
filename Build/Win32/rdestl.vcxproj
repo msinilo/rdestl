@@ -303,14 +303,12 @@
     <ClInclude Include="..\..\allocator.h" />
     <ClInclude Include="..\..\basic_string.h" />
     <ClInclude Include="..\..\buffer_allocator.h" />
-    <ClInclude Include="..\..\config.h" />
     <ClInclude Include="..\..\cow_string_storage.h" />
     <ClInclude Include="..\..\fixed_array.h" />
     <ClInclude Include="..\..\fixed_sorted_vector.h" />
     <ClInclude Include="..\..\fixed_substring.h" />
     <ClInclude Include="..\..\fixed_vector.h" />
     <ClInclude Include="..\..\functional.h" />
-    <ClInclude Include="..\..\hash.h" />
     <ClInclude Include="..\..\hash_map.h" />
     <ClInclude Include="..\..\int_to_type.h" />
     <ClInclude Include="..\..\intrusive_list.h" />
