@@ -56,7 +56,7 @@ struct basic_stringstream
 	}
 	basic_stringstream& operator>>(float& x) {
 		if (next())
-			x = atof((const char*)current.c_str());
+			x = static_cast<float>(atof((const char*)current.c_str()));
 		return *this;
 	}
 	basic_stringstream& operator>>(rde::string& x) {
@@ -107,7 +107,7 @@ private:
 				break;
 			}
 		}
-		return current.length();
+		return current.length() > 0;
 	}
 
 	//Data members
