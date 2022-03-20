@@ -1,4 +1,4 @@
-#include <UnitTest++/src/UnitTest++.h>
+#include "vendor/Catch/catch.hpp"
 #include "rdestl/hash_map.h"
 #include "rdestl/stack_allocator.h"
 #include <cstdio>
@@ -6,7 +6,7 @@
 
 namespace
 {
-	struct hasher	
+	struct hasher
 	{
 		rde::hash_value_t operator()(const std::string& s) const
 		{
@@ -28,23 +28,23 @@ namespace
 		}
 	};
 
-#define CONCAT_(x, y)	x ## y
-#define CONCAT2_(x, y)	CONCAT_(x, y)
-#define TESTC(x)		TEST(CONCAT2_(x, POSTFIX))
+
+#define tMap				rde::hash_map<std::string, int, hasher>
+#define tPoorlyHashedMap	rde::hash_map<std::string, int, poor_hasher>
+
+TEST_CASE("hash_map (Closed)", "[map]")
+{
+	#include "HashMapTestInc.h"
+}
 
 #undef tMap
 #undef tPoorlyHashedMap
-#undef POSTFIX
-#define POSTFIX				Closed
-#define tMap				rde::hash_map<std::string, int, hasher>
-#define tPoorlyHashedMap	rde::hash_map<std::string, int, poor_hasher>
-#include "HashMapTestInc.h"
 
 // Instantiate to check all methods.
 template rde::hash_map<std::string, int, hasher>;
 
     // Partially ripped from Google's hash tests.
-	TEST(GoogleIntHash)
+	TEST_CASE("hash_map: GoogleIntHash")
     {
 		rde::hash_map<int, int> m;
 		CHECK(m.empty());
@@ -59,28 +59,28 @@ template rde::hash_map<std::string, int, hasher>;
 		m.insert(rde::make_pair(11111111, 0));
 		m.insert(rde::make_pair(111111111, 0));
 		m.insert(rde::make_pair(1111111111, 0));
-		CHECK_EQUAL(10, m.size());
+		CHECK(10 == m.size());
 		m.erase(11111);
-		CHECK_EQUAL(9, m.size());
+		CHECK(9 == m.size());
 		m.insert(rde::make_pair(11111, 0));
-		CHECK_EQUAL(10, m.size());
+		CHECK(10 == m.size());
 		m.erase(11111);
 		m.insert(rde::make_pair(11111, 0));
-		CHECK_EQUAL(10, m.size());
-		CHECK_EQUAL(0, m.erase(-11111));
-		CHECK_EQUAL(10, m.size());
+		CHECK(10 == m.size());
+		CHECK(0 == m.erase(-11111));
+		CHECK(10 == m.size());
 		m.erase(1);
-		CHECK_EQUAL(9, m.size());
+		CHECK(9 == m.size());
 		rde::hash_map<int, int>::iterator it = m.find(1111);
 		m.erase(it);
-		CHECK_EQUAL(8, m.size());
+		CHECK(8 == m.size());
 		it = m.find(22222);
 		m.erase(it);
-		CHECK_EQUAL(8, m.size());
+		CHECK(8 == m.size());
 		m.erase(m.begin(), m.end());
 		CHECK(m.empty());
 	}
-	TEST(GoogleIntHashFixed)
+	TEST_CASE("hash_map: GoogleIntHashFixed")
     {
 		typedef rde::hash_map<int, int, rde::hash<int>, rde::equal_to<int>, rde::stack_allocator<1000> > TestMap;
 		TestMap m;
@@ -96,30 +96,30 @@ template rde::hash_map<std::string, int, hasher>;
 		m.insert(rde::make_pair(11111111, 0));
 		m.insert(rde::make_pair(111111111, 0));
 		m.insert(rde::make_pair(1111111111, 0));
-		CHECK_EQUAL(10, m.size());
+		CHECK(10 == m.size());
 		m.erase(11111);
-		CHECK_EQUAL(9, m.size());
+		CHECK(9 == m.size());
 		m.insert(rde::make_pair(11111, 0));
-		CHECK_EQUAL(10, m.size());
+		CHECK(10 == m.size());
 		m.erase(11111);
 		m.insert(rde::make_pair(11111, 0));
-		CHECK_EQUAL(10, m.size());
-		CHECK_EQUAL(0, m.erase(-11111));
-		CHECK_EQUAL(10, m.size());
+		CHECK(10 == m.size());
+		CHECK(0 == m.erase(-11111));
+		CHECK(10 == m.size());
 		m.erase(1);
-		CHECK_EQUAL(9, m.size());
+		CHECK(9 == m.size());
 		TestMap::iterator it = m.find(1111);
 		m.erase(it);
-		CHECK_EQUAL(8, m.size());
+		CHECK(8 == m.size());
 		it = m.find(22222);
 		m.erase(it);
-		CHECK_EQUAL(8, m.size());
+		CHECK(8 == m.size());
 		m.erase(m.begin(), m.end());
 		CHECK(m.empty());
 	}
 
 	// Reported by Shiran Ben-Israel
-	TEST(ShiranIssue)
+	TEST_CASE("hash_map: ShiranIssue")
 	{
 		static const int MAX_KEYS = 1024;
 		int aKeys[MAX_KEYS];
@@ -156,7 +156,7 @@ template rde::hash_map<std::string, int, hasher>;
 		{
 			m_mHashMap.insert(rde::make_pair(aKeys[i],0));
 		}
- 
+
 		for (int i = 0; i < MAX_KEYS; i++)
 		{
 			m_mHashMap.erase(aKeys[i]);
@@ -165,5 +165,4 @@ template rde::hash_map<std::string, int, hasher>;
 			CHECK(itr2 == m_mHashMap.end());
 		}
 	}
-}	
-
+}

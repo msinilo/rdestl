@@ -1,4 +1,4 @@
-#include <UnitTest++/src/UnitTest++.h>
+#include "vendor/Catch/catch.hpp"
 #include "rdestl/radix_sorter.h"
 #include "rdestl/sort.h"
 
@@ -34,7 +34,9 @@ namespace
 		return true;
 	}
 
-	TEST(RadixSortTestSigned)
+TEST_CASE("sort", "[algorithm]")
+{
+	SECTION("RadixSortTestSigned")
 	{
 		static const int N = 200 * 1000;
 		std::int32_t* data = new std::int32_t[N];
@@ -48,7 +50,7 @@ namespace
 
 		delete[] data;
 	}
-	TEST(RadixSort16Bit)
+	SECTION("RadixSort16Bit")
 	{
 		static const int N = 200 * 1000;
 		std::uint16_t* data = new std::uint16_t[N];
@@ -62,7 +64,7 @@ namespace
 
 		delete[] data;
 	}
-	TEST(InsertionSort)
+	SECTION("InsertionSort")
 	{
 		static const int N = 200;
 		std::uint16_t* data = new std::uint16_t[N];
@@ -74,7 +76,7 @@ namespace
 		CHECK(IsSorted(data, N));
 		delete[] data;
 	}
-	TEST(QuickSort)
+	SECTION("QuickSort")
 	{
 		static const int N = 200 * 1000;
 		std::uint16_t* data = new std::uint16_t[N];
@@ -86,7 +88,7 @@ namespace
 		CHECK(IsSorted(data, N));
 		delete[] data;
 	}
-	TEST(HeapSort)
+	SECTION("HeapSort")
 	{
 		static const int N = 200 * 1000;
 		std::uint16_t* data = new std::uint16_t[N];
@@ -98,19 +100,19 @@ namespace
 		CHECK(IsSorted(data, N));
 		delete[] data;
 	}
-	TEST(IsSortedWhenSorted)
+	SECTION("IsSortedWhenSorted")
 	{
 		const int data[4] = { -1, 2, 3, 8 };
 		CHECK(rde::is_sorted(&data[0], &data[4], rde::less<int>()));
 	}
-	TEST(IsSortedReturnsFalseWhenNotSorted)
+	SECTION("IsSortedReturnsFalseWhenNotSorted")
 	{
 		const int data[4] = { -1, 9, 3, 8 };
 		CHECK(!rde::is_sorted(&data[0], &data[4], rde::less<int>()));
 	}
 	// Issue reported by Daniel Treble: http://code.google.com/p/rdestl/issues/detail?id=2
 	// (used to crash).
-	TEST(QuickSortIssue2)
+	SECTION("QuickSortIssue2")
 	{
 		rde::vector<int> foo;
 		foo.push_back(70);
@@ -145,7 +147,7 @@ namespace
 		return a.x > b.x;
 	}
 
-	TEST(RadixSpeedTest)
+	SECTION("RadixSpeedTest")
 	{
 		static const int N = 300 * 1000;
 
@@ -199,4 +201,5 @@ namespace
 		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 	}
 #endif
+}
 }
