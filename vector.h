@@ -315,10 +315,11 @@ public:
 		TStorage::record_high_watermark();
 		RDE_ASSERT(invariant());
 	}
-
-	void insert(size_type index, size_type n, const T& val)
+		
+	void insert(int index, size_type n, const T& val)
 	{
 		RDE_ASSERT(invariant());
+		RDE_ASSERT(index >= 0); // FIXME: Having to use signed type for index param currently to prevent ambiguous overload matching ~SK
 		const size_type indexEnd = index + n;
 		const size_type prevSize = size();
 		if (m_end + n > m_capacityEnd)
