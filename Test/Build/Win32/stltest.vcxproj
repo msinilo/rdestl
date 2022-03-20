@@ -102,7 +102,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../../..;../../../../external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;RDE_DONT_CHECK_COMPILER_OPTIONS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_ALLOW_RTCc_IN_STL;RDE_DONT_CHECK_COMPILER_OPTIONS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -389,6 +389,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\HashMapTestInc.h" />
+    <ClInclude Include="..\..\ListTestInc.h" />
     <ClInclude Include="..\..\StringTestInc.h" />
   </ItemGroup>
   <ItemGroup>
