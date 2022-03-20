@@ -1,7 +1,7 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/algorithm.h"
-#include "rdestl/functional.h"
-#include "rdestl/list.h"
+#include "algorithm.h"
+#include "functional.h"
+#include "list.h"
 
 namespace
 {

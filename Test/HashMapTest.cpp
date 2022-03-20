@@ -1,6 +1,6 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/hash_map.h"
-#include "rdestl/stack_allocator.h"
+#include "hash_map.h"
+#include "stack_allocator.h"
 #include <cstdio>
 #include <iostream>
 

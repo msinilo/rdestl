@@ -1,6 +1,6 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/radix_sorter.h"
-#include "rdestl/sort.h"
+#include "radix_sorter.h"
+#include "sort.h"
 
 #if !RDESTL_STANDALONE
 #	include "core/Console.h"

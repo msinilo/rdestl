@@ -1,6 +1,6 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/fixed_vector.h"
-#include "rdestl/pair.h"
+#include "fixed_vector.h"
+#include "pair.h"
 #include <xmmintrin.h>
 
 
@@ -122,7 +122,6 @@ TEST_CASE("fixed_vector", "[vector]")
 		tTestVector::iterator it = v.erase(v.begin() + 1); // 4
 		CHECK(9 == *it);
 		v.erase(it + 1); // 16
-
 		CHECK(4 == v.size());
 		//PrintVector(v);
 	}

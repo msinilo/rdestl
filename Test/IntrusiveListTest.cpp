@@ -1,5 +1,5 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/intrusive_list.h"
+#include "intrusive_list.h"
 
 namespace
 {

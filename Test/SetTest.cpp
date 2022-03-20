@@ -1,5 +1,5 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/set.h"
+#include "set.h"
 
 namespace
 {

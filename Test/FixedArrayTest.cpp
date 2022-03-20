@@ -1,5 +1,5 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/fixed_array.h"
+#include "fixed_array.h"
 #include <cstdio>
 
 namespace

@@ -1,5 +1,5 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/stack.h"
+#include "stack.h"
 
 namespace
 {

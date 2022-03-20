@@ -1,6 +1,6 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/rde_string.h"
-#include "rdestl/cow_string_storage.h"
+#include "rde_string.h"
+#include "cow_string_storage.h"
 #include <cstdio>
 
 namespace

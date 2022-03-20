@@ -1,5 +1,5 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/slist.h"
+#include "slist.h"
 
 namespace
 {
