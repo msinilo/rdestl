@@ -1,45 +1,48 @@
-#include <UnitTest++/src/UnitTest++.h>
+#include "vendor/Catch/catch.hpp"
 #include "rdestl/slist.h"
 
 namespace
 {
-	const int array [] = { 1, 4, 9, 16, 25, 36 }; 
-	TEST(ConstructEmpty)
+TEST_CASE("slist", "[list]")
+{
+	const int array [] = { 1, 4, 9, 16, 25, 36 };
+
+	SECTION("ConstructEmpty")
 	{
 		rde::slist<int> lst;
 		CHECK(lst.empty());
-		CHECK_EQUAL(0, lst.size());
+		CHECK(0 == lst.size());
 	}
-	TEST(PushFront)
+	SECTION("PushFront")
 	{
 		rde::slist<int> lst;
 		lst.push_front(5);
 		CHECK(!lst.empty());
-		CHECK_EQUAL(1, lst.size());
-		CHECK_EQUAL(5, lst.front());
+		CHECK(1 == lst.size());
+		CHECK(5 == lst.front());
 		lst.push_front(3);
-		CHECK_EQUAL(2, lst.size());
-		CHECK_EQUAL(3, lst.front());
+		CHECK(2 == lst.size());
+		CHECK(3 == lst.front());
 	}
-	TEST(PopFront)
+	SECTION("PopFront")
 	{
 		rde::slist<int> lst;
 		lst.push_front(5);
 		lst.push_front(3);
 		CHECK(!lst.empty());
 		lst.pop_front();
-		CHECK_EQUAL(5, lst.front());
+		CHECK(5 == lst.front());
 		lst.pop_front();
 		CHECK(lst.empty());
 	}
-	TEST(Previous)
+	SECTION("Previous")
 	{
 		rde::slist<int> lst;
 		lst.push_front(5);
 		lst.push_front(10);
 		lst.push_front(15);
 		rde::slist<int>::iterator it = lst.begin();
-		++it; 
+		++it;
 		rde::slist<int>::iterator itAfterBegin = it;
 		++it;
 		rde::slist<int>::iterator itPrev = lst.previous(it);
@@ -48,7 +51,7 @@ namespace
 		CHECK(itPrev == lst.begin());
 	}
 
-	TEST(Clear)
+	SECTION("Clear")
 	{
 		rde::slist<int> lst;
 		lst.push_front(5);
@@ -57,37 +60,38 @@ namespace
 		lst.push_front(2);
 		lst.push_front(1);
 		CHECK(!lst.empty());
-		CHECK_EQUAL(5, lst.size());
+		CHECK(5 == lst.size());
 		lst.clear();
 		CHECK(lst.empty());
-		CHECK_EQUAL(0, lst.size());
+		CHECK(0 == lst.size());
 	}
 
-	TEST(AssignCtor)
+	SECTION("AssignCtor")
 	{
 		rde::slist<int> lst(&array[0], &array[6]);
-		CHECK_EQUAL(6, lst.size());
-		CHECK_EQUAL(1, lst.front());
+		CHECK(6 == lst.size());
+		CHECK(1 == lst.front());
 		rde::slist<int>::iterator it = lst.begin();
 		int i(1);
 		for (/**/; it != lst.end(); ++it, ++i)
 		{
-			CHECK_EQUAL(i*i, *it);
+			CHECK(i*i == *it);
 		}
 	}
 
-	TEST(AssignmentOp)
+	SECTION("AssignmentOp")
 	{
 		rde::slist<int> lst(&array[0], &array[6]);
 		rde::slist<int> lst2;
 		lst2 = lst;
-		CHECK_EQUAL(6, lst2.size());
-		CHECK_EQUAL(1, lst2.front());
+		CHECK(6 == lst2.size());
+		CHECK(1 == lst2.front());
 		rde::slist<int>::iterator it = lst.begin();
 		int i(1);
 		for (/**/; it != lst.end(); ++it, ++i)
 		{
-			CHECK_EQUAL(i*i, *it);
+			CHECK(i*i == *it);
 		}
 	}
+}
 }

@@ -3,6 +3,7 @@
 #include <numeric> 
 #include <vector>
 #include <windows.h>
+#include <string>
 
 
 namespace

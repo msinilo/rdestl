@@ -1,4 +1,4 @@
-#include <UnitTest++/src/UnitTest++.h>
+#include "vendor/Catch/catch.hpp"
 #include "rdestl/intrusive_list.h"
 
 namespace
@@ -9,71 +9,73 @@ namespace
 		int	data;
 	};
 
-	TEST(DefaultCtorConstructsEmptyList)
+TEST_CASE("intrusive_list", "[list]")
+{
+	SECTION("DefaultCtorConstructsEmptyList")
 	{
 		rde::intrusive_list<MyNode> l;
 		CHECK(l.empty());
-		CHECK_EQUAL(0, l.size());
+		CHECK(0 == l.size());
 	}
-	TEST(PushBack)
+	SECTION("PushBack")
 	{
 		rde::intrusive_list<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_back(&node);
-		CHECK_EQUAL(1, l.size());
+		CHECK(1 == l.size());
 		MyNode node2;
 		node2.data = 10;
 		l.push_back(&node2);
-		CHECK_EQUAL(2, l.size());
-		CHECK_EQUAL(10, l.back()->data);
+		CHECK(2 == l.size());
+		CHECK(10 == l.back()->data);
 	}
-	TEST(PushBackPtr)
+	SECTION("PushBackPtr")
 	{
 		rde::intrusive_list<MyNode> l;
 		MyNode* n(new MyNode());
 		l.push_back(n);
-		CHECK_EQUAL(1, l.size());
+		CHECK(1 == l.size());
 		delete n;
 	}
 
-	TEST(PushFront)
+	SECTION("PushFront")
 	{
 		rde::intrusive_list<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_front(&node);
-		CHECK_EQUAL(1, l.size());
+		CHECK(1 == l.size());
 		MyNode node2;
 		node2.data = 10;
 		l.push_front(&node2);
-		CHECK_EQUAL(2, l.size());
-		CHECK_EQUAL(10, l.front()->data);
-		CHECK_EQUAL(5, l.back()->data);
+		CHECK(2 == l.size());
+		CHECK(10 == l.front()->data);
+		CHECK(5 == l.back()->data);
 	}
 
-	TEST(PopBack)
+	SECTION("PopBack")
 	{
 		rde::intrusive_list<MyNode> l;
 		MyNode node;
 		node.data = 5;
 		l.push_back(&node);
-		CHECK_EQUAL(1, l.size());
+		CHECK(1 == l.size());
 		MyNode node2;
 		node2.data = 10;
 		l.push_back(&node2);
-		CHECK_EQUAL(2, l.size());
+		CHECK(2 == l.size());
 		l.pop_back();
-		CHECK_EQUAL(1, l.size());
-		CHECK_EQUAL(5, l.front()->data);
+		CHECK(1 == l.size());
+		CHECK(5 == l.front()->data);
 	}
 
-	TEST(IterEmpty)
+	SECTION("IterEmpty")
 	{
 		rde::intrusive_list<MyNode> l;
 		CHECK(l.begin() == l.end());
 	}
-	TEST(IterTest)
+	SECTION("IterTest")
 	{
 		rde::intrusive_list<MyNode> l;
 		MyNode node;
@@ -94,17 +96,17 @@ namespace
 		node2.data = 10;
 		l.push_back(&node2);
 		it = l.begin();
-		CHECK_EQUAL(5, it->data);
-		CHECK_EQUAL(10, (++it)->data);
+		CHECK(5 == it->data);
+		CHECK(10 == (++it)->data);
 
 		MyNode* n = new MyNode(15);
 		l.insert(it, n);
-		CHECK_EQUAL(3, l.size());
+		CHECK(3 == l.size());
 		it = l.begin();
 		++it;
-		CHECK_EQUAL(15, it->data);
-		CHECK_EQUAL(10, (++it)->data);
+		CHECK(15 == it->data);
+		CHECK(10 == (++it)->data);
 		delete n;
 	}
 }
-
+}

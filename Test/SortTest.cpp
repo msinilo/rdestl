@@ -1,4 +1,4 @@
-#include <UnitTest++/src/UnitTest++.h>
+#include "vendor/Catch/catch.hpp"
 #include "rdestl/radix_sorter.h"
 #include "rdestl/sort.h"
 
@@ -34,12 +34,14 @@ namespace
 		return true;
 	}
 
-	TEST(RadixSortTestSigned)
+TEST_CASE("sort", "[algorithm]")
+{
+	SECTION("RadixSortTestSigned")
 	{
-		static const int N = 200 * 1000;
+		static const size_t N = 200 * 1000;
 		std::int32_t* data = new std::int32_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = rand() - (rand() / 2);
 
 		rde::radix_sorter<std::int32_t> r;
@@ -48,12 +50,12 @@ namespace
 
 		delete[] data;
 	}
-	TEST(RadixSort16Bit)
+	SECTION("RadixSort16Bit")
 	{
-		static const int N = 200 * 1000;
+		static const size_t N = 200 * 1000;
 		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = (std::uint16_t)(rand());
 
 		rde::radix_sorter<std::uint16_t> r;
@@ -62,55 +64,55 @@ namespace
 
 		delete[] data;
 	}
-	TEST(InsertionSort)
+	SECTION("InsertionSort")
 	{
-		static const int N = 200;
+		static const size_t N = 200;
 		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = (std::uint16_t)(rand());
 
 		rde::insertion_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
 		delete[] data;
 	}
-	TEST(QuickSort)
+	SECTION("QuickSort")
 	{
-		static const int N = 200 * 1000;
+		static const size_t N = 200 * 1000;
 		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = (std::uint16_t)(rand());
 
 		rde::quick_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
 		delete[] data;
 	}
-	TEST(HeapSort)
+	SECTION("HeapSort")
 	{
-		static const int N = 200 * 1000;
+		static const size_t N = 200 * 1000;
 		std::uint16_t* data = new std::uint16_t[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i] = (std::uint16_t)(rand());
 
 		rde::heap_sort(&data[0], &data[N]);
 		CHECK(IsSorted(data, N));
 		delete[] data;
 	}
-	TEST(IsSortedWhenSorted)
+	SECTION("IsSortedWhenSorted")
 	{
 		const int data[4] = { -1, 2, 3, 8 };
 		CHECK(rde::is_sorted(&data[0], &data[4], rde::less<int>()));
 	}
-	TEST(IsSortedReturnsFalseWhenNotSorted)
+	SECTION("IsSortedReturnsFalseWhenNotSorted")
 	{
 		const int data[4] = { -1, 9, 3, 8 };
 		CHECK(!rde::is_sorted(&data[0], &data[4], rde::less<int>()));
 	}
 	// Issue reported by Daniel Treble: http://code.google.com/p/rdestl/issues/detail?id=2
 	// (used to crash).
-	TEST(QuickSortIssue2)
+	SECTION("QuickSortIssue2")
 	{
 		rde::vector<int> foo;
 		foo.push_back(70);
@@ -145,13 +147,13 @@ namespace
 		return a.x > b.x;
 	}
 
-	TEST(RadixSpeedTest)
+	SECTION("RadixSpeedTest")
 	{
-		static const int N = 300 * 1000;
+		static const size_t N = 300 * 1000;
 
 		Foo* data = new Foo[N];
 		srand(1011);
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i].x = rand();
 
 		rde::Timer t;
@@ -165,7 +167,7 @@ namespace
 		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 
 		rde::radix_sorter<Foo> r;
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i].x = rand();
 		t.Start();
 		ticks = __rdtsc();
@@ -176,7 +178,7 @@ namespace
 			double(ticks) / N);
 		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i].x = rand();
 		t.Start();
 		ticks = __rdtsc();
@@ -187,7 +189,7 @@ namespace
 			double(ticks) / N);
 		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 
-		for (int i = 0; i < N; ++i)
+		for (size_t i = 0; i < N; ++i)
 			data[i].x = rand();
 		t.Start();
 		ticks = __rdtsc();
@@ -199,4 +201,5 @@ namespace
 		CHECK(rde::is_sorted(data, data + N, rde::less<Foo>()));
 	}
 #endif
+}
 }

@@ -1,4 +1,4 @@
-#include <UnitTest++/src/UnitTest++.h>
+#include "vendor/Catch/catch.hpp"
 #include "rdestl/vector.h"
 #include "rdestl/pair.h"
 #include <cstdio>
@@ -22,7 +22,7 @@ namespace
 	typedef rde::vector<int>			tTestVector;
 	typedef rde::vector<std::string>	tStringVector;
 
-	const int array [] = { 1, 4, 9, 16, 25, 36 }; 
+	const int array [] = { 1, 4, 9, 16, 25, 36 };
 	void PrintVector(const tTestVector& v)
 	{
 		for (tTestVector::const_iterator it = v.begin(); it != v.end(); ++it)
@@ -36,72 +36,74 @@ namespace
 		printf("\n");
 	}
 
-	TEST(DefaultCtorEmpty)
+TEST_CASE("vector", "[vector]")
+{
+	SECTION("DefaultCtorEmpty")
 	{
 		tTestVector v;
 		CHECK(v.empty());
-		CHECK_EQUAL(0, v.size());
-		CHECK_EQUAL(v.begin(), v.end());
+		CHECK(0 == v.size());
+		CHECK(v.begin() == v.end());
 		printf("Sizeof(v) = %zd\n", sizeof(v));
 	}
-	TEST(PushBack)
+	SECTION("PushBack")
 	{
 		tTestVector v;
 		v.push_back(2);
-		CHECK_EQUAL(1, v.size());
-		CHECK_EQUAL(2, v[0]);
+		CHECK(1 == v.size());
+		CHECK(2 == v[0]);
 		CHECK(!v.empty());
 		CHECK(v.begin() != v.end());
 	}
-	TEST(PopBack)
+	SECTION("PopBack")
 	{
 		tTestVector v;
 		v.push_back(2);
 		v.push_back(3);
-		CHECK_EQUAL(2, v.front());
-		CHECK_EQUAL(3, v.back());
+		CHECK(2 == v.front());
+		CHECK(3 == v.back());
 		v.pop_back();
 		CHECK(!v.empty());
-		CHECK_EQUAL(1, v.size());
-		CHECK_EQUAL(2, v[0]);
+		CHECK(1 == v.size());
+		CHECK(2 == v[0]);
 		tTestVector::const_iterator it = v.begin();
 		++it;
-		CHECK_EQUAL(v.end(), it);
+		CHECK(v.end() == it);
 	}
-	TEST(AssignTab)
+	SECTION("AssignTab")
 	{
 		tTestVector v;
 		CHECK(v.empty());
 		v.assign(array, array + 6);
-		CHECK_EQUAL(6, v.size());
-		CHECK_EQUAL(0, memcmp(array, v.data(), sizeof(array)));
+		CHECK(6 == v.size());
+		CHECK(0 == memcmp(array, v.data(), sizeof(array)));
 	}
-	TEST(AssignTabConstruct)
+	SECTION("AssignTabConstruct")
 	{
 		tTestVector v(array, array + 6);
-		CHECK_EQUAL(6, v.size());
-		CHECK_EQUAL(0, memcmp(array, v.data(), sizeof(array)));
+		CHECK(6 == v.size());
+		CHECK(0 == memcmp(array, v.data(), sizeof(array)));
 	}
 
-	TEST(Clear)
+	SECTION("Clear")
 	{
 		tTestVector v(array, array + 6);
-		CHECK_EQUAL(6, v.size());
+		CHECK(6 == v.size());
 		v.clear();
-		CHECK_EQUAL(0, v.size());
+		CHECK(0 == v.size());
 		CHECK(v.empty());
 		// Make sure it doesnt free mem.
 		CHECK(v.capacity() > 0);
 	}
 
-	TEST(EraseBegin)
+	SECTION("EraseBegin")
 	{
 		tTestVector v(array, array + 6);
-		v.erase(v.begin()); 
+		v.erase(v.begin());
 		// 4, 9, 16, 25, 36
-		CHECK_EQUAL(4, v.front());
+		CHECK(4 == v.front());
 	}
-	TEST(Erase)
+	SECTION("Erase")
 	{
 		tTestVector v(array, array + 6);
 
@@ -111,31 +113,31 @@ namespace
 		tTestVector::iterator it2 = it;
 		it2 += 2;
 		v.erase(it, it2);
-		CHECK_EQUAL(4, v.size());
-		CHECK_EQUAL(1, v.front());
-		CHECK_EQUAL(16, v[1]);
-		CHECK_EQUAL(25, v[2]);
-		CHECK_EQUAL(36, v[3]);
+		CHECK(4 == v.size());
+		CHECK(1 == v.front());
+		CHECK(16 == v[1]);
+		CHECK(25 == v[2]);
+		CHECK(36 == v[3]);
 	}
-	TEST(EraseSingle)
+	SECTION("EraseSingle")
 	{
 		tTestVector v(array, array + 6);
 		tTestVector::iterator it = v.erase(v.begin() + 1); // 4
-		CHECK_EQUAL(9, *it);
+		CHECK(9 == *it);
 		v.erase(it + 1); // 16
-		
-		CHECK_EQUAL(4, v.size());
+
+		CHECK(4 == v.size());
 		//PrintVector(v);
 	}
-	TEST(EraseEnd)
+	SECTION("EraseEnd")
 	{
 		tTestVector v(array, array + 6);
 		tTestVector::iterator it = v.begin();
 		it += 2;
 		v.erase(it, v.end());
-		CHECK_EQUAL(2, v.size());
+		CHECK(2 == v.size());
 	}
-	TEST(EraseAll)
+	SECTION("EraseAll")
 	{
 		tTestVector v(array, array + 6);
 		v.erase(v.begin(), v.end());
@@ -145,76 +147,76 @@ namespace
 		v2.erase(v2.begin(), v2.end());
 	}
 
-	TEST(InsertString)
+	SECTION("InsertString")
 	{
 		tStringVector v;
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
 		v.insert(0, 1, "Hello");
-		CHECK_EQUAL(4, v.size());
+		CHECK(4 == v.size());
 		v.insert(4, 3, ".");
-		CHECK_EQUAL(7, v.size());
+		CHECK(7 == v.size());
 		PrintVector(v);
 		v.insert(1, 10, "very");
-		CHECK_EQUAL(17, v.size());
+		CHECK(17 == v.size());
 		PrintVector(v);
 	}
 
-	TEST(EraseString)
+	SECTION("EraseString")
 	{
 		tStringVector v;
 		v.push_back("Hello");
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
-		CHECK_EQUAL(4, v.size());
+		CHECK(4 == v.size());
 		v.erase(v.begin() + 1, v.end() - 1);
-		CHECK_EQUAL(2, v.size());
+		CHECK(2 == v.size());
 	}
-	TEST(IndexOf)
+	SECTION("IndexOf")
 	{
 		tStringVector v;
 		v.push_back("Hello");
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
-		CHECK_EQUAL(2, v.index_of("new"));
-		CHECK_EQUAL(tStringVector::npos, v.index_of("blah"));
-		CHECK_EQUAL(tStringVector::npos, v.index_of("brave", 2));
+		CHECK(2 == v.index_of("new"));
+		CHECK(tStringVector::npos == v.index_of("blah"));
+		CHECK(tStringVector::npos == v.index_of("brave", 2));
 	}
 
-	TEST(InsertFront)
+	SECTION("InsertFront")
 	{
 		tTestVector v(array, array + 6);
 		v.insert(v.begin(), 2, -1);
-		CHECK_EQUAL(8, v.size());
-		CHECK_EQUAL(-1, v.front());
-		CHECK_EQUAL(-1, v[1]);
-		CHECK_EQUAL(1, v[2]);
-		CHECK_EQUAL(4, v[3]);
-		CHECK_EQUAL(36, v[7]);
+		CHECK(8 == v.size());
+		CHECK(-1 == v.front());
+		CHECK(-1 == v[1]);
+		CHECK(1 == v[2]);
+		CHECK(4 == v[3]);
+		CHECK(36 == v[7]);
 	}
-	TEST(InsertMiddle)
+	SECTION("InsertMiddle")
 	{
 		tTestVector v(array, array + 6);
 		tTestVector::iterator it = v.begin() + 2;
 		v.insert(it, 3, 5);
-		CHECK_EQUAL(9, v.size());
-		CHECK_EQUAL(5, v[2]);
+		CHECK(9 == v.size());
+		CHECK(5 == v[2]);
 		it = v.begin() + 2;
 		v.insert(it, 4);
-		CHECK_EQUAL(4, v[2]);
+		CHECK(4 == v[2]);
 	}
-	TEST(InsertEnd)
+	SECTION("InsertEnd")
 	{
 		tTestVector v(array, array + 6);
 		v.insert(v.end(), 1, 49);
-		CHECK_EQUAL(7, v.size());
-		CHECK_EQUAL(49, v[6]);
+		CHECK(7 == v.size());
+		CHECK(49 == v[6]);
 	}
 
-	TEST(InsertEndRealloc)
+	SECTION("InsertEndRealloc")
 	{
 		tTestVector v;
 		for (tTestVector::size_type i = 0; i < v.capacity(); ++i)
@@ -222,63 +224,63 @@ namespace
 			v.push_back((int)i);
 		}
 		v.insert(v.end(), 666);
-		CHECK_EQUAL(666, v.back());
+		CHECK(666 == v.back());
 	}
 
-	TEST(InsertToEmpty)
+	SECTION("InsertToEmpty")
 	{
 		tTestVector v;
 		v.insert(v.begin(), 1, 2);
-		CHECK_EQUAL(1, v.size());
-		CHECK_EQUAL(2, v.front());
+		CHECK(1 == v.size());
+		CHECK(2 == v.front());
 	}
 
-	TEST(ResizeSmaller)
+	SECTION("ResizeSmaller")
 	{
 		tTestVector v(array, array + 6);
 		v.resize(4);
-		CHECK_EQUAL(4, v.size());
-		CHECK_EQUAL(16, v[3]);
+		CHECK(4 == v.size());
+		CHECK(16 == v[3]);
 	}
 
-	TEST(CopyConstructor)
+	SECTION("CopyConstructor")
 	{
 		tTestVector v(array, array + 6);
 		tTestVector v2(v);
-		CHECK_EQUAL(6, v2.size());
+		CHECK(6 == v2.size());
 		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
 	}
 
-	TEST(AssignmentOp)
+	SECTION("AssignmentOp")
 	{
 		tTestVector v(array, array + 6);
 		tTestVector v2;
 		v2 = v;
-		CHECK_EQUAL(6, v2.size());
+		CHECK(6 == v2.size());
 		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
 	}
 
-	TEST(Tighten)
+	SECTION("Tighten")
 	{
 		tTestVector v(array, array + 6);
 		v.push_back(49);
 		v.set_capacity(v.size());
-		CHECK_EQUAL(7, v.capacity());
+		CHECK(7 == v.capacity());
 	}
-	TEST(Reserve)
+	SECTION("Reserve")
 	{
 		tTestVector v;
-		CHECK_EQUAL(0, v.capacity());
+		CHECK(0 == v.capacity());
 		v.push_back(1); v.push_back(2); v.push_back(3);
 		v.reserve(10);
 		CHECK(v.capacity() >= 10);
-		CHECK_EQUAL(3, v.size());
-		CHECK_EQUAL(1, v[0]);
-		CHECK_EQUAL(2, v[1]);
-		CHECK_EQUAL(3, v[2]);
+		CHECK(3 == v.size());
+		CHECK(1 == v[0]);
+		CHECK(2 == v[1]);
+		CHECK(3 == v[2]);
 	}
 
-	TEST(CopyEmpty)
+	SECTION("CopyEmpty")
 	{
 		tTestVector v;
 		v.push_back(1); v.push_back(2); v.push_back(3);
@@ -288,48 +290,48 @@ namespace
 	}
 
 	// Force few grows
-	TEST(MultipleGrow)
+	SECTION("MultipleGrow")
 	{
 		tTestVector v;
 		for (int i = 0; i < 5000; ++i)
 		{
 			v.push_back(i);
 		}
-		CHECK_EQUAL(5000, v.size());
+		CHECK(5000 == v.size());
 		for (int i = 0; i < 5000; ++i)
 		{
-			CHECK_EQUAL(i, v[i]);
+			CHECK(i == v[i]);
 		}
 	}
 
     //-----------------------------------------------------------------
     //Vector tests by Danushka Abeysuriya silvermace@gmail.com
 
-    TEST(Resize)
+    SECTION("Resize")
     {
         rde::vector<int> myFoos;
         myFoos.resize(20);
-        
+
         CHECK(myFoos.size() == 20);
         CHECK(myFoos.capacity() >= 20);
     }
 
     //Regression test:
-    //The bug is caused when the copy constructor is invoked on a vector where 
+    //The bug is caused when the copy constructor is invoked on a vector where
     //the rhs is an empty (and non-preallocated) vector - i.e. there is nothing to copy
-    TEST(Resize_Regression_1)
+    SECTION("Resize_Regression_1")
     {
         rde::vector< rde::vector<int> > myFoosFoos;
         myFoosFoos.push_back(rde::vector<int>());
         myFoosFoos.push_back(rde::vector<int>());
         myFoosFoos[1].push_back(42);
-        
+
         CHECK(myFoosFoos.size() == 2);
         CHECK(myFoosFoos[0].size() == 0);
         CHECK(myFoosFoos[1].size() == 1);
     }
 
-    TEST(Resize_Regression_2)
+    SECTION("Resize_Regression_2")
     {
         rde::vector< rde::vector<int> > myFoosFoos;
         rde::vector<int> a;
@@ -341,39 +343,39 @@ namespace
         myFoosFoos.push_back(a);
         myFoosFoos.push_back(b);
         myFoosFoos[1].push_back(4224);
-        
+
         CHECK(myFoosFoos.size() == 2);
-        
+
         CHECK(myFoosFoos[0].size() == 2);
         CHECK(myFoosFoos[0][0] == 42);
         CHECK(myFoosFoos[0][1] == 24);
-        
+
         CHECK(myFoosFoos[1].size() == 1);
         CHECK(myFoosFoos[1][0] == 4224);
     }
 
-    TEST(Insert)
+    SECTION("Insert")
     {
         rde::vector<int> myFoos;
-        
+
         myFoos.push_back(42);
         CHECK(myFoos.size() == 1);
         CHECK(myFoos[0] == 42);
-        
+
         myFoos.insert(myFoos.begin(), 24);
         CHECK(myFoos.size() == 2);
         CHECK(myFoos[0] == 24);
         CHECK(myFoos[1] == 42);
-        
+
         myFoos.clear();
         CHECK(myFoos.size() == 0);
-        
+
         myFoos.insert(myFoos.begin(), 42);
         CHECK(myFoos.size() == 1);
         CHECK(myFoos[0] == 42);
     }
 
-    TEST(VectorOfVectors)
+    SECTION("VectorOfVectors")
     {
         rde::vector< rde::vector<int> > myFoosFoos;
         myFoosFoos.push_back(rde::vector<int>(10));
@@ -383,34 +385,34 @@ namespace
         CHECK(myFoosFoos[1].size() == 20);
     }
 
-    TEST(MoveConstructorExplicit)
+    SECTION("MoveConstructorExplicit")
     {
         rde::vector<int> v;
         v.push_back(1);
         v.push_back(2);
-        CHECK_EQUAL(2, v.size());
+        CHECK(2 == v.size());
 
         rde::vector<int> v2(std::move(v));
-        CHECK_EQUAL(0, v.size());
-        CHECK_EQUAL(2, v2.size());
-        CHECK_EQUAL(1, v2[0]);
-        CHECK_EQUAL(2, v2[1]);
+        CHECK(0 == v.size());
+        CHECK(2 == v2.size());
+        CHECK(1 == v2[0]);
+        CHECK(2 == v2[1]);
     }
-    TEST(MoveAssignment)
+    SECTION("MoveAssignment")
     {
         rde::vector<int> v;
         v.push_back(1);
         v.push_back(2);
-        CHECK_EQUAL(2, v.size());
+        CHECK(2 == v.size());
 
         rde::vector<int> v2;
         v2 = std::move(v);
-        CHECK_EQUAL(0, v.size());
-        CHECK_EQUAL(2, v2.size());
-        CHECK_EQUAL(1, v2[0]);
-        CHECK_EQUAL(2, v2[1]);
+        CHECK(0 == v.size());
+        CHECK(2 == v2.size());
+        CHECK(1 == v2[0]);
+        CHECK(2 == v2[1]);
     }
-    TEST(EmplaceBack)
+    SECTION("EmplaceBack")
     {
         rde::vector<rde::pair<int, int> > v;
 
@@ -418,30 +420,31 @@ namespace
         v.emplace_back(3, 4);
         v.emplace_back(5, 6);
 
-        CHECK_EQUAL(3, v.size());
-        CHECK(v[0].first == 1 && v[0].second == 2);
-        CHECK(v[1].first == 3 && v[1].second == 4);
-        CHECK(v[2].first == 5 && v[2].second == 6);
+        CHECK(3 == v.size());
+        CHECK(v[0].first == 1); CHECK(v[0].second == 2);
+        CHECK(v[1].first == 3); CHECK(v[1].second == 4);
+        CHECK(v[2].first == 5); CHECK(v[2].second == 6);
     }
-    
+
     //typedef rde::fixed_vector<int, 3, false> fvector;
 
-    //TEST(fixedvec_copy)
+    //SECTION("fixedvec_copy")
     //{
     //    fvector a;
     //    fvector b;
     //    a.push_back(42);
     //    a.push_back(24);
     //    a.push_back(4224);
-    //    
+    //
     //    b = a;
-    //    
+    //
     //    CHECK(b.size() == 3);
     //    CHECK(b[0] == 42);
     //    CHECK(b[1] == 24);
     //    CHECK(b[2] == 4224);
-    //    
+    //
     //    b = fvector();
     //    CHECK(b.size() == 3);
     //}
+}
 }

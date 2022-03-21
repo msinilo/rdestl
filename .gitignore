@@ -18,3 +18,9 @@ ipch/
 *.cachefile
 *.VC.db
 *.VC.VC.opendb
+
+## Misc ##
+Debug/
+Profile/
+Release/
+Final/

@@ -1,48 +1,51 @@
-#include <UnitTest++/src/UnitTest++.h>
+#include "vendor/Catch/catch.hpp"
 #include "rdestl/stack.h"
 
 namespace
 {
-	TEST(DefaultCtorMakesEmptyStack)
+TEST_CASE("stack", "[allocator]")
+{
+	SECTION("DefaultCtorMakesEmptyStack")
 	{
 		rde::stack<int> s;
 		CHECK(s.empty());
-		CHECK_EQUAL(0, s.size());
+		CHECK(0 == s.size());
 	}
-	TEST(PushIncreasesSize)
+	SECTION("PushIncreasesSize")
 	{
 		rde::stack<int> s;
 		s.push(1);
-		CHECK_EQUAL(1, s.size());
+		CHECK(1 == s.size());
 		CHECK(!s.empty());
 		s.push(2);
-		CHECK_EQUAL(2, s.size());
+		CHECK(2 == s.size());
 		CHECK(!s.empty());
 	}
-	TEST(PopDecreasesSize)
+	SECTION("PopDecreasesSize")
 	{
 		rde::stack<int> s;
 		s.push(1);
 		s.push(2);
 		s.pop();
-		CHECK_EQUAL(1, s.size());
+		CHECK(1 == s.size());
 		s.pop();
-		CHECK_EQUAL(0, s.size());
+		CHECK(0 == s.size());
 		CHECK(s.empty());
 	}
-	TEST(TopReturnsTop)
+	SECTION("TopReturnsTop")
 	{
 		rde::stack<int> s;
 		s.push(1);
 		s.push(2);
 		s.push(3);
 		s.push(4);
-		CHECK_EQUAL(4, s.top()); s.pop();
-		CHECK_EQUAL(3, s.top()); s.pop();
+		CHECK(4 == s.top()); s.pop();
+		CHECK(3 == s.top()); s.pop();
 		s.push(5);
-		CHECK_EQUAL(5, s.top()); s.pop();
-		CHECK_EQUAL(2, s.top()); s.pop();
-		CHECK_EQUAL(1, s.top()); s.pop();
+		CHECK(5 == s.top()); s.pop();
+		CHECK(2 == s.top()); s.pop();
+		CHECK(1 == s.top()); s.pop();
 		CHECK(s.empty());
 	}
+}
 }

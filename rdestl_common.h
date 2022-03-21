@@ -27,7 +27,9 @@
 #		define NOMINMAX
 #		undef min
 #		undef max
+#		ifndef _ALLOW_RTCc_IN_STL
 #		define _ALLOW_RTCc_IN_STL
+#		endif
 #		include <cassert>
 #		include <cstring>
 #		define RDE_FORCEINLINE	__forceinline

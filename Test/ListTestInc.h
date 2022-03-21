@@ -1,57 +1,57 @@
-	TESTC(ConstructEmpty)
+	SECTION("ConstructEmpty")
 	{
 		tTestList lst;
 		CHECK(lst.empty());
-		CHECK_EQUAL(0, lst.size());
+		CHECK(0 == lst.size());
 	}
-	TESTC(PushFront)
+	SECTION("PushFront")
 	{
 		tTestList lst;
 		lst.push_front(5);
 		CHECK(!lst.empty());
-		CHECK_EQUAL(1, lst.size());
-		CHECK_EQUAL(5, lst.front());
+		CHECK(1 == lst.size());
+		CHECK(5 == lst.front());
 		lst.push_front(3);
-		CHECK_EQUAL(2, lst.size());
-		CHECK_EQUAL(3, lst.front());
+		CHECK(2 == lst.size());
+		CHECK(3 == lst.front());
 	}
-	TESTC(PopFront)
+	SECTION("PopFront")
 	{
 		tTestList lst;
 		lst.push_front(5);
 		lst.push_front(3);
 		CHECK(!lst.empty());
 		lst.pop_front();
-		CHECK_EQUAL(5, lst.front());
+		CHECK(5 == lst.front());
 		lst.pop_front();
 		CHECK(lst.empty());
 	}
 
-	TESTC(PushBack)
+	SECTION("PushBack")
 	{
 		tTestList lst;
 		lst.push_back(5);
 		CHECK(!lst.empty());
-		CHECK_EQUAL(1, lst.size());
-		CHECK_EQUAL(5, lst.front());
-		CHECK_EQUAL(5, lst.back());
+		CHECK(1 == lst.size());
+		CHECK(5 == lst.front());
+		CHECK(5 == lst.back());
 		lst.push_back(3);
-		CHECK_EQUAL(2, lst.size());
-		CHECK_EQUAL(5, lst.front());
-		CHECK_EQUAL(3, lst.back());
+		CHECK(2 == lst.size());
+		CHECK(5 == lst.front());
+		CHECK(3 == lst.back());
 	}
-	TESTC(PopBack)
+	SECTION("PopBack")
 	{
 		tTestList lst;
 		lst.push_front(5);
 		lst.push_back(3);
 		CHECK(!lst.empty());
 		lst.pop_back();
-		CHECK_EQUAL(5, lst.front());
+		CHECK(5 == lst.front());
 		lst.pop_back();
 		CHECK(lst.empty());
 	}
-	TESTC(PushPopInsert)
+	SECTION("PushPopInsert")
 	{
 		tTestList lst;
 		lst.push_front(5);	// 5
@@ -71,12 +71,12 @@
 		tTestList::iterator it = lst.begin();
 		++it;
 		lst.insert(it, 11);	// 10 11 9 1 7 8 2 100
-		CHECK_EQUAL(8, lst.size());
-		CHECK_EQUAL(10, lst.front());
-		CHECK_EQUAL(100, lst.back());
+		CHECK(8 == lst.size());
+		CHECK(10 == lst.front());
+		CHECK(100 == lst.back());
 	}
 
-	TESTC(Clear)
+	SECTION("Clear")
 	{
 		tTestList lst;
 		lst.push_front(5);
@@ -85,7 +85,7 @@
 		CHECK(lst.empty());
 	}
 
-	TESTC(IterEmpty)
+	SECTION("IterEmpty")
 	{
 		tTestList lst;
 		CHECK(lst.begin() == lst.end());
@@ -93,15 +93,15 @@
 		CHECK(lst2.begin() == lst2.end());
 	}
 
-	TESTC(IterOneElem)
+	SECTION("IterOneElem")
 	{
 		tTestList lst;
 		lst.push_back(5);
 		tTestList::iterator it = lst.begin();
 		CHECK(it != lst.end());
-		CHECK_EQUAL(5, *it);
+		CHECK(5 == *it);
 	}
-	TESTC(IterTraverse)
+	SECTION("IterTraverse")
 	{
 		tTestList lst;
 		lst.push_back(2);
@@ -111,79 +111,79 @@
 		lst.push_front(1);
 		tTestList::const_iterator it = lst.end();
 		--it;
-		CHECK_EQUAL(5, *it);
+		CHECK(5 == *it);
 		it--;
-		CHECK_EQUAL(4, *it);
+		CHECK(4 == *it);
 		it--;
-		CHECK_EQUAL(3, *it);
+		CHECK(3 == *it);
 		it--;
-		CHECK_EQUAL(2, *it);
+		CHECK(2 == *it);
 		it--;
 		CHECK(it == lst.begin());
-		CHECK_EQUAL(1, *it);
+		CHECK(1 == *it);
 
 		++it;
-		CHECK_EQUAL(2, *it);
-		CHECK_EQUAL(3, *(++it));
-		CHECK_EQUAL(4, *(++it));
+		CHECK(2 == *it);
+		CHECK(3 == *(++it));
+		CHECK(4 == *(++it));
 		it++;
-		CHECK_EQUAL(5, *it++);
+		CHECK(5 == *it++);
 		CHECK(it == lst.end());
 	}
-	TESTC(AssignCtor)
+	SECTION("AssignCtor")
 	{
 		tTestList lst(&array[0], &array[6]);
-		CHECK_EQUAL(6, lst.size());
-		CHECK_EQUAL(1, lst.front());
-		CHECK_EQUAL(36, lst.back());
+		CHECK(6 == lst.size());
+		CHECK(1 == lst.front());
+		CHECK(36 == lst.back());
 	}
-	TESTC(Insert)
+	SECTION("Insert")
 	{
 		tTestList lst(&array[0], &array[6]);
-		CHECK_EQUAL(6, lst.size());
+		CHECK(6 == lst.size());
 		tTestList::iterator it = lst.end();
 		--it, --it;
 		tTestList::iterator it2 = lst.insert(it, 20);
-		CHECK_EQUAL(20, *it2);
-		CHECK_EQUAL(7, lst.size());
+		CHECK(20 == *it2);
+		CHECK(7 == lst.size());
 		--it2;
-		CHECK_EQUAL(16, *it2);
+		CHECK(16 == *it2);
 		++it2, ++it2;
-		CHECK_EQUAL(25, *it2);
+		CHECK(25 == *it2);
 		it = lst.end(); --it, --it, --it;
-		CHECK_EQUAL(20, *it);
+		CHECK(20 == *it);
 	}
 
-	TESTC(Erase)
+	SECTION("Erase")
 	{
 		tTestList lst(&array[0], &array[6]);
 		tTestList::iterator it = lst.begin(); // 1
 		++it, ++it, ++it; // 16
-		it = lst.erase(it); 
-		CHECK_EQUAL(25, *it);
-		CHECK_EQUAL(5, lst.size());
+		it = lst.erase(it);
+		CHECK(25 == *it);
+		CHECK(5 == lst.size());
 		++it;
-		CHECK_EQUAL(36, *it);
+		CHECK(36 == *it);
 		--it, --it;
-		CHECK_EQUAL(9, *it);
+		CHECK(9 == *it);
 	}
-	TESTC(EraseAll)
+	SECTION("EraseAll")
 	{
 		tTestList lst(&array[0], &array[6]);
 		lst.erase(lst.begin(), lst.end());
 		CHECK(lst.empty());
 	}
-	TESTC(AssignmentOp)
+	SECTION("AssignmentOp")
 	{
 		tTestList lst(&array[0], &array[6]);
 		tTestList lst2;
 		lst2 = lst;
-		CHECK_EQUAL(6, lst2.size());
-		CHECK_EQUAL(1, lst2.front());
-		CHECK_EQUAL(36, lst2.back());
+		CHECK(6 == lst2.size());
+		CHECK(1 == lst2.front());
+		CHECK(36 == lst2.back());
 	}
 
-	TESTC(IterArrowOp)
+	SECTION("IterArrowOp")
 	{
 		struct Foo
 		{
@@ -193,7 +193,7 @@
 		Foo f;
 		f.k = 11;
 		lst.push_front(f);
-		CHECK_EQUAL(11, lst.front().k);
-		CHECK_EQUAL(11, lst.begin()->k);
-		CHECK_EQUAL(11, (*lst.begin()).k);
+		CHECK(11 == lst.front().k);
+		CHECK(11 == lst.begin()->k);
+		CHECK(11 == (*lst.begin()).k);
 	}

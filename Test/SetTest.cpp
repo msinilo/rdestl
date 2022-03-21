@@ -1,23 +1,25 @@
-#include <UnitTest++/src/UnitTest++.h>
+#include "vendor/Catch/catch.hpp"
 #include "rdestl/set.h"
 
 namespace
 {
-	TEST(DefaultCtorEmptySet)
+TEST_CASE("set", "[set]")
+{
+	SECTION("DefaultCtorEmptySet")
 	{
 		rde::set<int> t;
 		CHECK(t.empty());
-		CHECK_EQUAL(0, t.size());
+		CHECK(0 == t.size());
 	}
-	TEST(IteratorBasic)
+	SECTION("IteratorBasic")
 	{
 		rde::set<int> t;
 		t.insert(5);
 		rde::set<int>::iterator it = t.begin();
 		CHECK(it != t.end());
-		CHECK_EQUAL(5, *it);
+		CHECK(5 == *it);
 	}
-	TEST(Find)
+	SECTION("Find")
 	{
 		rde::set<int> t;
 		t.insert(5);
@@ -26,11 +28,11 @@ namespace
 		t.insert(7);
 		rde::set<int>::iterator it = t.find(5);
 		CHECK(it != t.end());
-		CHECK_EQUAL(5, *it);
+		CHECK(5 == *it);
 		it = t.find(100);
 		CHECK(it == t.end());
 	}
-	TEST(Erase)
+	SECTION("Erase")
 	{
 		rde::set<int> t;
 		t.insert(5);
@@ -43,6 +45,7 @@ namespace
 		CHECK(it == t.end());
 		t.erase(2); t.erase(15); t.erase(7);
 		CHECK(t.empty());
-		CHECK_EQUAL(0, t.size());
+		CHECK(0 == t.size());
 	}
+}
 }

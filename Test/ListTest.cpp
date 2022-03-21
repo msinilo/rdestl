@@ -1,33 +1,37 @@
-#include <UnitTest++/src/UnitTest++.h>
-#include "rdestl/fixed_list.h"
-#include "rdestl/list.h"
+#include "vendor/Catch/catch.hpp"
 #include "rdestl/rdestl.h"
+#include "rdestl/list.h"
+#include "rdestl/fixed_list.h"
 #if !RDESTL_STANDALONE
-#	include "core/Console.h"
-#	include "core/Random.h"
-#	include "core/Timer.h"
 #	include "rdestl/vector.h"
+// FIXME: "core/*" Files missing? ~SK
+// #	include "core/Console.h"
+// #	include "core/Random.h"
+// #	include "core/Timer.h"
 #endif
 
 namespace
 {
-	const int array [] = { 1, 4, 9, 16, 25, 36 }; 
+	const int array [] = { 1, 4, 9, 16, 25, 36 };
 
-#define CONCAT_(x, y)	x ## y
-#define CONCAT2_(x, y)	CONCAT_(x, y)
-#define TESTC(x)		TEST(CONCAT2_(x, POSTFIX))
-
-#define POSTFIX	PtrBased
 #define tTestList	rde::list<int>
+
+	TEST_CASE("list (PtrBased)", "[list]")
+	{
 #include "ListTestInc.h"
+	}
 
 #undef tTestList
-#undef POSTFIX
-#define POSTFIX	Linear
 #define tTestList	rde::fixed_list<int, 8>
-#include "ListTestInc.h"
 
-	TEST(FixedListEraseInsertIndicesReuse)
+	TEST_CASE("fixed_list (Linear)", "[list]")
+	{
+#include "ListTestInc.h"
+	}
+
+#undef tTestList
+
+	TEST_CASE("FixedListEraseInsertIndicesReuse")
 	{
 		typedef rde::fixed_list<int, 4> TList;
 		TList lst;
@@ -38,18 +42,18 @@ namespace
 		it = lst.erase(it);
 		++it, ++it;
 		lst.erase(it);
-		CHECK_EQUAL(2, lst.size());
+		CHECK(2 == lst.size());
 		lst.push_back(999);
 		lst.push_back(888);
-		CHECK_EQUAL(4, lst.size());
-		CHECK_EQUAL(4, lst.front());
+		CHECK(4 == lst.size());
+		CHECK(4 == lst.front());
 		it = lst.begin(); ++it;
-		CHECK_EQUAL(6, *it);
-		CHECK_EQUAL(888, lst.back());
+		CHECK(6 == *it);
+		CHECK(888 == lst.back());
 	}
 #if !RDESTL_STANDALONE
 	// Tests if list can be copied by memcopying.
-	TEST(FixedListRelocation)
+	TEST_CASE("FixedListRelocation")
 	{
 		typedef rde::fixed_list<int, 1000> TList;
 		TList lst;
@@ -60,12 +64,12 @@ namespace
 		void* mem2 = new char[sizeof(lst)];
 		rde::Sys::MemCpy(mem2, &lst, sizeof(lst));
 		TList* lst2 = (TList*)mem2;
-		CHECK_EQUAL(lst.size(), lst2->size());
+		CHECK(lst.size() == lst2->size());
 		TList::iterator it = lst.begin();
 		TList::iterator it2 = lst2->begin();
 		while (it != lst.end())
 		{
-			CHECK_EQUAL(*it, *it2);
+			CHECK(*it == *it2);
 			++it;
 			++it2;
 		}
@@ -81,7 +85,7 @@ namespace
 		}
 	};
 #if 0
-	TEST(FixedListVersusVectorPerformance)
+	TEST_CASE("FixedListVersusVectorPerformance")
 	{
 		typedef rde::fixed_list<Observer*, 256>	ObserverList;
 		typedef rde::vector<Observer*>			ObserverVector;
@@ -127,5 +131,3 @@ namespace
 
 #endif // RDESTL_STANDALONE
 }
-
-
