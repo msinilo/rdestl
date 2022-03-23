@@ -1,5 +1,5 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/sorted_vector.h"
+#include "sorted_vector.h"
 #include <cstdio>
 
 namespace

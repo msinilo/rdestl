@@ -1,5 +1,5 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/rb_tree.h"
+#include "rb_tree.h"
 #include <map>
 
 namespace

@@ -1,12 +1,12 @@
-#include "rdestl/hash_map.h"
+#include "hash_map.h"
 
 #if !RDESTL_STANDALONE
 
 #include "khash.h"
 
-//#include "rdestl/map.h"
-//#include "rdestl/ternary_search_tree.h"
-#include "rdestl/vector.h"
+//#include "map.h"
+//#include "ternary_search_tree.h"
+#include "vector.h"
 #include <hash_map>
 #include <map>
 #include <string>

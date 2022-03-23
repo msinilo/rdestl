@@ -1,7 +1,7 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/rdestl.h"
-#include "rdestl/list.h"
-#include "rdestl/fixed_list.h"
+#include "rdestl.h"
+#include "list.h"
+#include "fixed_list.h"
 #if !RDESTL_STANDALONE
 #	include "rdestl/vector.h"
 // FIXME: "core/*" Files missing? ~SK

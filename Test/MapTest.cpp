@@ -1,5 +1,5 @@
-#include "rdestl/map.h"
-#include "rdestl/rde_string.h"
+#include "map.h"
+#include "rde_string.h"
 #include "vendor/Catch/catch.hpp"
 
 namespace

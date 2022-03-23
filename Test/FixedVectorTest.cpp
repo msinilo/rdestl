@@ -1,6 +1,6 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/fixed_vector.h"
-#include "rdestl/pair.h"
+#include "fixed_vector.h"
+#include "pair.h"
 #include <xmmintrin.h>
 
 

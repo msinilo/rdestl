@@ -1,6 +1,6 @@
 #include "vendor/Catch/catch.hpp"
-#include "rdestl/vector.h"
-#include "rdestl/pair.h"
+#include "vector.h"
+#include "pair.h"
 #include <cstdio>
 
 struct MyStruct
