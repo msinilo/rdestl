@@ -20,7 +20,4 @@ ipch/
 *.VC.VC.opendb
 
 ## Misc ##
-Debug/
-Profile/
-Release/
-Final/
+[Bb]uild/
