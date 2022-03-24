@@ -25,4 +25,4 @@ How to make best use of RDE stl in your projects:
 
 Tests are included in the `Test/` directory, and depend on the [Catch](https://github.com/catchorg/Catch2/tree/Catch1.x) framework (included as a single-file header at `Test/vendor/Catch/catch.hpp`)
 
-To run tests, simply open `rdestl/Test/rdestltest.sln`, build, and run.
+To run tests, simply open `rdestl/rdestl.sln`, build, and run.
