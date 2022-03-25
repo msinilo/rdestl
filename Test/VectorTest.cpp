@@ -153,7 +153,7 @@ TEST_CASE("vector", "[vector]")
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
-		v.insert(0, 1, "Hello");
+		v.insert(0u, 1, "Hello");
 		CHECK(4 == v.size());
 		v.insert(4, 3, ".");
 		CHECK(7 == v.size());
