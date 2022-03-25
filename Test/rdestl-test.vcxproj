@@ -386,6 +386,7 @@
     <ClCompile Include="VectorTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HashMapTestInc.h" />
     <ClInclude Include="ListTestInc.h" />
     <ClInclude Include="StringTestInc.h" />
   </ItemGroup>
