@@ -32,7 +32,7 @@ TEST_CASE("fixed_array", "[array]")
 			CHECK(6 == arr[2]);
 		}
 
-		SECTION("Front/Back)")
+		SECTION("Front/Back")
 		{
 			CHECK(1 == arr.front());
 			CHECK(5 == arr.back());
