@@ -20,7 +20,7 @@ public:
 	// User-provided temporary buffer for intermediate operations.
 	// It has to be at least 'num' elements big.
 	template<data_type TDataType, typename TFunc>
-	void sort(T* src, int num, const TFunc& func, T* help_buffer)
+	void sort(T* src, size_t num, const TFunc& func, T* help_buffer)
 	{
 		if (num == 0)
 			return;
@@ -35,8 +35,8 @@ public:
 		bool alreadySorted(true);
 		std::uint32_t prevValue = func(src[0]);
 
-		int k(0);
-		for (int i = 0; i < num; ++i)
+		size_t k(0);
+		for (size_t i = 0; i < num; ++i)
 		{
 			k = i;
 			const std::uint32_t x = func(src[i]);
@@ -77,24 +77,24 @@ public:
 		else
 			calculate_offsets(histogram);
 
-		for (int i = 0; i < num; ++i)
+		for (size_t i = 0; i < num; ++i)
 		{
 			const std::uint32_t pos = func(src[i]) & 0xFF;
 			help_buffer[histogram[pos]++] = src[i];
 		}
-		for (int i = 0; i < num; ++i)
+		for (size_t i = 0; i < num; ++i)
 		{
 			const std::uint32_t pos = (func(m_dst[i]) >> 8) & 0xFF;
 			src[h1[pos]++] = help_buffer[i];
 		}
 		if (TDataType == data_unsigned && canBreakAfter16Bits)
 			return;
-		for (int i = 0; i < num; ++i)
+		for (size_t i = 0; i < num; ++i)
 		{
 			const std::uint32_t pos = (func(src[i]) >> 16) & 0xFF;
 			help_buffer[h2[pos]++] = src[i];
 		}
-		for (int i = 0; i < num; ++i)
+		for (size_t i = 0; i < num; ++i)
 		{
 			const std::uint32_t pos = (func(m_dst[i]) >> 24) & 0xFF;
 			src[h3[pos]++] = help_buffer[i];
@@ -103,7 +103,7 @@ public:
 
 	// Version that uses internal buffer.
 	template<data_type TDataType, typename TFunc>
-	void sort(T* src, int num, const TFunc& func)
+	void sort(T* src, size_t num, const TFunc& func)
 	{
 		if (num > m_dst.size())
 			resize(num);
@@ -118,7 +118,7 @@ private:
 	void calculate_offsets(std::uint32_t* histogram)
 	{
 		std::uint32_t offsets[4] ={ 1, 1, 1, 1 };
-		for (int i = 0; i < kHistogramSize; ++i)
+		for (size_t i = 0; i < kHistogramSize; ++i)
 		{
 			std::uint32_t temp = histogram[i] + offsets[0];
 			histogram[i] = offsets[0] - 1;
@@ -140,8 +140,8 @@ private:
 	void calculate_offsets_signed(std::uint32_t* histogram)
 	{
 		std::uint32_t offsets[4] ={ 1, 1, 1, 1 };
-		int numNeg(0);
-		for (int i = 0; i < kHistogramSize; ++i)
+		size_t numNeg(0);
+		for (size_t i = 0; i < kHistogramSize; ++i)
 		{
 			std::uint32_t temp = histogram[i] + offsets[0];
 			histogram[i] = offsets[0] - 1;
@@ -160,14 +160,14 @@ private:
 		}
 		std::uint32_t* h3 = &histogram[kHistogramSize*3];
 		offsets[3] = numNeg + 1;
-		for (int i = 0; i < kHistogramSize / 2; ++i)
+		for (size_t i = 0; i < kHistogramSize / 2; ++i)
 		{
 			std::uint32_t temp = h3[i] + offsets[3];
 			h3[i] = offsets[3] - 1;
 			offsets[3] = temp;
 		}
 		offsets[3] = 1;
-		for (int i = kHistogramSize / 2; i < kHistogramSize; ++i)
+		for (size_t i = kHistogramSize / 2; i < kHistogramSize; ++i)
 		{
 			std::uint32_t temp = h3[i] + offsets[3];
 			h3[i] = offsets[3] - 1;
