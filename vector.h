@@ -317,6 +317,48 @@ public:
 		RDE_ASSERT(invariant());
 	}
 
+	template<class... Args>
+	iterator emplace(iterator pos, Args&&... args)
+	{
+		RDE_ASSERT(validate_iterator(pos));
+		RDE_ASSERT(invariant());
+		// @todo: optimize for toMove==0 --> push_back here?
+		const size_type index = (size_type)(pos - m_begin);
+		if (m_end == m_capacityEnd)
+		{
+			grow();
+			pos = m_begin + index;
+		}
+		else
+		{
+			rde::construct(m_end);
+		}
+
+		// @note: conditional vs empty loop, what's better?
+		if (m_end > pos)
+		{
+			if (!has_trivial_copy<T>::value)
+			{
+				const size_type prevSize = size();
+				RDE_ASSERT(index <= prevSize);
+				const size_type toMove = prevSize - index;
+
+				rde::internal::move_n(pos, toMove, pos + 1, int_to_type<has_trivial_copy<T>::value>());
+			}
+			else
+			{
+				RDE_ASSERT(pos < m_end);
+				const size_t n = reinterpret_cast<uintptr_t>(m_end) - reinterpret_cast<uintptr_t>(pos);
+				Sys::MemMove(pos + 1, pos, n);
+			}
+		}
+		rde::construct_args(pos, std::forward<Args>(args)...);
+		++m_end;
+		RDE_ASSERT(invariant());
+		TStorage::record_high_watermark();
+		return pos;		
+	}
+
 	void insert(size_type index, size_type n, const T& val)
 	{
 		RDE_ASSERT(invariant());
@@ -362,43 +404,7 @@ public:
 	}
 	iterator insert(iterator it, const T& val)
 	{
-		RDE_ASSERT(validate_iterator(it));
-		RDE_ASSERT(invariant());
-		// @todo: optimize for toMove==0 --> push_back here?
-		const size_type index = (size_type)(it - m_begin);
-		if (m_end == m_capacityEnd)
-		{
-			grow();
-			it = m_begin + index;
-		}
-		else
-		{
-			rde::construct(m_end);
-		}
-
-		// @note: conditional vs empty loop, what's better?
-		if (m_end > it)
-		{
-			if (!has_trivial_copy<T>::value)
-			{
-				const size_type prevSize = size();
-				RDE_ASSERT(index <= prevSize);
-				const size_type toMove = prevSize - index;
-
-				rde::internal::move_n(it, toMove, it + 1, int_to_type<has_trivial_copy<T>::value>());
-			}
-			else
-			{
-				RDE_ASSERT(it < m_end);
-				const size_t n = reinterpret_cast<uintptr_t>(m_end) - reinterpret_cast<uintptr_t>(it);
-				Sys::MemMove(it + 1, it, n);
-			}
-		}
-		*it = val;
-		++m_end;
-		RDE_ASSERT(invariant());
-		TStorage::record_high_watermark();
-		return it;
+		return emplace(it, val);
 	}
 
 	// @pre validate_iterator(it)
@@ -478,6 +484,10 @@ public:
 	{
 		TStorage::reset();
 		RDE_ASSERT(invariant());
+	}
+	void shrink_to_fit()
+	{
+		reallocate(size(), size());
 	}
 
 	// Extension: allows to limit amount of allocated memory.

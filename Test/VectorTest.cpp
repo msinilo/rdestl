@@ -423,6 +423,27 @@ namespace
         CHECK(v[1].first == 3 && v[1].second == 4);
         CHECK(v[2].first == 5 && v[2].second == 6);
     }
+	TEST(EmplaceAt)
+	{
+		rde::vector<rde::pair<int, int> > v;
+		v.push_back(rde::pair<int, int>(3, 4));
+		v.push_back(rde::pair<int, int>(7, 8));
+		v.emplace(v.begin(), 1, 2);
+		auto it = v.begin();
+		++it;
+		++it;
+		v.emplace(it, 5, 6);
+		v.emplace(v.end(), 9, 10);
+		CHECK_EQUAL(5ul, v.size());
+		rde::pair<int, int> expected(1, 2);
+		for (size_t i = 0; i != v.size(); ++i)
+		{
+			CHECK_EQUAL(expected.first, v[i].first);
+			CHECK_EQUAL(expected.second, v[i].second);
+			expected.first += 2;
+			expected.second += 2;
+		}
+	}
     
     //typedef rde::fixed_vector<int, 3, false> fvector;
 
