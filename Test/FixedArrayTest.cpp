@@ -42,5 +42,18 @@ TEST_CASE("fixed_array", "[array]")
 			CHECK(6 == arr.back());
 		}
 	}
+
+	SECTION("Modifiers")
+	{
+		rde::fixed_array<int, 5> arr = { 0, 0, 0, 0, 0 };
+		const int a[] = { 1, 1, 1, 1, 1 };
+
+		SECTION("fill")
+		{
+			REQUIRE(0 != memcmp(arr.data(), &a[0], sizeof(a)));
+			arr.fill(1);
+			CHECK(0 == memcmp(arr.data(), &a[0], sizeof(a)));
+		}
+	}
 }
 }
