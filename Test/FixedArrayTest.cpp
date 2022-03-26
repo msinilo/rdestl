@@ -12,22 +12,21 @@ namespace
 	TEST(ArrayCtor)
 	{
 		const int a[] = { 1, 2, 3, 4, 5 };
-		rde::fixed_array<int, 5> arr(a);
+		rde::fixed_array<int, 5> arr;
+		arr.from_raw_array(a);
 		CHECK_EQUAL(5ul, arr.size());
 		CHECK_EQUAL(0, memcmp(arr.data(), &a[0], sizeof(a)));
 	}
 	TEST(Subscription)
 	{
-		const int a[] = { 1, 2, 3, 4, 5 };
-		rde::fixed_array<int, 5> arr(a);
+		rde::fixed_array<int, 5> arr = { 1, 2, 3, 4, 5 };
 		CHECK_EQUAL(3, arr[2]);
 		arr[2] = 6;
 		CHECK_EQUAL(6, arr[2]);
 	}
 	TEST(FrontBack)
 	{
-		const int a[] = { 1, 2, 3, 4, 5 };
-		rde::fixed_array<int, 5> arr(a);
+		rde::fixed_array<int, 5> arr = { 1, 2, 3, 4, 5 };
 		CHECK_EQUAL(1, arr.front());
 		CHECK_EQUAL(5, arr.back());
 		arr.front() = -1;
