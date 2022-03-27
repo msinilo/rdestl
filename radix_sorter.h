@@ -108,8 +108,10 @@ public:
 	template<data_type TDataType, typename TFunc>
 	void sort(T* src, size_t num, const TFunc& func)
 	{
-		if (num > m_dst.size())
+		if (num > static_cast<int>(m_dst.size()))
+		{
 			resize(num);
+		}
 		sort<TDataType, TFunc>(src, num, func, m_dst.begin());
 	}
 

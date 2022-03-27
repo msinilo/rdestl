@@ -14,7 +14,7 @@ namespace
 	{
 		tVector v;
 		CHECK_EQUAL(true, v.insert(rde::pair<int, int>(5, 5)).second);
-		CHECK_EQUAL(1, v.size());
+		CHECK_EQUAL(1ul, v.size());
 		// Try to insert again at the same key
 		CHECK_EQUAL(false, v.insert(rde::pair<int, int>(5, 10)).second);
 	}
@@ -33,7 +33,7 @@ namespace
 		CHECK(it != v.end());
 		CHECK_EQUAL(7, it->first);
 		CHECK_EQUAL(11, it->second);
-		CHECK_EQUAL(2, v.size());
+		CHECK_EQUAL(2ul, v.size());
 	}
 	TEST(Erase)
 	{
@@ -41,8 +41,8 @@ namespace
 		CHECK_EQUAL(true, v.insert(5, 5).second);
 		CHECK_EQUAL(true, v.insert(7, 11).second);
 		CHECK_EQUAL(true, v.insert(9, 20).second);
-		CHECK_EQUAL(1, v.erase(7));
-		CHECK_EQUAL(2, v.size());
+		CHECK_EQUAL(1ul, v.erase(7));
+		CHECK_EQUAL(2ul, v.size());
 		tVector::iterator it = v.find(7);
 		CHECK(it == v.end());
 	}
@@ -53,6 +53,6 @@ namespace
 		CHECK_EQUAL(true, v.insert(268, 5).second);
 		CHECK_EQUAL(true, v.insert(502, 11).second);
 		CHECK_EQUAL(true, v.insert(123, 20).second);
-		CHECK_EQUAL(3, v.size());
+		CHECK_EQUAL(3ul, v.size());
 	}
 }

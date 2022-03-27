@@ -40,7 +40,7 @@ namespace
 	{
 		tTestVector v;
 		CHECK(v.empty());
-		CHECK_EQUAL(0, v.size());
+		CHECK_EQUAL(0ul, v.size());
 		CHECK_EQUAL(v.begin(), v.end());
 		printf("Sizeof(v) = %zd\n", sizeof(v));
 	}
@@ -48,7 +48,7 @@ namespace
 	{
 		tTestVector v;
 		v.push_back(2);
-		CHECK_EQUAL(1, v.size());
+		CHECK_EQUAL(1ul, v.size());
 		CHECK_EQUAL(2, v[0]);
 		CHECK(!v.empty());
 		CHECK(v.begin() != v.end());
@@ -62,7 +62,7 @@ namespace
 		CHECK_EQUAL(3, v.back());
 		v.pop_back();
 		CHECK(!v.empty());
-		CHECK_EQUAL(1, v.size());
+		CHECK_EQUAL(1ul, v.size());
 		CHECK_EQUAL(2, v[0]);
 		tTestVector::const_iterator it = v.begin();
 		++it;
@@ -73,22 +73,22 @@ namespace
 		tTestVector v;
 		CHECK(v.empty());
 		v.assign(array, array + 6);
-		CHECK_EQUAL(6, v.size());
+		CHECK_EQUAL(6ul, v.size());
 		CHECK_EQUAL(0, memcmp(array, v.data(), sizeof(array)));
 	}
 	TEST(AssignTabConstruct)
 	{
 		tTestVector v(array, array + 6);
-		CHECK_EQUAL(6, v.size());
+		CHECK_EQUAL(6ul, v.size());
 		CHECK_EQUAL(0, memcmp(array, v.data(), sizeof(array)));
 	}
 
 	TEST(Clear)
 	{
 		tTestVector v(array, array + 6);
-		CHECK_EQUAL(6, v.size());
+		CHECK_EQUAL(6ul, v.size());
 		v.clear();
-		CHECK_EQUAL(0, v.size());
+		CHECK_EQUAL(0ul, v.size());
 		CHECK(v.empty());
 		// Make sure it doesnt free mem.
 		CHECK(v.capacity() > 0);
@@ -111,7 +111,7 @@ namespace
 		tTestVector::iterator it2 = it;
 		it2 += 2;
 		v.erase(it, it2);
-		CHECK_EQUAL(4, v.size());
+		CHECK_EQUAL(4ul, v.size());
 		CHECK_EQUAL(1, v.front());
 		CHECK_EQUAL(16, v[1]);
 		CHECK_EQUAL(25, v[2]);
@@ -124,7 +124,7 @@ namespace
 		CHECK_EQUAL(9, *it);
 		v.erase(it + 1); // 16
 		
-		CHECK_EQUAL(4, v.size());
+		CHECK_EQUAL(4ul, v.size());
 		//PrintVector(v);
 	}
 	TEST(EraseEnd)
@@ -133,7 +133,7 @@ namespace
 		tTestVector::iterator it = v.begin();
 		it += 2;
 		v.erase(it, v.end());
-		CHECK_EQUAL(2, v.size());
+		CHECK_EQUAL(2ul, v.size());
 	}
 	TEST(EraseAll)
 	{
@@ -151,13 +151,13 @@ namespace
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
-		v.insert(0, 1, "Hello");
-		CHECK_EQUAL(4, v.size());
+		v.insert(size_t(0), 1, "Hello");
+		CHECK_EQUAL(4ul, v.size());
 		v.insert(4, 3, ".");
-		CHECK_EQUAL(7, v.size());
+		CHECK_EQUAL(7ul, v.size());
 		PrintVector(v);
 		v.insert(1, 10, "very");
-		CHECK_EQUAL(17, v.size());
+		CHECK_EQUAL(17ul, v.size());
 		PrintVector(v);
 	}
 
@@ -168,9 +168,9 @@ namespace
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
-		CHECK_EQUAL(4, v.size());
+		CHECK_EQUAL(4ul, v.size());
 		v.erase(v.begin() + 1, v.end() - 1);
-		CHECK_EQUAL(2, v.size());
+		CHECK_EQUAL(2ul, v.size());
 	}
 	TEST(IndexOf)
 	{
@@ -179,7 +179,7 @@ namespace
 		v.push_back("brave");
 		v.push_back("new");
 		v.push_back("world");
-		CHECK_EQUAL(2, v.index_of("new"));
+		CHECK_EQUAL(2ul, v.index_of("new"));
 		CHECK_EQUAL(tStringVector::npos, v.index_of("blah"));
 		CHECK_EQUAL(tStringVector::npos, v.index_of("brave", 2));
 	}
@@ -188,7 +188,7 @@ namespace
 	{
 		tTestVector v(array, array + 6);
 		v.insert(v.begin(), 2, -1);
-		CHECK_EQUAL(8, v.size());
+		CHECK_EQUAL(8ul, v.size());
 		CHECK_EQUAL(-1, v.front());
 		CHECK_EQUAL(-1, v[1]);
 		CHECK_EQUAL(1, v[2]);
@@ -200,7 +200,7 @@ namespace
 		tTestVector v(array, array + 6);
 		tTestVector::iterator it = v.begin() + 2;
 		v.insert(it, 3, 5);
-		CHECK_EQUAL(9, v.size());
+		CHECK_EQUAL(9ul, v.size());
 		CHECK_EQUAL(5, v[2]);
 		it = v.begin() + 2;
 		v.insert(it, 4);
@@ -210,7 +210,7 @@ namespace
 	{
 		tTestVector v(array, array + 6);
 		v.insert(v.end(), 1, 49);
-		CHECK_EQUAL(7, v.size());
+		CHECK_EQUAL(7ul, v.size());
 		CHECK_EQUAL(49, v[6]);
 	}
 
@@ -229,7 +229,7 @@ namespace
 	{
 		tTestVector v;
 		v.insert(v.begin(), 1, 2);
-		CHECK_EQUAL(1, v.size());
+		CHECK_EQUAL(1ul, v.size());
 		CHECK_EQUAL(2, v.front());
 	}
 
@@ -237,7 +237,7 @@ namespace
 	{
 		tTestVector v(array, array + 6);
 		v.resize(4);
-		CHECK_EQUAL(4, v.size());
+		CHECK_EQUAL(4ul, v.size());
 		CHECK_EQUAL(16, v[3]);
 	}
 
@@ -245,7 +245,7 @@ namespace
 	{
 		tTestVector v(array, array + 6);
 		tTestVector v2(v);
-		CHECK_EQUAL(6, v2.size());
+		CHECK_EQUAL(6ul, v2.size());
 		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
 	}
 
@@ -254,7 +254,7 @@ namespace
 		tTestVector v(array, array + 6);
 		tTestVector v2;
 		v2 = v;
-		CHECK_EQUAL(6, v2.size());
+		CHECK_EQUAL(6ul, v2.size());
 		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
 	}
 
@@ -263,16 +263,16 @@ namespace
 		tTestVector v(array, array + 6);
 		v.push_back(49);
 		v.set_capacity(v.size());
-		CHECK_EQUAL(7, v.capacity());
+		CHECK_EQUAL(7ul, v.capacity());
 	}
 	TEST(Reserve)
 	{
 		tTestVector v;
-		CHECK_EQUAL(0, v.capacity());
+		CHECK_EQUAL(0ul, v.capacity());
 		v.push_back(1); v.push_back(2); v.push_back(3);
 		v.reserve(10);
 		CHECK(v.capacity() >= 10);
-		CHECK_EQUAL(3, v.size());
+		CHECK_EQUAL(3ul, v.size());
 		CHECK_EQUAL(1, v[0]);
 		CHECK_EQUAL(2, v[1]);
 		CHECK_EQUAL(3, v[2]);
@@ -295,7 +295,7 @@ namespace
 		{
 			v.push_back(i);
 		}
-		CHECK_EQUAL(5000, v.size());
+		CHECK_EQUAL(5000ul, v.size());
 		for (int i = 0; i < 5000; ++i)
 		{
 			CHECK_EQUAL(i, v[i]);
@@ -388,11 +388,11 @@ namespace
         rde::vector<int> v;
         v.push_back(1);
         v.push_back(2);
-        CHECK_EQUAL(2, v.size());
+        CHECK_EQUAL(2ul, v.size());
 
         rde::vector<int> v2(std::move(v));
-        CHECK_EQUAL(0, v.size());
-        CHECK_EQUAL(2, v2.size());
+        CHECK_EQUAL(0ul, v.size());
+        CHECK_EQUAL(2ul, v2.size());
         CHECK_EQUAL(1, v2[0]);
         CHECK_EQUAL(2, v2[1]);
     }
@@ -401,12 +401,12 @@ namespace
         rde::vector<int> v;
         v.push_back(1);
         v.push_back(2);
-        CHECK_EQUAL(2, v.size());
+        CHECK_EQUAL(2ul, v.size());
 
         rde::vector<int> v2;
         v2 = std::move(v);
-        CHECK_EQUAL(0, v.size());
-        CHECK_EQUAL(2, v2.size());
+        CHECK_EQUAL(0ul, v.size());
+        CHECK_EQUAL(2ul, v2.size());
         CHECK_EQUAL(1, v2[0]);
         CHECK_EQUAL(2, v2[1]);
     }
@@ -418,11 +418,32 @@ namespace
         v.emplace_back(3, 4);
         v.emplace_back(5, 6);
 
-        CHECK_EQUAL(3, v.size());
+        CHECK_EQUAL(3ul, v.size());
         CHECK(v[0].first == 1 && v[0].second == 2);
         CHECK(v[1].first == 3 && v[1].second == 4);
         CHECK(v[2].first == 5 && v[2].second == 6);
     }
+	TEST(EmplaceAt)
+	{
+		rde::vector<rde::pair<int, int> > v;
+		v.push_back(rde::pair<int, int>(3, 4));
+		v.push_back(rde::pair<int, int>(7, 8));
+		v.emplace(v.begin(), 1, 2);
+		auto it = v.begin();
+		++it;
+		++it;
+		v.emplace(it, 5, 6);
+		v.emplace(v.end(), 9, 10);
+		CHECK_EQUAL(5ul, v.size());
+		rde::pair<int, int> expected(1, 2);
+		for (size_t i = 0; i != v.size(); ++i)
+		{
+			CHECK_EQUAL(expected.first, v[i].first);
+			CHECK_EQUAL(expected.second, v[i].second);
+			expected.first += 2;
+			expected.second += 2;
+		}
+	}
     
     //typedef rde::fixed_vector<int, 3, false> fvector;
 

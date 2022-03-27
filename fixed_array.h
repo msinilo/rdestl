@@ -51,6 +51,11 @@ public:
 	{
 		rde::fill_n(m_data, N, value);
 	}
+
+	RDE_FORCEINLINE void from_raw_array(const T arr[N])
+	{
+		rde::copy_n(&arr[0], N, data());
+	}
 };
 
 #if RDE_HAS_CPP11
