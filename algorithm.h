@@ -8,6 +8,7 @@
 
 namespace rde
 {
+
 //-----------------------------------------------------------------------------
 // Modern C++ version that does constructor/copy constructor/move constructor in 1
 template<typename T, typename... Args> RDE_FORCEINLINE
@@ -158,11 +159,11 @@ template<class TIter, typename T, class TPred> inline
 TIter lower_bound(TIter first, TIter last, const T& val, const TPred& pred)
 {
 	internal::test_ordering(first, last, pred);
-	int dist(0);
+	ptrdiff_t dist(0);
 	distance(first, last, dist);
 	while (dist > 0)
 	{
-		const int halfDist = dist >> 1;
+		const ptrdiff_t halfDist = dist >> 1;
 		TIter mid = first;
 		rde::advance(mid, halfDist);
 		if (internal::debug_pred(pred, *mid, val))
@@ -178,11 +179,11 @@ template<class TIter, typename T, class TPred> inline
 TIter upper_bound(TIter first, TIter last, const T& val, const TPred& pred)
 {
 	internal::test_ordering(first, last, pred);
-	int dist(0);
+	ptrdiff_t dist(0);
 	distance(first, last, dist);
 	while (dist > 0)
 	{
-		const int halfDist = dist >> 1;
+		const ptrdiff_t halfDist = dist >> 1;
 		TIter mid = first;
 		advance(mid, halfDist);
 		if (!internal::debug_pred(pred, val, *mid))

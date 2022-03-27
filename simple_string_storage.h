@@ -3,14 +3,16 @@
 
 namespace rde
 {
+
 template<typename E, class TAllocator>
 class simple_string_storage
 {
 public:
 	typedef E					value_type;
-	typedef int					size_type;
+	typedef size_t				size_type;
 	typedef TAllocator			allocator_type;
 	typedef const value_type*	const_iterator;
+
 	static const unsigned long	kGranularity = 32;
 
 	explicit simple_string_storage(const allocator_type& allocator)
@@ -22,9 +24,9 @@ public:
 	simple_string_storage(const value_type* str, const allocator_type& allocator)
 		: m_allocator(allocator)
 	{
-		const int len = strlen(str);
+		const size_t len = rde::strlen(str);
 		m_data = construct_string(len, m_capacity);
-		Sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len * sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
 	}
@@ -33,7 +35,7 @@ public:
 		: m_allocator(allocator)
 	{
 		m_data = construct_string(len, m_capacity);
-		Sys::MemCpy(m_data, str, len*sizeof(value_type));
+		Sys::MemCpy(m_data, str, len * sizeof(value_type));
 		m_length = len;
 		m_data[len] = 0;
 	}
@@ -93,16 +95,9 @@ public:
 		RDE_ASSERT(invariant());
 	}
 
-	inline const value_type* c_str() const
-	{
-		return m_data;
-	}
+	inline const value_type* c_str() const { return m_data; }
 
-	inline size_type length() const
-	{
-		return m_length;
-	}
-
+	inline size_type length() const { return m_length; }
 	inline size_type capacity() const { return m_capacity; }
 
 	void clear()
@@ -126,6 +121,7 @@ protected:
 			RDE_ASSERT(m_data[length()] == 0);
 		return true;
 	}
+
 private:
 	value_type* construct_string(size_type capacity, size_type& out_capacity)
 	{

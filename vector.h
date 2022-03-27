@@ -109,8 +109,7 @@ struct standard_vector_storage
 //=============================================================================
 // Simplified vector class.
 // Mimics std::vector.
-template<
-	typename T,
+template<typename T,
 	class TAllocator = rde::allocator,
 	class TStorage   = standard_vector_storage<T, TAllocator>
 >
@@ -317,9 +316,52 @@ public:
 		RDE_ASSERT(invariant());
 	}
 
-	void insert(size_type index, size_type n, const T& val)
+	template<class... Args>
+	iterator emplace(iterator pos, Args&&... args)
+	{
+		RDE_ASSERT(validate_iterator(pos));
+		RDE_ASSERT(invariant());
+		// @todo: optimize for toMove==0 --> push_back here?
+		const size_type index = (size_type)(pos - m_begin);
+		if (m_end == m_capacityEnd)
+		{
+			grow();
+			pos = m_begin + index;
+		}
+		else
+		{
+			rde::construct(m_end);
+		}
+
+		// @note: conditional vs empty loop, what's better?
+		if (m_end > pos)
+		{
+			if (!has_trivial_copy<T>::value)
+			{
+				const size_type prevSize = size();
+				RDE_ASSERT(index <= prevSize);
+				const size_type toMove = prevSize - index;
+
+				rde::internal::move_n(pos, toMove, pos + 1, int_to_type<has_trivial_copy<T>::value>());
+			}
+			else
+			{
+				RDE_ASSERT(pos < m_end);
+				const size_t n = reinterpret_cast<uintptr_t>(m_end) - reinterpret_cast<uintptr_t>(pos);
+				Sys::MemMove(pos + 1, pos, n);
+			}
+		}
+		rde::construct_args(pos, std::forward<Args>(args)...);
+		++m_end;
+		RDE_ASSERT(invariant());
+		TStorage::record_high_watermark();
+		return pos;
+	}
+
+	void insert(int index, size_type n, const T& val)
 	{
 		RDE_ASSERT(invariant());
+		RDE_ASSERT(index >= 0); // FIXME: Having to use signed type for index param currently to prevent ambiguous overload matching ~SK
 		const size_type indexEnd = index + n;
 		const size_type prevSize = size();
 		if (m_end + n > m_capacityEnd)

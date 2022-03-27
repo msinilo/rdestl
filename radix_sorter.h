@@ -5,6 +5,7 @@
 
 namespace rde
 {
+
 template<typename T>
 class radix_sorter
 {
@@ -54,6 +55,7 @@ public:
 
 			prevValue = x;
 		}
+
 		if (alreadySorted)
 			return;
 
@@ -111,10 +113,11 @@ public:
 	}
 
 private:
-	void resize(int num)
+	void resize(size_t num)
 	{
 		m_dst.resize(num);
 	}
+
 	void calculate_offsets(std::uint32_t* histogram)
 	{
 		std::uint32_t offsets[4] ={ 1, 1, 1, 1 };
@@ -128,12 +131,12 @@ private:
 			histogram[i + kHistogramSize] = offsets[1] - 1;
 			offsets[1] = temp;
 
-			temp = histogram[i + kHistogramSize*2] + offsets[2];
-			histogram[i + kHistogramSize*2] = offsets[2] - 1;
+			temp = histogram[i + kHistogramSize * 2] + offsets[2];
+			histogram[i + kHistogramSize * 2] = offsets[2] - 1;
 			offsets[2] = temp;
 
-			temp = histogram[i + kHistogramSize*3] + offsets[3];
-			histogram[i + kHistogramSize*3] = offsets[3] - 1;
+			temp = histogram[i + kHistogramSize * 3] + offsets[3];
+			histogram[i + kHistogramSize * 3] = offsets[3] - 1;
 			offsets[3] = temp;
 		}
 	}
@@ -151,14 +154,14 @@ private:
 			histogram[i + kHistogramSize] = offsets[1] - 1;
 			offsets[1] = temp;
 
-			temp = histogram[i + kHistogramSize*2] + offsets[2];
-			histogram[i + kHistogramSize*2] = offsets[2] - 1;
+			temp = histogram[i + kHistogramSize * 2] + offsets[2];
+			histogram[i + kHistogramSize * 2] = offsets[2] - 1;
 			offsets[2] = temp;
 
 			if (i >= kHistogramSize/2)
-				numNeg += histogram[i + kHistogramSize*3];
+				numNeg += histogram[i + kHistogramSize * 3];
 		}
-		std::uint32_t* h3 = &histogram[kHistogramSize*3];
+		std::uint32_t* h3 = &histogram[kHistogramSize * 3];
 		offsets[3] = numNeg + 1;
 		for (size_t i = 0; i < kHistogramSize / 2; ++i)
 		{
@@ -174,7 +177,8 @@ private:
 			offsets[3] = temp;
 		}
 	}
-	vector<T>	m_dst;
+
+	rde::vector<T>	m_dst;
 };
 
 } // namespace rde

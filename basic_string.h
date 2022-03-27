@@ -11,12 +11,13 @@
 
 namespace rde
 {
+
 //=============================================================================
 // @note: this one is totally _not_ std::string compatible for the time being!
 // one way conversion should work, ie rde --> STL.
 template<typename E,
-	class TAllocator = rde::allocator,
-	typename TStorage = rde::simple_string_storage<E, TAllocator> >
+	class TAllocator	= rde::allocator,
+	typename TStorage	= rde::simple_string_storage<E, TAllocator>>
 	class basic_string: private TStorage
 {
 public:
@@ -155,19 +156,13 @@ public:
 	}
 
 	// @note: do NOT const_cast!
-	const value_type* c_str() const
-	{
-		RDE_ASSERT(invariant());
-		return TStorage::c_str();
-	}
+	const value_type* c_str() const	{ RDE_ASSERT(invariant()); return TStorage::c_str(); }
+
 	const_iterator begin() const	{ RDE_ASSERT(invariant()); return c_str(); }
 	const_iterator end() const		{ RDE_ASSERT(invariant()); return c_str() + length(); }
 
-	size_type length() const
-	{
-		return TStorage::length();
-	}
-	bool empty() const	{ return length() == 0; }
+	size_type length() const		{ return TStorage::length(); }
+	bool empty() const				{ return length() == 0; }
 
 	const allocator_type& get_allocator() const	{ return TStorage::get_allocator; }
 

@@ -98,7 +98,7 @@ private:
 		if (!buffer.size())
 			return false;
 		current.clear();
-		for (; cursor!=buffer.end(); ++cursor) {
+		for (; cursor != buffer.end(); ++cursor) {
 			if (!is_whitespace(*cursor)) {
 				current.append(*cursor);
 			}
