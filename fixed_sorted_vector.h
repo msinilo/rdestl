@@ -6,8 +6,8 @@
 
 namespace rde
 {
-template<
-	typename TKey, typename TValue, int TCapacity, bool TGrowOnOverflow,
+
+template<typename TKey, typename TValue, size_t TCapacity, bool TGrowOnOverflow,
 	class TCompare = rde::less<TKey>,
 	class TAllocator = rde::allocator
 >
@@ -21,7 +21,6 @@ public:
 	explicit fixed_sorted_vector(const allocator_type& allocator = allocator_type())
 		: sorted_vector(allocator)
 	{
-		/**/
 	}
 };
 

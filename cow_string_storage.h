@@ -3,6 +3,7 @@
 
 namespace rde
 {
+
 //=============================================================================
 struct string_rep
 {
@@ -33,9 +34,10 @@ class cow_string_storage
 	typedef char ERR_CharTypeTooBigSeeM_BufferComment[sizeof(E) <= 2 ? 1 : -1];
 public:
 	typedef E					value_type;
-	typedef int					size_type;
+	typedef size_t				size_type;
 	typedef TAllocator			allocator_type;
 	typedef const value_type*	const_iterator;
+
 	static const unsigned long	kGranularity = 32;
 
 	explicit cow_string_storage(const allocator_type& allocator)
@@ -46,15 +48,14 @@ public:
 	cow_string_storage(const value_type* str, const allocator_type& allocator)
 		: m_allocator(allocator)
 	{
-		const int len = strlen(str);
+		const size_t len = strlen(str);
 		construct_string(len);
 		Sys::MemCpy(m_data, str, len * sizeof(value_type));
 		RDE_ASSERT(len < string_rep::kMaxCapacity);
 		get_rep()->size = static_cast<short>(len);
 		m_data[len] = 0;
 	}
-	cow_string_storage(const value_type* str, size_type len,
-		const allocator_type& allocator)
+	cow_string_storage(const value_type* str, size_type len, const allocator_type& allocator)
 		: m_allocator(allocator)
 	{
 		construct_string(len);
@@ -73,7 +74,7 @@ public:
 		}
 		else
 		{
-			const int len = rhs.length();
+			const size_t len = rhs.length();
 			construct_string(len);
 			Sys::MemCpy(m_data, rhs.c_str(), len * sizeof(value_type));
 			RDE_ASSERT(len < string_rep::kMaxCapacity);

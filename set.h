@@ -6,10 +6,8 @@
 
 namespace rde
 {
-template<
-	typename T,
-	class TAllocator = rde::allocator
->
+
+template<typename T, class TAllocator = rde::allocator>
 class set: private rb_tree<T, TAllocator>
 {
 	typedef rb_tree<T, TAllocator>  Base;
@@ -25,29 +23,17 @@ class set: private rb_tree<T, TAllocator>
 			: m_node(node),
 			m_set(set_)
 		{
-			/**/
 		}
 		template<typename UNodePtr, typename UPtr, typename URef>
 		node_iterator(const node_iterator<UNodePtr, UPtr, URef>& rhs)
 			: m_node(rhs.node()),
 			m_set(rhs.get_set())
 		{
-			/**/
 		}
 
-		TRef operator*() const
-		{
-			RDE_ASSERT(m_node != 0);
-			return m_node->value.key;
-		}
-		TPtr operator->() const
-		{
-			return &m_node->value.key;
-		}
-		TNodePtr node() const
-		{
-			return m_node;
-		}
+		TRef operator*() const	{ RDE_ASSERT(m_node != 0); return m_node->value.key; }
+		TPtr operator->() const	{ return &m_node->value.key; }
+		TNodePtr node() const	{ return m_node; }
 
 		node_iterator& operator++()
 		{
@@ -65,16 +51,11 @@ class set: private rb_tree<T, TAllocator>
 			return copy;
 		}
 
-		bool operator==(const node_iterator& rhs) const
-		{
-			return rhs.m_node == m_node && m_set == rhs.m_set;
-		}
-		bool operator!=(const node_iterator& rhs) const
-		{
-			return !(rhs == *this);
-		}
+		bool operator==(const node_iterator& rhs) const { return rhs.m_node == m_node && m_set == rhs.m_set; }
+		bool operator!=(const node_iterator& rhs) const { return !(rhs == *this); }
 
 		set* get_set() const { return m_set; }
+
 	private:
 		TNodePtr find_next_node(TNodePtr node) const
 		{
@@ -94,22 +75,10 @@ public:
 	explicit set(const allocator_type& allocator = allocator_type())
 		: Base(allocator) {}
 
-	iterator begin()
-	{
-		return iterator(Base::get_begin_node(), this);
-	}
-	const_iterator begin() const
-	{
-		return const_iterator(Base::get_begin_node(), this);
-	}
-	iterator end()
-	{
-		return iterator(0, this);
-	}
-	const_iterator end() const
-	{
-		return iterator(0, this);
-	}
+	iterator begin()								{ return iterator(Base::get_begin_node(), this); }
+	const_iterator begin() const					{ return const_iterator(Base::get_begin_node(), this); }
+	iterator end()									{ return iterator(0, this); }
+	const_iterator end() const						{ return iterator(0, this); }
 
 	iterator find(const value_type& v)
 	{

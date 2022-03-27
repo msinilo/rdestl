@@ -11,11 +11,12 @@
 
 namespace rde
 {
+
 // Load factor is 7/8th.
 template<typename TKey, typename TValue,
-	class THashFunc = rde::hash<TKey>,
-	class TKeyEqualFunc = rde::equal_to<TKey>,
-	class TAllocator = rde::allocator
+	class THashFunc		= rde::hash<TKey>,
+	class TKeyEqualFunc	= rde::equal_to<TKey>,
+	class TAllocator	= rde::allocator
 >
 class hash_map
 {
@@ -31,7 +32,7 @@ public:
 		node(): hash(kUnusedHash) {}
 
 		RDE_FORCEINLINE bool is_unused() const		{ return hash == kUnusedHash; }
-		RDE_FORCEINLINE bool is_deleted() const     { return hash == kDeletedHash; }
+		RDE_FORCEINLINE bool is_deleted() const		{ return hash == kDeletedHash; }
 		RDE_FORCEINLINE bool is_occupied() const	{ return hash < kDeletedHash; }
 
 		hash_value_t    hash;
@@ -60,19 +61,9 @@ public:
 		{
 			 /**/
 		}
-		TRef operator*() const
-		{
-			RDE_ASSERT(m_node != 0);
-			return m_node->data;
-		}
-		TPtr operator->() const
-		{
-			return &m_node->data;
-		}
-		RDE_FORCEINLINE TNodePtr node() const
-		{
-			return m_node;
-		}
+		TRef operator*() const					{ RDE_ASSERT(m_node != 0); return m_node->data; }
+		TPtr operator->() const					{ return &m_node->data; }
+		RDE_FORCEINLINE TNodePtr node() const	{ return m_node; }
 
 		node_iterator& operator++()
 		{
@@ -88,27 +79,23 @@ public:
 			return copy;
 		}
 
-		RDE_FORCEINLINE bool operator==(const node_iterator& rhs) const
-		{
-			return rhs.m_node == m_node;
-		}
-		bool operator!=(const node_iterator& rhs) const
-		{
-			return !(rhs == *this);
-		}
+		RDE_FORCEINLINE bool operator==(const node_iterator& rhs) const { return rhs.m_node == m_node; }
+		RDE_FORCEINLINE bool operator!=(const node_iterator& rhs) const { return !(rhs == *this); }
 
 		const hash_map* get_map() const { return m_map; }
+
 	private:
 		void move_to_next_occupied_node()
 		{
 			// @todo: save nodeEnd in constructor?
 			TNodePtr nodeEnd = m_map->m_nodes + m_map->bucket_count();
-			for (/**/; m_node < nodeEnd; ++m_node)
+			for (; m_node < nodeEnd; ++m_node)
 			{
 				if (m_node->is_occupied())
 					break;
 			}
 		}
+
 		TNodePtr		m_node;
 		const hash_map*	m_map;
 	};
@@ -119,7 +106,8 @@ public:
 	typedef TAllocator															allocator_type;
 	typedef node_iterator<node*, value_type*, value_type&>						iterator;
 	typedef node_iterator<const node*, const value_type*, const value_type&>	const_iterator;
-	typedef int																	size_type;
+	typedef size_t																size_type;
+
 	static const size_type														kNodeSize = sizeof(node);
 	static const size_type														kInitialCapacity = 64;
 
@@ -142,8 +130,7 @@ public:
 	{
 		/**/
 	}
-	explicit hash_map(size_type initial_bucket_count,
-			const allocator_type& allocator = allocator_type())
+	explicit hash_map(size_type initial_bucket_count, const allocator_type& allocator = allocator_type())
 		: m_nodes(&ms_emptyNode),
 		m_size(0),
 		m_capacity(0),
@@ -153,9 +140,7 @@ public:
 	{
 		reserve(initial_bucket_count);
 	}
-	hash_map(size_type initial_bucket_count,
-			const THashFunc& hashFunc,
-			const allocator_type& allocator = allocator_type())
+	hash_map(size_type initial_bucket_count, const THashFunc& hashFunc, const allocator_type& allocator = allocator_type())
 		: m_nodes(&ms_emptyNode),
 		m_size(0),
 		m_capacity(0),
@@ -178,7 +163,6 @@ public:
 	}
 	explicit hash_map(e_noinitialize)
 	{
-		/**/
 	}
 	~hash_map()
 	{
@@ -289,7 +273,7 @@ public:
 	}
 	void erase(iterator from, iterator to)
 	{
-		for (/**/; from != to; ++from)
+		for (; from != to; ++from)
 		{
 			node* n = from.node();
 			if (n->is_occupied())
@@ -341,10 +325,7 @@ public:
 	size_type size() const					{ return m_size; }
 	size_type empty() const					{ return size() == 0; }
 	size_type nonempty_bucket_count() const	{ return m_numUsed; }
-	size_type used_memory() const
-	{
-		return bucket_count() * kNodeSize;
-	}
+	size_type used_memory() const			{ return bucket_count() * kNodeSize; }
 
 	const allocator_type& get_allocator() const	{ return m_allocator; }
 	void set_allocator(const allocator_type& allocator) { m_allocator = allocator; }
@@ -352,10 +333,10 @@ public:
 private:
 	void grow()
 	{
-		const int newCapacity = (m_capacity == 0 ? kInitialCapacity : m_capacity * 2);
+		const size_type newCapacity = (m_capacity == 0 ? kInitialCapacity : m_capacity * 2);
 		grow(newCapacity);
 	}
-	void grow(int new_capacity)
+	void grow(size_t new_capacity)
 	{
 		RDE_ASSERT((new_capacity & (new_capacity - 1)) == 0);	// Must be power-of-two
 		node* newNodes = allocate_nodes(new_capacity);
@@ -455,7 +436,7 @@ private:
 		return m_nodes + m_capacity;
 	}
 
-	static void rehash(int new_capacity, node* new_nodes, int capacity, const node* nodes, bool destruct_original)
+	static void rehash(size_t new_capacity, node* new_nodes, size_t capacity, const node* nodes, bool destruct_original)
 	{
 		//if (nodes == &ms_emptyNode || new_nodes == &ms_emptyNode)
 		//  return;
@@ -498,14 +479,13 @@ private:
 		}
 	}
 
-	node* allocate_nodes(int n)
+	node* allocate_nodes(size_t n)
 	{
 		node* buckets = static_cast<node*>(m_allocator.allocate(n * sizeof(node)));
 		node* iterBuckets(buckets);
 		node* end = iterBuckets + n;
-		for (/**/; iterBuckets != end; ++iterBuckets)
+		for (; iterBuckets != end; ++iterBuckets)
 			iterBuckets->hash = node::kUnusedHash;
-
 		return buckets;
 	}
 	void delete_nodes()
@@ -553,10 +533,10 @@ private:
 	}
 
 	node*			m_nodes;
-	int				m_size;
-	int				m_capacity;
-	std::uint32_t			m_capacityMask;
-	int				m_numUsed;
+	size_type		m_size;
+	size_type		m_capacity;
+	std::uint32_t	m_capacityMask;
+	size_type		m_numUsed;
 	THashFunc       m_hashFunc;
 	TKeyEqualFunc	m_keyEqualFunc;
 	TAllocator      m_allocator;
