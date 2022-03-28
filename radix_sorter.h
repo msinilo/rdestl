@@ -89,8 +89,10 @@ public:
 			const std::uint32_t pos = (func(m_dst[i]) >> 8) & 0xFF;
 			src[h1[pos]++] = help_buffer[i];
 		}
+
 		if (TDataType == data_unsigned && canBreakAfter16Bits)
 			return;
+
 		for (size_t i = 0; i < num; ++i)
 		{
 			const std::uint32_t pos = (func(src[i]) >> 16) & 0xFF;
@@ -107,10 +109,8 @@ public:
 	template<data_type TDataType, typename TFunc>
 	void sort(T* src, size_t num, const TFunc& func)
 	{
-		if (num > static_cast<int>(m_dst.size()))
-		{
+		if (num > m_dst.size())
 			resize(num);
-		}
 		sort<TDataType, TFunc>(src, num, func, m_dst.begin());
 	}
 
