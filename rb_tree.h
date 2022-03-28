@@ -8,9 +8,10 @@ namespace rde
 {
 namespace internal
 {
+
 struct rb_tree_base
 {
-	typedef int	size_type;
+	typedef size_t	size_type;
 	enum color_e
 	{
 		red,
@@ -30,7 +31,7 @@ struct rb_tree_key_wrapper
 template<typename TKey>
 struct rb_tree_traits
 {
-	typedef	TKey	key_type;
+	typedef	TKey						key_type;
 	typedef rb_tree_key_wrapper<TKey>	value_type;
 };
 
@@ -48,9 +49,7 @@ public:
 	{
 		node() {}
 		node(color_e color_, node* left_, node* right_, node* parent_)
-			: left(left_), parent(parent_), right(right_), color(color_)
-		{
-		}
+			: left(left_), parent(parent_), right(right_), color(color_) { }
 
 		node*		left;
 		node*		parent;
@@ -209,11 +208,8 @@ public:
 		}
 	}
 
-	bool empty() const	{ return m_size == 0; }
-	size_type size() const
-	{
-		return m_size;
-	}
+	bool empty() const		{ return m_size == 0; }
+	size_type size() const	{ return m_size; }
 
 	typedef void (*TravFunc)(node* n, int left, int depth);
 
@@ -291,6 +287,7 @@ public:
 	{
 		return n == &ms_sentinel ? 0 : 1 + num_nodes(n->left) + num_nodes(n->right);
 	}
+
 	RDE_FORCEINLINE void rebalance(node* new_node)
 	{
 		RDE_ASSERT(new_node->color == red);

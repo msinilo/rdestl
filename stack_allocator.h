@@ -5,12 +5,13 @@
 
 namespace rde
 {
+
 // Stack based allocator.
 // Traits:
 //	- operates on buffer of TBytes bytes of stack memory
 //	- never frees memory
 //	- cannot be copied
-template<int TBytes>
+template<size_t TBytes>
 class stack_allocator
 {
 public:
@@ -18,7 +19,6 @@ public:
 		: m_name(name),
 		m_bufferTop(0)
 	{
-		/**/
 	}
 
 	void* allocate(size_t bytes, int /*flags*/ = 0)

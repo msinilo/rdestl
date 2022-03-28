@@ -90,7 +90,7 @@ TEST_CASE("fixed_vector", "[vector]")
 		CHECK(0 == v.size());
 		CHECK(v.empty());
 		// Make sure it doesnt free mem.
-		CHECK(v.capacity() > 0);
+		CHECK(v.capacity() != 0);
 	}
 
 	SECTION("EraseBegin")

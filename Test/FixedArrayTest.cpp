@@ -16,7 +16,8 @@ TEST_CASE("fixed_array", "[array]")
 	SECTION("Aggregate initialization")
 	{
 		const int a[] ={ 1, 2, 3, 4, 5 };
-		rde::fixed_array<int, 5> arr ={ 1, 2, 3, 4, 5 };
+		rde::fixed_array<int, 5> arr;
+		arr.from_raw_array(a);
 		CHECK(5 == arr.size());
 		CHECK(0 == memcmp(arr.data(), &a[0], sizeof(a)));
 	}
