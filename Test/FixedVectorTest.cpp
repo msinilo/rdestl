@@ -3,20 +3,19 @@
 #include "fixed_vector.h"
 #include "vendor/Catch/catch.hpp"
 
-
 namespace
 {
-	typedef rde::fixed_vector<int, 64, true>			tTestVector;
-	typedef rde::fixed_vector<std::string, 64, true>	tStringVector;
+typedef rde::fixed_vector<int, 64, true>			tTestVector;
+typedef rde::fixed_vector<std::string, 64, true>	tStringVector;
 
-	const int array [] = { 1, 4, 9, 16, 25, 36 };
+const int array[] ={ 1, 4, 9, 16, 25, 36 };
 
-	void PrintVector(const tStringVector& v)
-	{
-		for (tStringVector::const_iterator it = v.begin(); it != v.end(); ++it)
-			printf("%s, ", it->c_str());
-		printf("\n");
-	}
+void PrintVector(const tStringVector& v)
+{
+	for (tStringVector::const_iterator it = v.begin(); it != v.end(); ++it)
+		printf("%s, ", it->c_str());
+	printf("\n");
+}
 
 TEST_CASE("fixed_vector", "[vector]")
 {
@@ -232,7 +231,7 @@ TEST_CASE("fixed_vector", "[vector]")
 		tTestVector v(array, array + 6);
 		tTestVector v2(v);
 		CHECK(6 == v2.size());
-		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
+		CHECK(memcmp(v.begin(), v2.begin(), 6 * sizeof(int)) == 0);
 	}
 
 	SECTION("AssignmentOp")
@@ -241,7 +240,7 @@ TEST_CASE("fixed_vector", "[vector]")
 		tTestVector v2;
 		v2 = v;
 		CHECK(6 == v2.size());
-		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
+		CHECK(memcmp(v.begin(), v2.begin(), 6 * sizeof(int)) == 0);
 	}
 
 	SECTION("Reserve")
@@ -257,19 +256,19 @@ TEST_CASE("fixed_vector", "[vector]")
 		CHECK(3 == v[2]);
 	}
 
-    SECTION("EmplaceBack")
-    {
-        rde::fixed_vector<rde::pair<int, int>, 8, false> v;
+	SECTION("EmplaceBack")
+	{
+		rde::fixed_vector<rde::pair<int, int>, 8, false> v;
 
-        v.emplace_back(1, 2);
-        v.emplace_back(3, 4);
-        v.emplace_back(5, 6);
+		v.emplace_back(1, 2);
+		v.emplace_back(3, 4);
+		v.emplace_back(5, 6);
 
-        CHECK(3 == v.size());
-        CHECK(v[0].first == 1); CHECK(v[0].second == 2);
-        CHECK(v[1].first == 3); CHECK(v[1].second == 4);
-        CHECK(v[2].first == 5); CHECK(v[2].second == 6);
-    }
+		CHECK(3 == v.size());
+		CHECK(v[0].first == 1); CHECK(v[0].second == 2);
+		CHECK(v[1].first == 3); CHECK(v[1].second == 4);
+		CHECK(v[2].first == 5); CHECK(v[2].second == 6);
+	}
 
 #if RDESTL_RECORD_WATERMARKS
 	SECTION("Watermarks")
@@ -305,4 +304,4 @@ TEST_CASE("fixed_vector", "[vector]")
 	}
 #endif
 }
-}
+} //namespace

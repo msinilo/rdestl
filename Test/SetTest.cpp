@@ -48,4 +48,4 @@ TEST_CASE("set", "[set]")
 		CHECK(0 == t.size());
 	}
 }
-}
+} //namespace

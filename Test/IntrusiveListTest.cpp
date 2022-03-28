@@ -3,11 +3,11 @@
 
 namespace
 {
-	struct MyNode : public rde::intrusive_list_node
-	{
-		explicit MyNode(int i = 0): data(i) {}
-		int	data;
-	};
+struct MyNode: public rde::intrusive_list_node
+{
+	explicit MyNode(int i = 0): data(i) { }
+	int	data;
+};
 
 TEST_CASE("intrusive_list", "[list]")
 {
@@ -109,4 +109,4 @@ TEST_CASE("intrusive_list", "[list]")
 		delete n;
 	}
 }
-}
+} //namespace

@@ -70,4 +70,4 @@ TEST_CASE("fixed_substring", "[string]")
 		CHECK(str == str2);
 	}
 }
-}
+} //namespace

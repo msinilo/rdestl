@@ -4,17 +4,17 @@
 
 namespace
 {
-	template<typename T> char HasKeyType(...);
-	template<typename T> int HasKeyType(typename T::key_type*);
+template<typename T> char HasKeyType(...);
+template<typename T> int HasKeyType(typename T::key_type*);
 
-	bool hasKeyType = sizeof(HasKeyType<std::map<int, int> >(0)) != sizeof(char);
+bool hasKeyType = sizeof(HasKeyType<std::map<int, int> >(0)) != sizeof(char);
 
-	void PrintNode(rde::rb_tree<int>::node* n, int left, int depth)
-	{
-		static const char* s_left[] ={ "[root]", "right", "left" };
-		printf("%*s %d: Node %d, [%s, %s]\n", (depth*2), "", depth, n->value.key,
-			s_left[left + 1], n->color == 0 ? "red" : "black");
-	}
+void PrintNode(rde::rb_tree<int>::node* n, int left, int depth)
+{
+	static const char* s_left[] ={ "[root]", "right", "left" };
+	printf("%*s %d: Node %d, [%s, %s]\n", (depth * 2), "", depth, n->value.key,
+		s_left[left + 1], n->color == 0 ? "red" : "black");
+}
 
 TEST_CASE("rb_tree", "[map][algorithm]")
 {
@@ -102,4 +102,4 @@ TEST_CASE("rb_tree", "[map][algorithm]")
 	}
 	*/
 }
-}
+} //namespace

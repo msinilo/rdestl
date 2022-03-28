@@ -4,10 +4,10 @@
 
 namespace
 {
-	typedef rde::map<int, int> tMap;
-	template rde::map<int, int>;
-	template rde::map<int, rde::string>;
-	template rde::map<rde::string, rde::string>;
+typedef rde::map<int, int> tMap;
+template rde::map<int, int>;
+template rde::map<int, rde::string>;
+template rde::map<rde::string, rde::string>;
 
 TEST_CASE("map", "[map]")
 {
@@ -117,7 +117,7 @@ TEST_CASE("map", "[map]")
 	};
 	SECTION("IteratorIteratesAllElements")
 	{
-		bool hadElement[4] = { false, false, false, false };
+		bool hadElement[4] ={ false, false, false, false };
 		tMap m(&data4[0], &data4[4]);
 		tMap::const_iterator it = m.begin();
 		for (/**/; it != m.end(); ++it)
@@ -134,7 +134,7 @@ TEST_CASE("map", "[map]")
 	{
 		tMap m(&data4[0], &data4[4]);
 		m.erase(2);
-		bool hadElement[4] = { false, false, false, false };
+		bool hadElement[4] ={ false, false, false, false };
 		tMap::const_iterator it = m.begin();
 		for (/**/; it != m.end(); ++it)
 		{
@@ -155,7 +155,7 @@ TEST_CASE("map", "[map]")
 		CHECK(m1.begin() == m1.end());
 
 		CHECK(4 == m2.size());
-		bool hadElement[4] = { false, false, false, false };
+		bool hadElement[4] ={ false, false, false, false };
 		tMap::const_iterator it = m2.begin();
 		for (/**/; it != m2.end(); ++it)
 		{
@@ -168,4 +168,4 @@ TEST_CASE("map", "[map]")
 		}
 	}
 }
-}
+} //namespace

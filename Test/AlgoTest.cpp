@@ -137,4 +137,4 @@ TEST_CASE("algorithm", "[utility]")
 		CHECK(2 == tab[5]);
 	}
 }
-}
+} //namespace

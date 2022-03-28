@@ -15,26 +15,23 @@
 
 namespace
 {
-	template<typename T>
-	struct as_int
-	{
-		std::uint32_t operator()(const T& x) const
-		{
-			return x;
-		}
-	};
+template<typename T>
+struct as_int
+{
+	std::uint32_t operator()(const T& x) const { return x; }
+};
 
-	template<typename T>
-	bool IsSorted(T* data, size_t num)
+template<typename T>
+bool IsSorted(T* data, size_t num)
+{
+	for (size_t i = 1; i < num; ++i)
 	{
-		for (size_t i = 1; i < num; ++i)
-		{
-			RDE_ASSERT(data[i - 1] <= data[i]);
-			if (data[i - 1] > data[i])
-				return false;
-		}
-		return true;
+		RDE_ASSERT(data[i - 1] <= data[i]);
+		if (data[i - 1] > data[i])
+			return false;
 	}
+	return true;
+}
 
 TEST_CASE("sort", "[algorithm]")
 {
@@ -104,12 +101,12 @@ TEST_CASE("sort", "[algorithm]")
 	}
 	SECTION("IsSortedWhenSorted")
 	{
-		const int data[4] = { -1, 2, 3, 8 };
+		const int data[4] ={ -1, 2, 3, 8 };
 		CHECK(rde::is_sorted(&data[0], &data[4], rde::less<int>()));
 	}
 	SECTION("IsSortedReturnsFalseWhenNotSorted")
 	{
-		const int data[4] = { -1, 9, 3, 8 };
+		const int data[4] ={ -1, 9, 3, 8 };
 		CHECK(!rde::is_sorted(&data[0], &data[4], rde::less<int>()));
 	}
 	// Issue reported by Daniel Treble: http://code.google.com/p/rdestl/issues/detail?id=2
@@ -121,7 +118,7 @@ TEST_CASE("sort", "[algorithm]")
 		foo.push_back(60);
 		foo.push_back(50);
 		foo.push_back(40);
-	    rde::quick_sort(foo.begin(), foo.end());
+		rde::quick_sort(foo.begin(), foo.end());
 		CHECK(rde::is_sorted(foo.begin(), foo.end(), rde::less<int>()));
 	}
 
@@ -140,11 +137,11 @@ TEST_CASE("sort", "[algorithm]")
 			return f.x;
 		}
 	};
-	bool operator<(const Foo& a, const Foo& b)
+	bool operator<(const Foo & a, const Foo & b)
 	{
 		return a.x < b.x;
 	}
-	bool operator>(const Foo& a, const Foo& b)
+	bool operator>(const Foo & a, const Foo & b)
 	{
 		return a.x > b.x;
 	}
@@ -204,4 +201,4 @@ TEST_CASE("sort", "[algorithm]")
 	}
 #endif
 }
-}
+} //namespace

@@ -50,4 +50,4 @@ TEST_CASE("fixed_sorted_vector", "[vector]")
 		CHECK(it == v.end());
 	}
 }
-}
+} //namespace

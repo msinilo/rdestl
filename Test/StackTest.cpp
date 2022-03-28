@@ -48,4 +48,4 @@ TEST_CASE("stack", "[allocator]")
 		CHECK(s.empty());
 	}
 }
-}
+} //namespace

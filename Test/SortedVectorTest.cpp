@@ -4,7 +4,7 @@
 
 namespace
 {
-	typedef rde::sorted_vector<int, int> tVector;
+typedef rde::sorted_vector<int, int> tVector;
 
 TEST_CASE("sorted_vector", "[vector]")
 {
@@ -59,4 +59,4 @@ TEST_CASE("sorted_vector", "[vector]")
 		CHECK(3 == v.size());
 	}
 }
-}
+} //namespace

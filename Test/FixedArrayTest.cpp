@@ -64,4 +64,4 @@ TEST_CASE("fixed_array", "[array]")
 		CHECK(0 == memcmp(arr.data(), &a[0], sizeof(a)));
 	}
 }
-}
+} //namespace

@@ -5,7 +5,7 @@ namespace
 {
 TEST_CASE("slist", "[list]")
 {
-	const int array [] = { 1, 4, 9, 16, 25, 36 };
+	const int array[] ={ 1, 4, 9, 16, 25, 36 };
 
 	SECTION("ConstructEmpty")
 	{
@@ -75,7 +75,7 @@ TEST_CASE("slist", "[list]")
 		int i(1);
 		for (/**/; it != lst.end(); ++it, ++i)
 		{
-			CHECK(i*i == *it);
+			CHECK(i * i == *it);
 		}
 	}
 
@@ -90,8 +90,8 @@ TEST_CASE("slist", "[list]")
 		int i(1);
 		for (/**/; it != lst.end(); ++it, ++i)
 		{
-			CHECK(i*i == *it);
+			CHECK(i * i == *it);
 		}
 	}
 }
-}
+} //namespace

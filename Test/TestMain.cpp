@@ -10,7 +10,7 @@
 void RunSpeedTests();
 
 #if RDE_DEBUG
-	long& g_BreakOnAlloc (_crtBreakAlloc);
+long& g_BreakOnAlloc(_crtBreakAlloc);
 #endif
 
 
@@ -34,7 +34,7 @@ int __cdecl main(int argc, const char* argv[])
 	_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
 
 	// Enable leak report if debugger attached
-    flags |= _CRTDBG_LEAK_CHECK_DF;
+	flags |= _CRTDBG_LEAK_CHECK_DF;
 	// Set the new bits
 	_CrtSetDbgFlag(flags);
 

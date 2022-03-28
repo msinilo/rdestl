@@ -9,32 +9,31 @@ struct MyStruct
 	char c;
 	float f;
 };
+
 namespace rde
 {
-	template<> struct is_pod<MyStruct>
-	{
-		enum { value = true };
-	};
+template<> struct is_pod<MyStruct> { enum { value = true }; };
 }
 
 namespace
 {
-	typedef rde::vector<int>			tTestVector;
-	typedef rde::vector<std::string>	tStringVector;
+typedef rde::vector<int>			tTestVector;
+typedef rde::vector<std::string>	tStringVector;
 
-	const int array [] = { 1, 4, 9, 16, 25, 36 };
-	void PrintVector(const tTestVector& v)
-	{
-		for (tTestVector::const_iterator it = v.begin(); it != v.end(); ++it)
-			printf("%d, ", *it);
-		printf("\n");
-	}
-	void PrintVector(const tStringVector& v)
-	{
-		for (tStringVector::const_iterator it = v.begin(); it != v.end(); ++it)
-			printf("%s, ", it->c_str());
-		printf("\n");
-	}
+const int array[] ={ 1, 4, 9, 16, 25, 36 };
+
+void PrintVector(const tTestVector& v)
+{
+	for (tTestVector::const_iterator it = v.begin(); it != v.end(); ++it)
+		printf("%d, ", *it);
+	printf("\n");
+}
+void PrintVector(const tStringVector& v)
+{
+	for (tStringVector::const_iterator it = v.begin(); it != v.end(); ++it)
+		printf("%s, ", it->c_str());
+	printf("\n");
+}
 
 TEST_CASE("vector", "[vector]")
 {
@@ -248,7 +247,7 @@ TEST_CASE("vector", "[vector]")
 		tTestVector v(array, array + 6);
 		tTestVector v2(v);
 		CHECK(6 == v2.size());
-		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
+		CHECK(memcmp(v.begin(), v2.begin(), 6 * sizeof(int)) == 0);
 	}
 
 	SECTION("AssignmentOp")
@@ -257,7 +256,7 @@ TEST_CASE("vector", "[vector]")
 		tTestVector v2;
 		v2 = v;
 		CHECK(6 == v2.size());
-		CHECK(memcmp(v.begin(), v2.begin(), 6*sizeof(int)) == 0);
+		CHECK(memcmp(v.begin(), v2.begin(), 6 * sizeof(int)) == 0);
 	}
 
 	SECTION("Tighten")
@@ -304,128 +303,128 @@ TEST_CASE("vector", "[vector]")
 		}
 	}
 
-    //-----------------------------------------------------------------
-    //Vector tests by Danushka Abeysuriya silvermace@gmail.com
+	//-----------------------------------------------------------------
+	//Vector tests by Danushka Abeysuriya silvermace@gmail.com
 
-    SECTION("Resize")
-    {
-        rde::vector<int> myFoos;
-        myFoos.resize(20);
+	SECTION("Resize")
+	{
+		rde::vector<int> myFoos;
+		myFoos.resize(20);
 
-        CHECK(myFoos.size() == 20);
-        CHECK(myFoos.capacity() >= 20);
-    }
+		CHECK(myFoos.size() == 20);
+		CHECK(myFoos.capacity() >= 20);
+	}
 
-    //Regression test:
-    //The bug is caused when the copy constructor is invoked on a vector where
-    //the rhs is an empty (and non-preallocated) vector - i.e. there is nothing to copy
-    SECTION("Resize_Regression_1")
-    {
-        rde::vector< rde::vector<int> > myFoosFoos;
-        myFoosFoos.push_back(rde::vector<int>());
-        myFoosFoos.push_back(rde::vector<int>());
-        myFoosFoos[1].push_back(42);
+	//Regression test:
+	//The bug is caused when the copy constructor is invoked on a vector where
+	//the rhs is an empty (and non-preallocated) vector - i.e. there is nothing to copy
+	SECTION("Resize_Regression_1")
+	{
+		rde::vector< rde::vector<int> > myFoosFoos;
+		myFoosFoos.push_back(rde::vector<int>());
+		myFoosFoos.push_back(rde::vector<int>());
+		myFoosFoos[1].push_back(42);
 
-        CHECK(myFoosFoos.size() == 2);
-        CHECK(myFoosFoos[0].size() == 0);
-        CHECK(myFoosFoos[1].size() == 1);
-    }
+		CHECK(myFoosFoos.size() == 2);
+		CHECK(myFoosFoos[0].size() == 0);
+		CHECK(myFoosFoos[1].size() == 1);
+	}
 
-    SECTION("Resize_Regression_2")
-    {
-        rde::vector< rde::vector<int> > myFoosFoos;
-        rde::vector<int> a;
-        rde::vector<int> b;
+	SECTION("Resize_Regression_2")
+	{
+		rde::vector< rde::vector<int> > myFoosFoos;
+		rde::vector<int> a;
+		rde::vector<int> b;
 
-        a.push_back(42);
-        a.push_back(24);
+		a.push_back(42);
+		a.push_back(24);
 
-        myFoosFoos.push_back(a);
-        myFoosFoos.push_back(b);
-        myFoosFoos[1].push_back(4224);
+		myFoosFoos.push_back(a);
+		myFoosFoos.push_back(b);
+		myFoosFoos[1].push_back(4224);
 
-        CHECK(myFoosFoos.size() == 2);
+		CHECK(myFoosFoos.size() == 2);
 
-        CHECK(myFoosFoos[0].size() == 2);
-        CHECK(myFoosFoos[0][0] == 42);
-        CHECK(myFoosFoos[0][1] == 24);
+		CHECK(myFoosFoos[0].size() == 2);
+		CHECK(myFoosFoos[0][0] == 42);
+		CHECK(myFoosFoos[0][1] == 24);
 
-        CHECK(myFoosFoos[1].size() == 1);
-        CHECK(myFoosFoos[1][0] == 4224);
-    }
+		CHECK(myFoosFoos[1].size() == 1);
+		CHECK(myFoosFoos[1][0] == 4224);
+	}
 
-    SECTION("Insert")
-    {
-        rde::vector<int> myFoos;
+	SECTION("Insert")
+	{
+		rde::vector<int> myFoos;
 
-        myFoos.push_back(42);
-        CHECK(myFoos.size() == 1);
-        CHECK(myFoos[0] == 42);
+		myFoos.push_back(42);
+		CHECK(myFoos.size() == 1);
+		CHECK(myFoos[0] == 42);
 
-        myFoos.insert(myFoos.begin(), 24);
-        CHECK(myFoos.size() == 2);
-        CHECK(myFoos[0] == 24);
-        CHECK(myFoos[1] == 42);
+		myFoos.insert(myFoos.begin(), 24);
+		CHECK(myFoos.size() == 2);
+		CHECK(myFoos[0] == 24);
+		CHECK(myFoos[1] == 42);
 
-        myFoos.clear();
-        CHECK(myFoos.size() == 0);
+		myFoos.clear();
+		CHECK(myFoos.size() == 0);
 
-        myFoos.insert(myFoos.begin(), 42);
-        CHECK(myFoos.size() == 1);
-        CHECK(myFoos[0] == 42);
-    }
+		myFoos.insert(myFoos.begin(), 42);
+		CHECK(myFoos.size() == 1);
+		CHECK(myFoos[0] == 42);
+	}
 
-    SECTION("VectorOfVectors")
-    {
-        rde::vector< rde::vector<int> > myFoosFoos;
-        myFoosFoos.push_back(rde::vector<int>(10));
-        myFoosFoos.push_back(rde::vector<int>(20));
-        CHECK(myFoosFoos.size() == 2);
-        CHECK(myFoosFoos[0].size() == 10);
-        CHECK(myFoosFoos[1].size() == 20);
-    }
+	SECTION("VectorOfVectors")
+	{
+		rde::vector< rde::vector<int> > myFoosFoos;
+		myFoosFoos.push_back(rde::vector<int>(10));
+		myFoosFoos.push_back(rde::vector<int>(20));
+		CHECK(myFoosFoos.size() == 2);
+		CHECK(myFoosFoos[0].size() == 10);
+		CHECK(myFoosFoos[1].size() == 20);
+	}
 
-    SECTION("MoveConstructorExplicit")
-    {
-        rde::vector<int> v;
-        v.push_back(1);
-        v.push_back(2);
-        CHECK(2 == v.size());
+	SECTION("MoveConstructorExplicit")
+	{
+		rde::vector<int> v;
+		v.push_back(1);
+		v.push_back(2);
+		CHECK(2 == v.size());
 
-        rde::vector<int> v2(std::move(v));
-        CHECK(0 == v.size());
-        CHECK(2 == v2.size());
-        CHECK(1 == v2[0]);
-        CHECK(2 == v2[1]);
-    }
-    SECTION("MoveAssignment")
-    {
-        rde::vector<int> v;
-        v.push_back(1);
-        v.push_back(2);
-        CHECK(2 == v.size());
+		rde::vector<int> v2(std::move(v));
+		CHECK(0 == v.size());
+		CHECK(2 == v2.size());
+		CHECK(1 == v2[0]);
+		CHECK(2 == v2[1]);
+	}
+	SECTION("MoveAssignment")
+	{
+		rde::vector<int> v;
+		v.push_back(1);
+		v.push_back(2);
+		CHECK(2 == v.size());
 
-        rde::vector<int> v2;
-        v2 = std::move(v);
-        CHECK(0 == v.size());
-        CHECK(2 == v2.size());
-        CHECK(1 == v2[0]);
-        CHECK(2 == v2[1]);
-    }
+		rde::vector<int> v2;
+		v2 = std::move(v);
+		CHECK(0 == v.size());
+		CHECK(2 == v2.size());
+		CHECK(1 == v2[0]);
+		CHECK(2 == v2[1]);
+	}
 
-    SECTION("EmplaceBack")
-    {
-        rde::vector<rde::pair<int, int> > v;
+	SECTION("EmplaceBack")
+	{
+		rde::vector<rde::pair<int, int> > v;
 
-        v.emplace_back(1, 2);
-        v.emplace_back(3, 4);
-        v.emplace_back(5, 6);
+		v.emplace_back(1, 2);
+		v.emplace_back(3, 4);
+		v.emplace_back(5, 6);
 
-        CHECK(3 == v.size());
-        CHECK(v[0].first == 1); CHECK(v[0].second == 2);
-        CHECK(v[1].first == 3); CHECK(v[1].second == 4);
-        CHECK(v[2].first == 5); CHECK(v[2].second == 6);
-    }
+		CHECK(3 == v.size());
+		CHECK(v[0].first == 1); CHECK(v[0].second == 2);
+		CHECK(v[1].first == 3); CHECK(v[1].second == 4);
+		CHECK(v[2].first == 5); CHECK(v[2].second == 6);
+	}
 	SECTION("EmplaceAt")
 	{
 		rde::vector<rde::pair<int, int> > v;
@@ -448,25 +447,25 @@ TEST_CASE("vector", "[vector]")
 		}
 	}
 
-    //typedef rde::fixed_vector<int, 3, false> fvector;
+	//typedef rde::fixed_vector<int, 3, false> fvector;
 
-    //SECTION("fixedvec_copy")
-    //{
-    //    fvector a;
-    //    fvector b;
-    //    a.push_back(42);
-    //    a.push_back(24);
-    //    a.push_back(4224);
-    //
-    //    b = a;
-    //
-    //    CHECK(b.size() == 3);
-    //    CHECK(b[0] == 42);
-    //    CHECK(b[1] == 24);
-    //    CHECK(b[2] == 4224);
-    //
-    //    b = fvector();
-    //    CHECK(b.size() == 3);
-    //}
+	//SECTION("fixedvec_copy")
+	//{
+	//    fvector a;
+	//    fvector b;
+	//    a.push_back(42);
+	//    a.push_back(24);
+	//    a.push_back(4224);
+	//
+	//    b = a;
+	//
+	//    CHECK(b.size() == 3);
+	//    CHECK(b[0] == 42);
+	//    CHECK(b[1] == 24);
+	//    CHECK(b[2] == 4224);
+	//
+	//    b = fvector();
+	//    CHECK(b.size() == 3);
+	//}
 }
-}
+} //namespace
