@@ -1,7 +1,7 @@
-#include "vendor/Catch/catch.hpp"
 #include "algorithm.h"
 #include "functional.h"
 #include "list.h"
+#include "vendor/Catch/catch.hpp"
 
 namespace
 {

@@ -3,6 +3,7 @@
 
 namespace rde
 {
+
 // CONCEPT!
 class allocator
 {
@@ -30,6 +31,7 @@ inline bool operator==(const allocator& /*lhs*/, const allocator& /*rhs*/)
 {
 	return true;
 }
+
 inline bool operator!=(const allocator& lhs, const allocator& rhs)
 {
 	return !(lhs == rhs);

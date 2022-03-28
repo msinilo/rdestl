@@ -1,7 +1,7 @@
-#include "vendor/Catch/catch.hpp"
+//#include <cstdio>
 #include "rde_string.h"
 #include "cow_string_storage.h"
-#include <cstdio>
+#include "vendor/Catch/catch.hpp"
 
 namespace
 {

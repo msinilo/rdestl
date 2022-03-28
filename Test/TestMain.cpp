@@ -1,6 +1,7 @@
+#include <cstdio>
+#include "rdestl.h"
 #define CATCH_CONFIG_RUNNER
 #include "vendor/Catch/catch.hpp"
-#include "rdestl.h"
 
 #if !RDESTL_STANDALONE
 #	define SPEED_TEST	1

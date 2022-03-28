@@ -1,7 +1,7 @@
-#include "vendor/Catch/catch.hpp"
-#include "fixed_vector.h"
-#include "pair.h"
 #include <xmmintrin.h>
+#include "pair.h"
+#include "fixed_vector.h"
+#include "vendor/Catch/catch.hpp"
 
 
 namespace
@@ -271,6 +271,7 @@ TEST_CASE("fixed_vector", "[vector]")
         CHECK(v[1].first == 3); CHECK(v[1].second == 4);
         CHECK(v[2].first == 5); CHECK(v[2].second == 6);
     }
+
 #if RDESTL_RECORD_WATERMARKS
 	SECTION("Watermarks")
 	{
@@ -286,6 +287,7 @@ TEST_CASE("fixed_vector", "[vector]")
 		CHECK(4 == v.get_high_watermark());
 	}
 #endif
+
 #if !RDESTL_STANDALONE && RDE_DEBUG
 	int numFailedAssertions(0);
 	bool AssertionHandler(const char*, const char*, int)

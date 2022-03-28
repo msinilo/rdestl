@@ -1,8 +1,8 @@
 #ifndef RDESTL_ALIGNMENT_H
 #define RDESTL_ALIGNMENT_H
 
-#include "rdestl_common.h"
 #include <cstddef>
+#include "rdestl_common.h"
 
 namespace rde
 {

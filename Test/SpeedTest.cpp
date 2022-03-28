@@ -1,10 +1,8 @@
-#include "vector.h"
-#include <cstdio>
-#include <numeric> 
-#include <vector>
 #include <windows.h>
+#include <numeric>
+#include <vector>
 #include <string>
-
+#include "vector.h"
 
 namespace
 {
@@ -32,25 +30,25 @@ namespace
 			SetThreadAffinityMask( GetCurrentThread(), 1 );	// Tries to prevent this thread from jumping around.
 			Sleep(0); // When we wake up, we're hopefully at the beginning of a timequantum.
 		}
-		
+
 		void Sample()
 		{
 			LARGE_INTEGER stick;
 			QueryPerformanceCounter(&stick);
-			
+
 			this->deltaTicks = (stick.QuadPart - this->tick);
 			if( this->deltaTicks < 0 )
 				this->deltaTicks = 0;
 			this->tick = stick.QuadPart;
 		}
-		
+
 		float DeltaTime() const
 		{
 			LARGE_INTEGER freq;
 			QueryPerformanceFrequency( &freq );
 			return float(double(this->deltaTicks) / double(freq.QuadPart));	// Dubious casting of the floats here...
 		}
-		
+
 		__int64 tick;
 		__int64 deltaTicks;
 	};
@@ -166,7 +164,7 @@ namespace
 		return timer.DeltaTime();
 	}
 
-	SpeedTest s_tests[] = 
+	SpeedTest s_tests[] =
 	{
 		{ "STL vector: construction", Vector_Construct<std::vector<std::string> > },
 		{ "RDE vector: construction", Vector_Construct<rde::vector<std::string> > },

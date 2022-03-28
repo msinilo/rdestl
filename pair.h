@@ -5,11 +5,8 @@
 // and it comes with more 'modern C++' bells and whistles (most notably, piecewise construct)
 //#define RDESTL_USE_STD_PAIR 1
 
-#include "type_traits.h"
-
-#ifdef RDESTL_USE_STD_PAIR
 #include <utility>
-#endif
+#include "type_traits.h"
 
 namespace rde
 {

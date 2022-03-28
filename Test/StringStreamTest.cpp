@@ -1,5 +1,5 @@
-#include "vendor/Catch/catch.hpp"
 #include "sstream.h"
+#include "vendor/Catch/catch.hpp"
 
 namespace
 {

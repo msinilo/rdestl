@@ -1,6 +1,6 @@
-#include "vendor/Catch/catch.hpp"
-#include "rb_tree.h"
 #include <map>
+#include "rb_tree.h"
+#include "vendor/Catch/catch.hpp"
 
 namespace
 {
@@ -89,7 +89,7 @@ TEST_CASE("rb_tree", "[map][algorithm]")
 		t.insert(15); t.insert(1); t.insert(7);
 		t.insert(5); t.insert(8);
 		rde::rb_tree<int>::node* n(t.get_begin_node());
-		CHECK(1 == n->value.key);
+		CHECK(1 == n->value.get_key());
 		n = t.find_next_node(n); CHECK(2 == n->value.key);
 		n = t.find_next_node(n); CHECK(5 == n->value.key);
 		n = t.find_next_node(n); CHECK(7 == n->value.key);
