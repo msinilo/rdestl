@@ -1,6 +1,6 @@
-#include "vendor/Catch/catch.hpp"
-#include "fixed_sorted_vector.h"
 #include <cstdio>
+#include "fixed_sorted_vector.h"
+#include "vendor/Catch/catch.hpp"
 
 namespace
 {

@@ -1,5 +1,5 @@
-#include "vendor/Catch/catch.hpp"
 #include "fixed_substring.h"
+#include "vendor/Catch/catch.hpp"
 
 namespace
 {

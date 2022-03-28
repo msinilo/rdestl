@@ -1,7 +1,7 @@
-#include "vendor/Catch/catch.hpp"
+//#include <cstdio>
 #include "vector.h"
 #include "pair.h"
-#include <cstdio>
+#include "vendor/Catch/catch.hpp"
 
 struct MyStruct
 {
@@ -44,7 +44,7 @@ TEST_CASE("vector", "[vector]")
 		CHECK(v.empty());
 		CHECK(0 == v.size());
 		CHECK(v.begin() == v.end());
-		printf("Sizeof(v) = %zd\n", sizeof(v));
+		printf("Sizeof(v) = %d\n", sizeof(v));
 	}
 	SECTION("PushBack")
 	{
@@ -412,6 +412,7 @@ TEST_CASE("vector", "[vector]")
         CHECK(1 == v2[0]);
         CHECK(2 == v2[1]);
     }
+
     SECTION("EmplaceBack")
     {
         rde::vector<rde::pair<int, int> > v;

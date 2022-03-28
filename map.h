@@ -1,9 +1,9 @@
 #ifndef RDESTL_MAP_H
 #define RDESTL_MAP_H
 
+#include "pair.h"
 #include "algorithm.h"
 #include "iterator.h"
-#include "pair.h"
 #include "rb_tree.h"
 
 namespace rde

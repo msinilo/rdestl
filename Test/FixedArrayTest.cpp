@@ -1,6 +1,6 @@
-#include "vendor/Catch/catch.hpp"
-#include "fixed_array.h"
 #include <cstdio>
+#include "fixed_array.h"
+#include "vendor/Catch/catch.hpp"
 
 namespace
 {

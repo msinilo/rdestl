@@ -3,6 +3,7 @@
 #include "stack_allocator.h"
 #include <cstdio>
 #include <iostream>
+#include <string>
 
 namespace
 {

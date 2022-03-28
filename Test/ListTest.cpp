@@ -1,14 +1,14 @@
-#include "vendor/Catch/catch.hpp"
 #include "rdestl.h"
 #include "list.h"
 #include "fixed_list.h"
 #if !RDESTL_STANDALONE
-#	include "rdestl/vector.h"
+#	include "vector.h"
 // FIXME: "core/*" Files missing? ~SK
 // #	include "core/Console.h"
 // #	include "core/Random.h"
 // #	include "core/Timer.h"
 #endif
+#include "vendor/Catch/catch.hpp"
 
 namespace
 {

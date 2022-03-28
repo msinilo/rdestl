@@ -1,13 +1,15 @@
-#include "vendor/Catch/catch.hpp"
 #include "radix_sorter.h"
 #include "sort.h"
 
 #if !RDESTL_STANDALONE
+// FIXME: "core/*" Files missing? ~SK
 #	include "core/Console.h"
 #	include "core/Timer.h"
 #	include "core/win32/Windows.h"
 #	include <algorithm>	// sort (for comparison)
 #endif
+
+#include "vendor/Catch/catch.hpp"
 
 #define SORT_SPEED_TEST	0
 
