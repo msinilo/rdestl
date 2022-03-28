@@ -267,7 +267,7 @@ public:
 
 		//find the last index of the first char in needle
 		//searching from end->start for obvious reasons
-		while (--si >= 0)
+		while (--si != basic_string::npos)
 		{
 			//if the first character matches, run our check
 			if (*s-- == *needle) {
