@@ -34,7 +34,7 @@ namespace
 
 TEST_CASE("hash_map (Closed)", "[map]")
 {
-	#include "HashMapTestInc.h"
+	#include "HashMapTest.inl"
 }
 
 #undef tMap

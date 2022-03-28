@@ -12,7 +12,7 @@ namespace
 
 	TEST_CASE("simple string", "[string]")
 	{
-#include "StringTestInc.h"
+#include "StringTest.inl"
 	}
 
 #undef STRING_CLASS
@@ -20,7 +20,7 @@ namespace
 
 	TEST_CASE("cow string", "[string]")
 	{
-#include "StringTestInc.h"
+#include "StringTest.inl"
 	}
 
 #undef STRING_CLASS

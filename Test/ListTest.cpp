@@ -18,7 +18,7 @@ namespace
 
 	TEST_CASE("list (PtrBased)", "[list]")
 	{
-#include "ListTestInc.h"
+#include "ListTest.inl"
 	}
 
 #undef tTestList
@@ -26,7 +26,7 @@ namespace
 
 	TEST_CASE("fixed_list (Linear)", "[list]")
 	{
-#include "ListTestInc.h"
+#include "ListTest.inl"
 	}
 
 #undef tTestList

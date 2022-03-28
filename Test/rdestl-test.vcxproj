@@ -386,9 +386,9 @@
     <ClCompile Include="VectorTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\HashMapTestInc.h" />
-    <ClInclude Include="..\..\ListTestInc.h" />
-    <ClInclude Include="..\..\StringTestInc.h" />
+    <ClInclude Include="HashMapTest.inl" />
+    <ClInclude Include="ListTest.inl" />
+    <ClInclude Include="StringTest.inl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)rdestl.vcxproj">
