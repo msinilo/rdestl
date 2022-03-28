@@ -347,7 +347,7 @@ public:
 			else
 			{
 				RDE_ASSERT(pos < m_end);
-				const size_t n = reinterpret_cast<uintptr_t>(m_end) - reinterpret_cast<uintptr_t>(pos);
+				const size_type n = reinterpret_cast<uintptr_t>(m_end) - reinterpret_cast<uintptr_t>(pos);
 				Sys::MemMove(pos + 1, pos, n);
 			}
 		}
