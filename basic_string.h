@@ -1,8 +1,8 @@
 #ifndef RDESTL_BASIC_STRING_H
 #define RDESTL_BASIC_STRING_H
 
-#include "allocator.h"
 #include "rdestl_common.h"
+#include "allocator.h"
 #include "simple_string_storage.h"
 #include "string_utils.h"
 
@@ -16,9 +16,9 @@ namespace rde
 // @note: this one is totally _not_ std::string compatible for the time being!
 // one way conversion should work, ie rde --> STL.
 template<typename E,
-	class TAllocator	= rde::allocator,
-	typename TStorage	= rde::simple_string_storage<E, TAllocator>>
-	class basic_string: private TStorage
+	class TAllocator = rde::allocator,
+	typename TStorage = rde::simple_string_storage<E, TAllocator>>
+	class basic_string : private TStorage
 {
 public:
 	typedef typename TStorage::value_type		value_type;
@@ -35,20 +35,17 @@ public:
 		/**/
 	}
 	// yeah, EXPLICIT.
-	explicit basic_string(const value_type* str,
-		const allocator_type& allocator = allocator_type())
+	explicit basic_string(const value_type* str, const allocator_type& allocator = allocator_type())
 		: TStorage(str, allocator)
 	{
 		/**/
 	}
-	basic_string(const value_type* str, size_type len,
-		const allocator_type& allocator = allocator_type())
+	basic_string(const value_type* str, size_type len, const allocator_type& allocator = allocator_type())
 		: TStorage(str, len, allocator)
 	{
 		/**/
 	}
-	basic_string(const basic_string& str,
-		const allocator_type& allocator = allocator_type())
+	basic_string(const basic_string& str, const allocator_type& allocator = allocator_type())
 		: TStorage(str, allocator)
 	{
 		/**/
@@ -156,15 +153,15 @@ public:
 	}
 
 	// @note: do NOT const_cast!
-	const value_type* c_str() const	{ RDE_ASSERT(invariant()); return TStorage::c_str(); }
+	const value_type* c_str() const { RDE_ASSERT(invariant()); return TStorage::c_str(); }
 
-	const_iterator begin() const	{ RDE_ASSERT(invariant()); return c_str(); }
-	const_iterator end() const		{ RDE_ASSERT(invariant()); return c_str() + length(); }
+	const_iterator begin() const { RDE_ASSERT(invariant()); return c_str(); }
+	const_iterator end() const { RDE_ASSERT(invariant()); return c_str() + length(); }
 
-	size_type length() const		{ return TStorage::length(); }
-	bool empty() const				{ return length() == 0; }
+	size_type length() const { return TStorage::length(); }
+	bool empty() const { return length() == 0; }
 
-	const allocator_type& get_allocator() const	{ return TStorage::get_allocator; }
+	const allocator_type& get_allocator() const { return TStorage::get_allocator; }
 
 	value_type* reserve(size_type capacity_hint)
 	{
@@ -266,11 +263,11 @@ public:
 	size_type rfind(const value_type* needle) const
 	{
 		const value_type* s(c_str() + length());
-		size_type si(length()+1);
+		size_type si(length() + 1);
 
 		//find the last index of the first char in needle
 		//searching from end->start for obvious reasons
-		while (--si >= 0)
+		while (--si  != basic_string::npos)
 		{
 			//if the first character matches, run our check
 			if (*s-- == *needle) {

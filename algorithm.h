@@ -1,10 +1,10 @@
 #ifndef RDESTL_ALGORITHM_H
 #define RDESTL_ALGORITHM_H
 
+#include "utility.h"
 #include "int_to_type.h"
 #include "iterator.h"
 #include "type_traits.h"
-#include "utility.h"
 
 namespace rde
 {

@@ -1,29 +1,27 @@
-#include <UnitTest++/src/UnitTest++.h>
-#include "rdestl/rde_string.h"
-#include "rdestl/cow_string_storage.h"
-#include <cstdio>
+//#include <cstdio>
+#include "rde_string.h"
+#include "cow_string_storage.h"
+#include "vendor/Catch/catch.hpp"
 
 namespace
 {
-	typedef rde::basic_string<char, rde::allocator, rde::simple_string_storage<char, rde::allocator> >	simple_string;
-	typedef rde::basic_string<char, rde::allocator, rde::cow_string_storage<char, rde::allocator> >		cow_string;
+typedef rde::basic_string<char, rde::allocator, rde::simple_string_storage<char, rde::allocator>>	simple_string;
+typedef rde::basic_string<char, rde::allocator, rde::cow_string_storage<char, rde::allocator>>		cow_string;
 
-#define CONCAT_(x, y)	x ## y
-#define CONCAT2_(x, y)	CONCAT_(x, y)
-#define TESTC(x)		TEST(CONCAT2_(x, POSTFIX))
+#define STRING_CLASS	simple_string
 
-#define POSTFIX			COW
-#define STRING_CLASS	cow_string
-#include "StringTestInc.h"
+TEST_CASE("simple string", "[string]")
+{
+#	include "StringTest.inl"
+}
 
 #undef STRING_CLASS
-#undef POSTFIX
-#define POSTFIX			Simple
-#define STRING_CLASS	simple_string
-#include "StringTestInc.h"
+#define STRING_CLASS	cow_string
 
-#undef POSTFIX
-#undef CONCAT_
-#undef CONCAT2_
-#undef TESTC
+TEST_CASE("cow string", "[string]")
+{
+#	include "StringTest.inl"
 }
+
+#undef STRING_CLASS
+} //namespace

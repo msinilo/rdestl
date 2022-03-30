@@ -1,8 +1,9 @@
 #ifndef RDESTL_UTILITY_H
 #define RDESTL_UTILITY_H
 
-#include "rdestl_common.h"
 #include <new>
+#include "rdestl_common.h"
+#include "int_to_type.h"
 
 namespace rde
 {
@@ -51,7 +52,7 @@ namespace internal
 	template<typename T> RDE_FORCEINLINE
 	void move_n(const T* from, size_t n, T* result, int_to_type<false>)
 	{
-		for (size_t i = n - 1; i >= 0; --i)
+		for (size_t i = n - 1; i != size_t(-1); --i)
 			result[i] = from[i];
 	}
 	template<typename T> RDE_FORCEINLINE
@@ -76,7 +77,6 @@ namespace internal
 		//const size_t n = (last - first) * sizeof(T);
 		Sys::MemMove(result, first, n);
 	}
-
 
 	template<typename T>
 	void copy_construct_n(const T* first, size_t n, T* result, int_to_type<false>)

@@ -24,7 +24,7 @@ public:
 	simple_string_storage(const value_type* str, const allocator_type& allocator)
 		: m_allocator(allocator)
 	{
-		const size_t len = rde::strlen(str);
+		const size_t len = strlen(str);
 		m_data = construct_string(len, m_capacity);
 		Sys::MemCpy(m_data, str, len * sizeof(value_type));
 		m_length = len;

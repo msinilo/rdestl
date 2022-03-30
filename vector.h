@@ -347,7 +347,7 @@ public:
 			else
 			{
 				RDE_ASSERT(pos < m_end);
-				const size_t n = reinterpret_cast<uintptr_t>(m_end) - reinterpret_cast<uintptr_t>(pos);
+				const size_type n = reinterpret_cast<uintptr_t>(m_end) - reinterpret_cast<uintptr_t>(pos);
 				Sys::MemMove(pos + 1, pos, n);
 			}
 		}
@@ -355,7 +355,7 @@ public:
 		++m_end;
 		RDE_ASSERT(invariant());
 		TStorage::record_high_watermark();
-		return pos;		
+		return pos;
 	}
 
 	void insert(int index, size_type n, const T& val)
