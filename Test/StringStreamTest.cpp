@@ -7,32 +7,47 @@ TEST_CASE("sstream", "[string][stream]")
 {
 	SECTION("Initialization")
 	{
+		int x(0);
+
 		SECTION("Default ctor")
 		{
-			rde::stringstream ss1;
-			CHECK(!ss1.good());
+			rde::stringstream ss;
+			CHECK(!ss.good());
 
-			auto ss2 = rde::stringstream();
-			CHECK(!ss2.good());
+			ss >> x;
+			CHECK(x == 0);
 		}
 
 		SECTION("With value_type ctor")
 		{
-			rde::stringstream ss("1");
-			CHECK(ss.good());
+			const char* ch = "1";
+			rde::stringstream ss1(ch);
+			CHECK(ss1.good());
+
+			ss1 >> x;
+			CHECK(x == 1);
+
+			rde::stringstream ss2("2");
+			CHECK(ss2.good());
+
+			ss2 >> x;
+			CHECK(x == 2);
 		}
 
 		SECTION("With string_type ctor")
 		{
 			rde::string s("1");
-			rde::stringstream ss(s);
-			CHECK(ss.good());
-		}
+			rde::stringstream ss1(s);
+			CHECK(ss1.good());
 
-		SECTION("With inline string_type ctor")
-		{
-			rde::stringstream ss(rde::string("1"));
-			CHECK(ss.good());
+			ss1 >> x;
+			CHECK(x == 1);
+
+			rde::stringstream ss2(rde::string("2"));
+			CHECK(ss2.good());
+
+			ss2 >> x;
+			CHECK(x == 2);
 		}
 	}
 
@@ -83,12 +98,13 @@ TEST_CASE("sstream", "[string][stream]")
 		CHECK(ss.good() == false);
 	}
 
+	// https://github.com/msinilo/rdestl/issues/13
 	SECTION("Operator bool and !bool")
 	{
 		bool isgood = false;
 		bool isbad = true;
 
-		SECTION("implicit bool conversions work as expected")
+		SECTION("Implicit bool conversions work as expected")
 		{
 			rde::stringstream ssGood("1");
 			CHECK(ssGood);
@@ -100,7 +116,7 @@ TEST_CASE("sstream", "[string][stream]")
 			CHECK(!rde::stringstream(""));
 		}
 
-		SECTION("ternary operator")
+		SECTION("Ternary operator")
 		{
 			rde::stringstream ssGood("1");
 			rde::stringstream ssBad;
@@ -116,7 +132,7 @@ TEST_CASE("sstream", "[string][stream]")
 			CHECK(isbad == true);
 		}
 
-		SECTION("if statement")
+		SECTION("If statement")
 		{
 			rde::stringstream ssGood("1");
 			if (ssGood)
@@ -131,7 +147,7 @@ TEST_CASE("sstream", "[string][stream]")
 			CHECK(isbad == true);
 		}
 
-		SECTION("inline assignment inside if statement")
+		SECTION("Inline assignment inside if statement")
 		{
 			rde::stringstream ss;
 
@@ -160,7 +176,7 @@ TEST_CASE("sstream", "[string][stream]")
 			CHECK(isbad == true);
 		}
 
-		SECTION("illegal comparisons should not compile")
+		SECTION("Illegal comparisons should not compile")
 		{
 			rde::stringstream ssGood("1");
 			rde::stringstream ssBad("");
