@@ -40,6 +40,7 @@ struct basic_stringstream
 
 	explicit operator bool() const 	{ return good(); }
 
+	void reset() { init(nullptr); }
 	void reset(const value_type* inp) {
 		init(inp);
 	}
