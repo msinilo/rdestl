@@ -21,6 +21,7 @@ namespace rde
  * - only supports signed int, signed long, float and rde::string
  * - no support for unsigned word types
  * - untested unicode support, no support for custom allocator
+ * - supports only narrow conversions (8-bit char size)
  */
 template<typename E, typename TAlloc = rde::allocator>
 struct basic_stringstream
@@ -30,41 +31,37 @@ struct basic_stringstream
 	typedef typename buffer_type::size_type		size_type;
 	typedef basic_string<value_type, TAlloc>	string_type;
 
+	basic_stringstream() { }
 	explicit basic_stringstream(const value_type* inp) { init(inp); }
 	explicit basic_stringstream(const string_type& inp) { init(inp.c_str()); }
-	basic_stringstream() {}
 
-	bool good() const 				{ return buffer.size() ? cursor != buffer.end() : false; }
+	bool good() const 				{ return !buffer.empty() ? cursor != buffer.end() : false; }
 	bool eof() const 				{ return !good(); }
+
 	explicit operator bool() const 	{ return good(); }
 
 	void reset(const value_type* inp) {
 		init(inp);
 	}
 
-	//------------------------------------------------------
-	//Output operators
+	// Output operators
+
 	basic_stringstream& operator>>(int& x) {
-		if (next())
-			x = atoi((const char*)current.c_str());
+		if (next()) { x = static_cast<int>(atoi(current.c_str())); }
 		return *this;
 	}
 	basic_stringstream& operator>>(long& x) {
-		if (next())
-			x = atol((const char*)current.c_str());
+		if (next()) { x = static_cast<long>(atol(current.c_str())); }
 		return *this;
 	}
 	basic_stringstream& operator>>(float& x) {
-		if (next())
-			x = static_cast<float>(atof((const char*)current.c_str()));
+		if (next()) { x = static_cast<float>(atof(current.c_str())); }
 		return *this;
 	}
 	basic_stringstream& operator>>(rde::string& x) {
-		if (next())
-			x = current;
+		if (next()) { x = current; }
 		return *this;
 	}
-	//------------------------------------------------------
 
 private:
 	//Setup our data buffer and cursor
@@ -83,6 +80,7 @@ private:
 	}
 
 	bool is_whitespace(const value_type& ch) const {
+		// TODO whitespace can mean different things based on locale
 		return (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n');
 	}
 
@@ -95,8 +93,9 @@ private:
 	//Read in the next token into current
 	bool next()
 	{
-		if (!buffer.size())
+		if (buffer.empty())
 			return false;
+
 		current.clear();
 		for (; cursor != buffer.end(); ++cursor) {
 			if (!is_whitespace(*cursor)) {
@@ -107,10 +106,10 @@ private:
 				break;
 			}
 		}
-		return current.length() > 0;
+
+		return !current.empty();
 	}
 
-	//Data members
 	string_type current;
 	buffer_type buffer;
 	typename buffer_type::const_iterator cursor;
@@ -118,7 +117,6 @@ private:
 
 typedef basic_stringstream<char>	stringstream;
 
-} // namespace rde
+} //namespace rde
 
-//-----------------------------------------------------------------------------
 #endif // #ifndef RDESTL_STRINGSTREAM_H
