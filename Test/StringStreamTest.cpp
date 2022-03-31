@@ -3,12 +3,194 @@
 
 namespace
 {
-TEST_CASE("sstream", "[string]")
+TEST_CASE("sstream", "[string][stream]")
 {
-	SECTION("Empty")
+	SECTION("Initialization")
+	{
+		SECTION("Default ctor")
+		{
+			rde::stringstream ss1;
+			CHECK(!ss1.good());
+
+			auto ss2 = rde::stringstream();
+			CHECK(!ss2.good());
+		}
+
+		SECTION("With value_type ctor")
+		{
+			rde::stringstream ss("1");
+			CHECK(ss.good());
+		}
+
+		SECTION("With string_type ctor")
+		{
+			rde::string s("1");
+			rde::stringstream ss(s);
+			CHECK(ss.good());
+		}
+
+		SECTION("With inline string_type ctor")
+		{
+			rde::stringstream ss(rde::string("1"));
+			CHECK(ss.good());
+		}
+	}
+
+	SECTION("Good/EOF")
+	{
+		rde::stringstream ss1("1");
+		CHECK(ss1.good() == true);
+		CHECK(ss1.eof() == false);
+
+		rde::stringstream ss2;
+		CHECK(ss2.good() == false);
+		CHECK(ss2.eof() == true);
+	}
+
+	SECTION("Whitespace/Trim")
+	{
+		rde::stringstream ss("1");
+		REQUIRE(ss.good() == true);
+
+		SECTION("A non-null string with strlen > 0 containing only whitespace characters != good()")
+		{
+			ss = rde::stringstream();
+			CHECK(ss.good() == false);
+
+			ss = rde::stringstream(" ");
+			CHECK(ss.good() == false);
+
+			ss = rde::stringstream("     ");
+			CHECK(ss.good() == false);
+
+			ss = rde::stringstream(" \t\r\n");
+			CHECK(ss.good() == false);
+		}
+	}
+
+	SECTION("Reset")
+	{
+		rde::stringstream ss("1");
+		REQUIRE(ss.good() == true);
+
+		ss.reset();
+		CHECK(ss.good() == false);
+
+		ss.reset("1");
+		CHECK(ss.good() == true);
+
+		ss.reset("");
+		CHECK(ss.good() == false);
+	}
+
+	SECTION("Operator bool and !bool")
+	{
+		bool isgood = false;
+		bool isbad = true;
+
+		SECTION("implicit bool conversions work as expected")
+		{
+			rde::stringstream ssGood("1");
+			CHECK(ssGood);
+
+			rde::stringstream ssBad("");
+			CHECK(!ssBad);
+
+			CHECK(rde::stringstream("1"));
+			CHECK(!rde::stringstream(""));
+		}
+
+		SECTION("ternary operator")
+		{
+			rde::stringstream ssGood("1");
+			rde::stringstream ssBad;
+
+			isgood = ssGood ? true : false;
+			isbad = !ssGood ? true : false;
+			CHECK(isgood == true);
+			CHECK(isbad == false);
+
+			isgood = ssBad ? true : false;
+			isbad = !ssBad ? true : false;
+			CHECK(isgood == false);
+			CHECK(isbad == true);
+		}
+
+		SECTION("if statement")
+		{
+			rde::stringstream ssGood("1");
+			if (ssGood)
+				isgood = true;
+			else isgood = false;
+			CHECK(isgood == true);
+
+			rde::stringstream ssBad;
+			if (ssBad)
+				isbad = false;
+			else isbad = true;
+			CHECK(isbad == true);
+		}
+
+		SECTION("inline assignment inside if statement")
+		{
+			rde::stringstream ss;
+
+			if ((ss = rde::stringstream("1")))
+				isgood = true;
+			else isgood = false;
+			REQUIRE(ss.good() == true);
+			CHECK(isgood == true);
+
+			if (!(ss = rde::stringstream("1")))
+				isgood = false;
+			else isgood = true;
+			REQUIRE(ss.good() == true);
+			CHECK(isgood == true);
+
+			if ((ss = rde::stringstream()))
+				isbad = false;
+			else isbad = true;
+			REQUIRE(ss.good() == false);
+			CHECK(isbad == true);
+
+			if (!(ss = rde::stringstream()))
+				isbad = true;
+			else isbad = false;
+			REQUIRE(ss.good() == false);
+			CHECK(isbad == true);
+		}
+
+		SECTION("illegal comparisons should not compile")
+		{
+			rde::stringstream ssGood("1");
+			rde::stringstream ssBad("");
+			bool shouldbefalse = false;
+
+			//
+			// NOTE:
+			// The following assertions should not compile!
+			// If tests build with them uncommented, that means
+			// the compiler is incorrectly performing an implicit conversion
+			// from `stringstream` to `bool` in order to satisfy an illegal
+			// comparison between different types. ~SK
+			//
+
+			//shouldbefalse = ssBad == false;
+			//shouldbefalse = ssBad != true;
+			//shouldbefalse = ssGood == true;
+			//shouldbefalse = ssGood != false;
+			//CHECK(ssGood == true);
+			//CHECK(ssBad == false);
+
+			REQUIRE(shouldbefalse == false);
+		}
+	}
+
+	SECTION("Output Operators with empty stringstream")
 	{
 		rde::stringstream ss("");
 		int x(123);
+
 		ss >> x;
 		REQUIRE(x == 123);
 
