@@ -202,6 +202,223 @@ TEST_CASE("sstream", "[string][stream]")
 		}
 	}
 
+	SECTION("Extraction operator>> - Extract formatted data from an input stream")
+	{
+		rde::stringstream ss;
+
+		SECTION("integer")
+		{
+			int16_t  i16Val(0);
+			uint16_t u16Val(0);
+			int32_t  i32Val(0);
+			uint32_t u32Val(0);
+			int64_t  i64Val(0);
+			//uint64_t u64Val(0);
+
+			SECTION("short")
+			{
+				ss.reset("0");
+				ss >> i16Val;
+				CHECK(0 == i16Val);
+
+				ss.reset("-32768");
+				ss >> i16Val;
+				CHECK(INT16_MIN == i16Val);
+
+				ss.reset("32767");
+				ss >> i16Val;
+				CHECK(INT16_MAX == i16Val);
+			}
+
+			SECTION("unsigned short")
+			{
+				ss.reset("0");
+				ss >> u16Val;
+				CHECK(0 == u16Val);
+
+				ss.reset("65535");
+				ss >> u16Val;
+				CHECK(UINT16_MAX == u16Val);
+			}
+
+			SECTION("mixed shorts")
+			{
+				ss.reset("-32768 32767 0 65535");
+
+				ss >> i16Val;
+				CHECK(INT16_MIN == i16Val);
+				ss >> i16Val;
+				CHECK(INT16_MAX == i16Val);
+				ss >> u16Val;
+				CHECK(0 == u16Val);
+				ss >> u16Val;
+				CHECK(UINT16_MAX == u16Val);
+			}
+
+			SECTION("int")
+			{
+				ss.reset("0");
+				ss >> i32Val;
+				CHECK(0 == i32Val);
+
+				ss.reset("-2147483648");
+				ss >> i32Val;
+				CHECK(INT32_MIN == i32Val);
+
+				ss.reset("2147483647");
+				ss >> i32Val;
+				CHECK(INT32_MAX == i32Val);
+			}
+
+			SECTION("unsigned int")
+			{
+				ss.reset("0");
+				ss >> u32Val;
+				CHECK(0 == u32Val);
+
+				ss.reset("4294967295");
+				ss >> u32Val;
+				CHECK(UINT32_MAX == u32Val);
+			}
+
+			SECTION("mixed ints")
+			{
+				ss.reset("-2147483648 2147483647 0 4294967295");
+
+				ss >> i32Val;
+				CHECK(INT32_MIN == i32Val);
+				ss >> i32Val;
+				CHECK(INT32_MAX == i32Val);
+				ss >> u32Val;
+				CHECK(0 == u32Val);
+				ss >> u32Val;
+				CHECK(UINT32_MAX == u32Val);
+			}
+
+			SECTION("long long")
+			{
+				ss.reset("0");
+				ss >> i64Val;
+				CHECK(0 == i64Val);
+
+				ss.reset("-9223372036854775808");
+				ss >> i64Val;
+				CHECK(INT64_MIN == i64Val);
+
+				ss.reset("9223372036854775807");
+				ss >> i64Val;
+				CHECK(INT64_MAX == i64Val);
+			}
+
+			// TODO: unsigned long long (_ULonglong)
+			//SECTION("unsigned long long")
+			//{
+			//	REQUIRE(0 == u64Val);
+			//
+			//	ss.reset("0");
+			//	ss >> u64Val;
+			//	CHECK(0 == u64Val);
+			//
+			//	ss.reset("18446744073709551615");
+			//	ss >> u64Val;
+			//	CHECK(UINT64_MAX == u64Val);
+			//}
+
+			SECTION("mixed long long")
+			{
+				ss.reset("-9223372036854775808 9223372036854775807");
+				//ss.reset("-9223372036854775808 9223372036854775807 0 18446744073709551615");
+
+				ss >> i64Val;
+				CHECK(INT64_MIN == i64Val);
+				ss >> i64Val;
+				CHECK(INT64_MAX == i64Val);
+				//ss >> u64Val;
+				//CHECK(0 == u64Val);
+				//ss >> u64Val;
+				//CHECK(UINT64_MAX == u64Val);
+			}
+		}
+
+		SECTION("floating point")
+		{
+			float       fltVal(0.0f);
+			double      dblVal(0.0);
+			long double ldblVal(0.0);
+
+			SECTION("float")
+			{
+				ss.reset("1.192092896e-07f");
+				ss >> fltVal;
+				CHECK(FLT_EPSILON == fltVal);
+
+				ss.reset("-3.402823466e+38f");
+				ss >> fltVal;
+				CHECK(-FLT_MAX == fltVal);
+
+				ss.reset("1.175494351e-38f");
+				ss >> fltVal;
+				CHECK(FLT_MIN == fltVal);
+
+				ss.reset("3.402823466e+38f");
+				ss >> fltVal;
+				CHECK(FLT_MAX == fltVal);
+			}
+
+			SECTION("double")
+			{
+				ss.reset("2.2204460492503131e-016");
+				ss >> dblVal;
+				CHECK(DBL_EPSILON == dblVal);
+
+				ss.reset("-1.7976931348623158e+308");
+				ss >> dblVal;
+				CHECK(-DBL_MAX == dblVal);
+
+				ss.reset("2.2250738585072014e-308");
+				ss >> dblVal;
+				CHECK(DBL_MIN == dblVal);
+
+				ss.reset("1.7976931348623158e+308");
+				ss >> dblVal;
+				CHECK(DBL_MAX == dblVal);
+			}
+
+			SECTION("long double")
+			{
+				ss.reset("2.2204460492503131e-016");
+				ss >> ldblVal;
+				CHECK(LDBL_EPSILON == ldblVal);
+
+				ss.reset("-1.7976931348623158e+308");
+				ss >> ldblVal;
+				CHECK(-LDBL_MAX == ldblVal);
+
+				ss.reset("2.2250738585072014e-308");
+				ss >> ldblVal;
+				CHECK(LDBL_MIN == ldblVal);
+
+				ss.reset("1.7976931348623158e+308");
+				ss >> ldblVal;
+				CHECK(LDBL_MAX == ldblVal);
+			}
+		}
+
+		SECTION("boolean")
+		{
+			bool bVal(false);
+			REQUIRE(false == bVal);
+
+			ss.reset("1");
+			ss >> bVal;
+			CHECK(true == bVal);
+
+			ss.reset("0");
+			ss >> bVal;
+			CHECK(false == bVal);
+		}
+	}
+
 	SECTION("Original tests")
 	{
 		SECTION("Extraction operators with empty stringstream")
