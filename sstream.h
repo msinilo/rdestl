@@ -19,9 +19,10 @@ namespace rde
 /**
  * this is a super cut down replacement for std::stringstream
  * current limitations:
- * - only converts from string -> primitve type
- * - only supports signed int, signed long, float and rde::string
- * - no support for unsigned word types
+ * - only converts from rde::string -> arithmetic types
+ * - supports bool, short, ushort, int/long, uint/ulong, long long, float, double, and long double
+ * - unsigned long long (_ULonglong/unsigned __int64) not currently supported
+ * - long double values are treated as doubles
  * - untested unicode support, no support for custom allocator
  * - supports only narrow conversions (8-bit char size)
  */
@@ -48,21 +49,76 @@ struct basic_stringstream
 		init(inp);
 	}
 
-	// Output operators
+	// Extraction operator>> (input)
 
-	basic_stringstream& operator>>(int& x) {
-		if (next()) { x = static_cast<int>(atoi(current.c_str())); }
+	basic_stringstream& operator>>(short& x)
+	{
+		if (next()) { x = static_cast<short>(atoi(current.c_str())); }
 		return *this;
 	}
-	basic_stringstream& operator>>(long& x) {
-		if (next()) { x = static_cast<long>(atol(current.c_str())); }
+	basic_stringstream& operator>>(unsigned short& x)
+	{
+		if (next()) { x = static_cast<unsigned short>(atoi(current.c_str())); }
 		return *this;
 	}
-	basic_stringstream& operator>>(float& x) {
+	basic_stringstream& operator>>(int& x)
+	{
+		if (next()) { x = static_cast<int>(atoll(current.c_str())); }
+		return *this;
+	}
+	basic_stringstream& operator>>(unsigned int& x)
+	{
+		if (next()) { x = static_cast<unsigned int>(atoll(current.c_str())); }
+		return *this;
+	}
+	basic_stringstream& operator>>(long& x)
+	{
+		if (next()) { x = static_cast<long>(atoll(current.c_str())); }
+		return *this;
+	}
+	basic_stringstream& operator>>(unsigned long& x)
+	{
+		if (next()) { x = static_cast<unsigned long>(atoll(current.c_str())); }
+		return *this;
+	}
+	basic_stringstream& operator>>(long long& x)
+	{
+		if (next()) { x = static_cast<long long>(atoll(current.c_str())); }
+		return *this;
+	}
+
+	// TODO unsigned long long (_ULonglong)
+	basic_stringstream& operator>>(unsigned long long& x)
+	{
+		static_assert(false == true, "unsigned 64-bit types not supported");
+		(void)x;
+		return *this;
+	}
+
+	basic_stringstream& operator>>(float& x)
+	{
 		if (next()) { x = static_cast<float>(atof(current.c_str())); }
 		return *this;
 	}
-	basic_stringstream& operator>>(rde::string& x) {
+	basic_stringstream& operator>>(double& x)
+	{
+		if (next()) { x = static_cast<double>(atof(current.c_str())); }
+		return *this;
+	}
+	basic_stringstream& operator>>(long double& x)
+	{
+		if (next()) { x = static_cast<double>(atof(current.c_str())); }
+		return *this;
+	}
+
+	basic_stringstream& operator>>(bool& x)
+	{
+		if (next()) { x = static_cast<bool>(atoi(current.c_str())); }
+		return *this;
+	}
+
+	basic_stringstream& operator>>(rde::string& x)
+	{
 		if (next()) { x = current; }
 		return *this;
 	}
