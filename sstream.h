@@ -1,8 +1,10 @@
 /**
- by Danushka Abeysuriya aka. 'silvermace'
- Contact: silvermace@gmail.com
- Last Edit 18 May 2010
-*/
+ * by Danushka Abeysuriya aka. 'silvermace'
+ * Contact: silvermace@gmail.com
+ *
+ * Edited 18 May 2010 by silvermace
+ * Edited 25 April 2022 by Stelio Kontos
+ */
 
 #ifndef RDESTL_STRINGSTREAM_H
 #define RDESTL_STRINGSTREAM_H
@@ -35,13 +37,14 @@ struct basic_stringstream
 	explicit basic_stringstream(const value_type* inp) { init(inp); }
 	explicit basic_stringstream(const string_type& inp) { init(inp.c_str()); }
 
-	bool good() const 				{ return !buffer.empty() ? cursor != buffer.end() : false; }
-	bool eof() const 				{ return !good(); }
+	bool good() const { return !buffer.empty() ? cursor != buffer.end() : false; }
+	bool eof() const { return !good(); }
 
-	explicit operator bool() const 	{ return good(); }
+	explicit operator bool() const { return good(); }
 
 	void reset() { init(nullptr); }
-	void reset(const value_type* inp) {
+	void reset(const value_type* inp)
+	{
 		init(inp);
 	}
 
@@ -68,7 +71,8 @@ private:
 	//Setup our data buffer and cursor
 	void init(const value_type* inp)
 	{
-		if (!inp || !strlen(inp)) {
+		if (!inp || !strlen(inp))
+		{
 			cursor = buffer.end();
 			return;
 		}
@@ -80,13 +84,15 @@ private:
 		ltrim();
 	}
 
-	bool is_whitespace(const value_type& ch) const {
+	bool is_whitespace(const value_type& ch) const
+	{
 		// TODO whitespace can mean different things based on locale
 		return (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n');
 	}
 
 	//Trim whitespace from the left->right
-	void ltrim() {
+	void ltrim()
+	{
 		while (is_whitespace(*cursor))
 			++cursor;
 	}
@@ -98,11 +104,14 @@ private:
 			return false;
 
 		current.clear();
-		for (; cursor != buffer.end(); ++cursor) {
-			if (!is_whitespace(*cursor)) {
+		for (; cursor != buffer.end(); ++cursor)
+		{
+			if (!is_whitespace(*cursor))
+			{
 				current.append(*cursor);
 			}
-			else {
+			else
+			{
 				ltrim();
 				break;
 			}
