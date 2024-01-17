@@ -532,16 +532,10 @@ private:
 
 	bool compare_key(const node* n, const key_type& key, hash_value_t hash) const
 	{
-		return compare_key_internal(n, key, hash, int_to_type<has_cheap_compare<key_type>::value>());
-	}
-	bool compare_key_internal(const node* n, const key_type& key, hash_value_t, int_to_type<true>) const
-	{
-		return m_keyEqualFunc(key, n->data.first);
-	}
-	bool compare_key_internal(const node* n, const key_type& key, hash_value_t hash, int_to_type<false>) const
-	{
+		// Tempting to skip the hash comparison, but it's needed for detecting erased nodes.
 		return hash == n->hash && m_keyEqualFunc(key, n->data.first);
 	}
+	
 	node*			m_nodes;
 	size_type		m_size;
 	size_type		m_capacity;
