@@ -14,6 +14,7 @@
 namespace rde
 {
 
+
 // Load factor is 7/8th.
 template<typename TKey, typename TValue,
 	class THashFunc		= rde::hash<TKey>,
@@ -49,8 +50,8 @@ public:
 		typedef forward_iterator_tag    iterator_category;
 
 		explicit node_iterator(TNodePtr node, const hash_map* map)
-			: m_node(node),
-			m_map(map)
+		: m_node(node),
+		  m_map(map)
 		{
 			/**/
 		}
@@ -393,13 +394,13 @@ private:
 		std::uint32_t i = hash & m_capacityMask;
 
 		node* n = m_nodes + i;
-		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
+		if (compare_key(n, key, hash))
 			return n;
 
 		node* freeNode(0);
 		if (n->is_deleted())
 			freeNode = n;
-		std::uint32_t numProbes(1);
+		std::uint32_t numProbes = 1;
 		// Guarantees loop termination.
 		RDE_ASSERT(m_numUsed < m_capacity);
 		while (!n->is_unused())
@@ -408,7 +409,7 @@ private:
 			n = m_nodes + i;
 			if (compare_key(n, key, hash))
 				return n;
-			if (n->is_deleted() && freeNode == 0)
+			if (freeNode == nullptr && n->is_deleted())
 				freeNode = n;
 			++numProbes;
 		}
@@ -419,7 +420,7 @@ private:
 		const hash_value_t hash = hash_func(key);
 		std::uint32_t i = hash & m_capacityMask;
 		node* n = m_nodes + i;
-		if (n->hash == hash && m_keyEqualFunc(key, n->data.first))
+		if (compare_key(n, key, hash))
 			return n;
 
 		std::uint32_t numProbes(1);
@@ -529,11 +530,18 @@ private:
 		return true;
 	}
 
-	RDE_FORCEINLINE bool compare_key(const node* n, const key_type& key, hash_value_t hash) const
+	bool compare_key(const node* n, const key_type& key, hash_value_t hash) const
 	{
-		return (n->hash == hash && m_keyEqualFunc(key, n->data.first));
+		return compare_key_internal(n, key, hash, int_to_type<has_cheap_compare<key_type>::value>());
 	}
-
+	bool compare_key_internal(const node* n, const key_type& key, hash_value_t, int_to_type<true>) const
+	{
+		return m_keyEqualFunc(key, n->data.first);
+	}
+	bool compare_key_internal(const node* n, const key_type& key, hash_value_t hash, int_to_type<false>) const
+	{
+		return hash == n->hash && m_keyEqualFunc(key, n->data.first);
+	}
 	node*			m_nodes;
 	size_type		m_size;
 	size_type		m_capacity;
