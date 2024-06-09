@@ -29,8 +29,9 @@ public:
 //private:
 	struct node
 	{
-		static const hash_value_t kUnusedHash       = 0xFFFFFFFF;
-		static const hash_value_t kDeletedHash      = 0xFFFFFFFE;
+		static const hash_value_t kUnusedHash       = ~hash_value_t(0);
+		static const hash_value_t kDeletedHash      = kUnusedHash - 1;
+		static const hash_value_t kHashMask         = kDeletedHash - 1;
 
 		node(): hash(kUnusedHash) {}
 
@@ -519,7 +520,7 @@ private:
 
 	RDE_FORCEINLINE hash_value_t hash_func(const key_type& key) const
 	{
-		const hash_value_t h = m_hashFunc(key) & 0xFFFFFFFD;
+		const hash_value_t h = m_hashFunc(key) & node::kHashMask;
 		//RDE_ASSERT(h < node::kDeletedHash);
 		return h;
 	}
